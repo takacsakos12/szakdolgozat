@@ -1,0 +1,23 @@
+Kaszinó játékok:
+1. saját készítésű nyerőgép (slot)
+2. rouelette
+3. blackjack
+4. Baccarat
+
+Statisztikai vizsgálatok:
+- Nyerőgépre:
+1. Elméleti RTP (Matematikai számítás)
+2. Empirikus RTP szimulációval ( 1 vagy 10 millió pörgetés után)
+3. Volatalitás (nyeremények szórása)
+-Roulette:
+1. Valószínűségek ellenőrzése
+2. Ház előnye
+3. Ismert stratégiák elemzése
+-Blackjack:
+1. Alap valószínűségek
+2. Ház előnye
+3. Stratégiák vizsgálata
+-Baccarat:
+1. 1M leosztás után RTP-k vizsgálata
+2. Elméleti RTP
+Konvergencia minden játékhoz: 1millió játék után mennyire közelít az elméleti RTPhez.
