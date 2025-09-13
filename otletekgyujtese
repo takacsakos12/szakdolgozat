@@ -1,6 +1,7 @@
-Felhasználó rendszer, ahol le lehet követni a megjátszott téteket, játékokat, nyereményeket.
+MEAN stack
+Webes Felhasználó rendszer, ahol le lehet követni a megjátszott téteket, játékokat, nyereményeket.
 Adatok titkosítása.
-
+Provably fair rendszer használata.
 Kaszinó játékok:
 1. saját készítésű nyerőgép (slot)
 2. rouelette
@@ -26,4 +27,4 @@ Statisztikai vizsgálatok:
 Konvergencia minden játékhoz: 1millió játék után mennyire közelít az elméleti RTPhez.
 
 Cím ötletek:
-- Webalapú kaszinójátékok fejlesztése biztonságos hitelesítéssel és statisztikai elemzéssel
+- Webalapú kaszinójátékok fejlesztése statisztikai elemzéssel.
