@@ -1,0 +1,56 @@
+flowchart TD
+    A[Start] --> B[Tét megadása]
+    B --> C[Kezdő osztás<br/>Játékos két lap<br/>Dealer egy lap felfelé és egy lefordítva]
+
+    C --> D{Játékosnak blackjack?}
+    D -->|Igen| E[Dealer lefordított lapjának felfedése]
+    D -->|Nem| J[Játékos köre]
+
+    E --> F{Dealernek is blackjack?}
+    F -->|Igen| G[Push<br/>Tét visszajár]
+    F -->|Nem| H[Játékos nyer blackjackkel]
+
+    G --> Z[Leosztás vége]
+    H --> Z
+
+    %% JÁTÉKOS KÖRE
+    J --> K{Játékos döntése}
+    K -->|Hit| L[Új lap húzása]
+    K -->|Stand| M[Dealer köre következik]
+    K -->|Double| N[Tét duplázása<br/>Egy lap húzása<br/>Játékos köre véget ér]
+    K -->|Split| S[Két külön kéz<br/>mindkettő ugyanilyen döntést követ]
+
+    %% HIT ÁG
+    L --> O{Összérték > 21?}
+    O -->|Igen| P[Játékos bust<br/>Tét elveszik]
+    O -->|Nem| K
+
+    %% DOUBLE ÁG – KÜLÖN ROMBUSZ, CSAK LEFELÉ
+    N --> T{Összérték > 21?}
+    T -->|Igen| P
+    T -->|Nem| M
+
+    %% SPLIT VISSZA A DÖNTÉSHEZ
+    S --> K
+
+    P --> Z
+
+    %% DEALER KÖRE JOBB OLDALT
+    subgraph Dealer_kore
+        direction TB
+        M --> Q[Dealer felfedi a lefordított lapot]
+        Q --> U[Dealer húz amíg 16 vagy kevesebb<br/>17-től mindig áll]
+        U --> V{Dealer > 21?}
+        V -->|Igen| W[Dealer bust<br/>Játékos nyer]
+        V -->|Nem| X[Összehasonlítás<br/>Játékos és Dealer között]
+        X --> Y{Játékos nagyobb?}
+        Y -->|Igen| AA[Játékos nyer<br/>1 az 1 kifizetés]
+        Y -->|Nem| AB{Egyenlő az érték?}
+        AB -->|Igen| AD[Push<br/>Tét visszajár]
+        AB -->|Nem| AC[Dealer nyer<br/>Tét elveszik]
+    end
+
+    W --> Z
+    AA --> Z
+    AC --> Z
+    AD --> Z

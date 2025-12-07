@@ -1,0 +1,23 @@
+flowchart TD
+    A[Start] --> B[Tét megadása]
+    B --> C[Spin gomb megnyomása]
+    C --> D[Tárcsák pörgetése]
+    D --> E[Tárcsák megállnak és a szimbólumok megjelennek]
+    E --> F[Nyerővonalak ellenőrzése]
+
+    F --> G{Van nyerő kombináció}
+    G -->|Igen| H[Kifizetés a paytable alapján]
+    G -->|Nem| I[Nincs nyeremény]
+
+    E --> J{Megjelent legalább három Scatter}
+    J -->|Igen| K[Bónusz játék aktiválása]
+    J -->|Nem| L[Normál kör vége]
+
+    K --> M[Bónusz játék indítása ingyen pörgetés vagy minijáték]
+    M --> N[Bónusz pörgetések lejátszása saját szabályokkal]
+    N --> O[Bónusz nyeremény hozzáadása az alapjátékhoz]
+
+    H --> P[Játék vége új kör]
+    I --> P
+    L --> P
+    O --> P

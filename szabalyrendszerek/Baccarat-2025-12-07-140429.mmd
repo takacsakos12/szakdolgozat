@@ -1,0 +1,29 @@
+flowchart TD
+    A([Start]) --> B[Játékos tétet tesznek:<br/>Player / Banker / Tie]
+    B --> C[2 lap a Player kéznek,<br/>2 lap a Banker kéznek<br/>RNG / online osztás]
+    C --> D[Mindkét kéz pontszámának<br/>kiszámítása 0–9-ig<br/>10,J,Q,K = 0, A = 1,<br/>>=10 esetén csak az utolsó számjegy számít]
+
+    D --> E{Van-e natural 8 vagy 9<br/>bármelyik kéznél?}
+    E -->|Igen| F[Azonnali döntés:<br/>magasabb pontszámú kéz nyer;<br/>egyenlő esetén Tie]
+    E -->|Nem| G[Player húzási szabály<br/>alkalmazása]
+
+    %% Player rule
+    G --> H{Player első két lapjának<br/>összege 0–5?}
+    H -->|Igen| I[Player húz egy harmadik lapot]
+    H -->|Nem 6 vagy 7| J[Player nem húz<br/>további lapot]
+
+    %% Banker rule – online verzió, táblázat szerint
+    I --> K[Banker húzási szabályainak<br/>alkalmazása a standard táblázat szerint<br/>Banker 0–2 mindig húz,<br/>7 vagy többnél áll,<br/>3–6 esetén a Player<br/>harmadik lapjától függ a döntés]
+    J --> K[Ha a Player nem húzott,<br/>Banker 0–5 esetén húzhat,<br/>6–7 esetén áll]
+
+    K --> L[Player és Banker végső<br/>pontszámának összehasonlítása]
+    L --> M{Ki van közelebb 9-hez<br/>túllépés nélkül?}
+
+    M -->|Player| N[Player kéz nyer:<br/>Player-re tett tétek<br/>1:1 arányban fizetnek]
+    M -->|Banker| O[Banker kéz nyer:<br/>Banker-re tett tétek<br/>1:1 arányban fizetnek,<br/>de a nyeremény bizonyos része<br/>pl. 5% jutalékként levonható]
+    M -->|Tie| P[Tie döntetlen:<br/>Tie-re tett tétek<br/>pl. 8:1 arányban fizetnek;<br/>a Player/Banker tétek push-olódnak<br/>visszajárnak a játékosnak]
+
+    F --> Q([Játék vége / új leosztás kezdhető])
+    N --> Q
+    O --> Q
+    P --> Q

@@ -1,0 +1,12 @@
+flowchart TD
+    A[Start] --> B[Tét megtétele például szín páros páratlan szám]
+    B --> C[A rulettkerék megpörgetése]
+    C --> D[A golyó megáll egy számon]
+    D --> E[A tétek összevetése a nyerő számmal]
+
+    E --> F{A tét egyezik a nyerő eredménnyel}
+    F -->|Igen| G[Kifizetés az odds szerint]
+    F -->|Nem| H[A tét elveszik]
+
+    G --> I[Játék vége új kör]
+    H --> I
