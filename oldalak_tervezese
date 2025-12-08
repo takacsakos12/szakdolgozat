@@ -1,0 +1,13 @@
+Egy folyamatos header, balról-jobbra legyen rajta egy ikon ami vissza visz a főoldalra, a játékokra, statisztikákra, provably fair magyarázatra  irányítás. Ha nincs felhasználó bejelentkezve akkor regisztráció és belépés gomb, ha be van akkor egy profil gomb, ami az adatokra, játéktörténet statisztikára visz. Ez legyen minden oldalon rajta.
+
+Oldalak és tartalmuk:
+Főoldal: a rendszer bemutatása, információk.
+Bejelentkezés vagy regisztráció: a Bejelentkezés és regisztráció megvalósítása
+Roulette: egy egyszerű rulett játék megvalósítása.
+blackjack: egy egyszerű blackjack játék megvalósítása.
+baccarat: egy egyszerű baccarat játék megvalósítása.
+slotok: egyszerű slot játék megvalósítása.
+Statisztika: a számítások leírása, példákkal.
+provably fair magyarázat: a provably fair működésének részletes leírása.
+felhasználói profil: a felhasználó adatai, játéktörténet, statisztikák megjelenítése.
+Esetleg admin oldal: felhasználók kezelése, játékok statisztikái.
