@@ -1,38 +1,727 @@
-.App {
-  text-align: center;
+:root {
+  --background: #0d0e10;
+  --background-soft: #121315;
+  --surface: #181a1e;
+  --surface-light: #202226;
+  --surface-hover: #272a2f;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.17);
+  --text: #f5f5f5;
+  --muted: #a0a1a5;
+  --primary: #f5c542;
+  --primary-light: #ffda62;
+  --primary-dark: #c99a18;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
 }
 
-.App-header {
-  background-color: #282c34;
+body {
+  background: var(--background);
+  color: var(--text);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app {
   min-height: 100vh;
+  overflow-x: clip;
+}
+
+/* Fejléc */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns:
+    minmax(270px, 1fr)
+    minmax(430px, 1.5fr)
+    minmax(270px, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 88px;
+  padding: 0 5%;
+  background: rgba(13, 14, 16, 0.96);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  width: fit-content;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  color: #17130a;
+  background: var(--primary);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.brand-text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+}
+
+.brand-text strong {
+  color: var(--text);
+  font-size: 19px;
+  letter-spacing: -0.4px;
+}
+
+.brand-text small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.navigation {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-self: stretch;
+  gap: clamp(24px, 3vw, 52px);
 }
 
-.App-link {
-  color: #61dafb;
+.navigation a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: #c6c6c9;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 0.2s ease;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.navigation a::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--primary);
+  content: "";
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.navigation a:hover {
+  color: var(--primary);
+}
+
+.navigation a:hover::after {
+  transform: scaleX(1);
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+}
+
+/* Gombok */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 19px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.button-primary {
+  color: #17130a;
+  background: var(--primary);
+}
+
+.button-primary:hover {
+  background: var(--primary-light);
+}
+
+.button-secondary {
+  background: var(--surface-light);
+  border-color: var(--border);
+}
+
+.button-secondary:hover,
+.button-ghost:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.button-ghost {
+  color: #d2d2d5;
+  border-color: var(--border);
+}
+
+.button-large {
+  min-height: 50px;
+  padding: 0 23px;
+}
+
+/* Nyitóblokk */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  align-items: center;
+  gap: 70px;
+  min-height: 480px;
+  padding: 58px 8%;
+  background:
+    radial-gradient(
+      circle at 75% 30%,
+      rgba(245, 197, 66, 0.1),
+      transparent 28%
+    ),
+    var(--background);
+}
+
+.hero-content {
+  max-width: 750px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 800px;
+  margin-bottom: 18px;
+  font-size: clamp(42px, 5vw, 66px);
+  line-height: 1.02;
+  letter-spacing: -2.8px;
+}
+
+h1 span {
+  display: block;
+  color: var(--primary);
+}
+
+h2 {
+  margin-bottom: 11px;
+  font-size: clamp(27px, 3vw, 36px);
+  letter-spacing: -1.2px;
+}
+
+.hero-description {
+  max-width: 700px;
+  margin-bottom: 25px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Készítő adatai */
+
+.author-information {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 2px;
+  width: fit-content;
+  margin-top: 28px;
+  padding-left: 15px;
+  border-left: 3px solid var(--primary);
+}
+
+.author-information > span {
+  grid-row: 1 / 3;
+  padding-right: 12px;
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.author-information strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.author-information small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Projektbemutató panel */
+
+.project-panel {
+  padding: 30px;
+  background: linear-gradient(
+    145deg,
+    rgba(32, 34, 38, 0.97),
+    rgba(18, 19, 21, 0.97)
+  );
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.4);
+}
+
+.project-panel-heading {
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-panel-heading .eyebrow {
+  margin-bottom: 6px;
+}
+
+.project-panel-heading h2 {
+  margin-bottom: 0;
+  font-size: 27px;
+}
+
+.project-introduction {
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.project-goals {
+  display: grid;
+  gap: 9px;
+}
+
+.project-goals > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.goal-number {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: #17130a;
+  background: var(--primary);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.project-goals strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+
+.project-goals p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* Játékok */
+
+.games-section {
+  padding: 55px 8% 60px;
+  background: var(--background-soft);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+}
+
+.section-heading p {
+  max-width: 530px;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.game-card {
+  display: grid;
+  grid-template-rows: 85px 1fr;
+  min-height: 190px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.game-card:hover {
+  border-color: rgba(245, 197, 66, 0.42);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+  transform: translateY(-5px);
+}
+
+.game-code {
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(245, 197, 66, 0.1),
+      rgba(245, 197, 66, 0.01)
+    ),
+    var(--background-soft);
+  border-bottom: 1px solid var(--border);
+  font-size: 31px;
+  font-weight: 900;
+  letter-spacing: -1.4px;
+}
+
+.game-information {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.game-status {
+  margin-bottom: 7px;
+  color: var(--primary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.game-card h3 {
+  margin-bottom: 7px;
+  font-size: 19px;
+}
+
+.game-card p {
+  margin-bottom: 15px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.game-button {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding: 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  font-weight: 700;
+}
+
+.game-button span:last-child {
+  color: var(--primary);
+  transition: transform 0.2s ease;
+}
+
+.game-button:hover span:last-child {
+  transform: translateX(4px);
+}
+
+/* Statisztika és provably fair */
+
+.information-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 60px 8%;
+}
+
+.information-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 230px;
+  padding: 32px;
+  background: linear-gradient(
+    140deg,
+    rgba(29, 31, 35, 0.98),
+    rgba(18, 19, 21, 0.98)
+  );
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.information-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 13px;
+}
+
+.card-index {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #17130a;
+  background: var(--primary);
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.information-heading h2 {
+  margin-bottom: 0;
+  font-size: 25px;
+}
+
+.information-card > p {
+  margin-bottom: 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.text-button {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding: 18px 0 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
+}
+
+.text-button span {
+  color: var(--primary);
+}
+
+/* Lábléc */
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 30px 8%;
+  color: var(--muted);
+  background: var(--background-soft);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+}
+
+.footer .brand-mark {
+  width: 38px;
+  height: 38px;
+  font-size: 12px;
+}
+
+.footer .brand-text strong {
+  font-size: 15px;
+}
+
+.footer p {
+  margin: 0 auto 0 0;
+}
+
+/* Reszponzív megjelenés */
+
+@media (max-width: 1100px) {
+  .header {
+    grid-template-columns: 1fr auto;
   }
-  to {
-    transform: rotate(360deg);
+
+  .navigation {
+    display: none;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .result-panel {
+    width: 100%;
+  }
+
+  .information-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .information-card {
+    min-height: auto;
+  }
+
+  .text-button {
+    margin-top: 25px;
+  }
+}
+
+@media (max-width: 650px) {
+  html {
+    scroll-padding-top: 76px;
+  }
+
+  .header {
+    min-height: 76px;
+    padding: 0 4%;
+  }
+
+  .brand-mark {
+    width: 39px;
+    height: 39px;
+    font-size: 12px;
+  }
+
+  .brand-text strong {
+    font-size: 15px;
+  }
+
+  .brand-text small {
+    display: none;
+  }
+
+  .auth-actions .button-ghost {
+    display: none;
+  }
+
+  .auth-actions .button {
+    min-height: 38px;
+    padding: 0 11px;
+    font-size: 11px;
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 50px 6%;
+  }
+
+  h1 {
+    font-size: 43px;
+    letter-spacing: -2px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .games-section {
+    padding: 50px 6%;
+  }
+
+  .section-heading {
+    display: block;
+  }
+
+  .section-heading p {
+    margin-top: 13px;
+  }
+
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .information-grid {
+    padding: 50px 6%;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .verification-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 30px 6%;
+  }
+
+  .footer p {
+    margin: 0;
   }
 }
