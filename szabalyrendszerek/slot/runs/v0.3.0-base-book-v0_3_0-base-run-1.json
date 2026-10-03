@@ -1,0 +1,51 @@
+{
+  "configVersion": "0.3.0",
+  "mode": "base-book",
+  "seed": "v0.3.0-base-run-1",
+  "roundCount": 10000000,
+  "lineBet": 1,
+  "totalWager": 100000000,
+  "totalWin": 95804108,
+  "rtpPercent": 95.804108,
+  "baseGameRtpPercent": 89.695455,
+  "naturalBonusRtpPercent": 6.108653,
+  "bonusBuyCostMultiplier": null,
+  "hitRatePercent": 22.966420000000003,
+  "bonusTriggerRatePercent": 0.16585,
+  "bonusTriggers": 16585,
+  "averageBonusWin": 368.32396744045826,
+  "averagePurchasedBonusWin": null,
+  "averageBonusSpins": 10.164606572203798,
+  "bonusRetriggers": 273,
+  "maximumWin": 42050,
+  "maximumWinMultiplier": 4205,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 2654,
+  "winsAtLeast500x": 70,
+  "winsAtLeast1000x": 11,
+  "winsAtLeast2000x": 4,
+  "standardDeviation": 5.844593180107604,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 119
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 96.631
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.6759
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.93781
+    },
+    {
+      "rounds": 10000000,
+      "rtpPercent": 95.804108
+    }
+  ],
+  "createdAt": "2026-09-28T08:30:57.883Z"
+}

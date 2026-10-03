@@ -1,0 +1,37 @@
+{
+  "configVersion": "0.4.1",
+  "mode": "bonus-choice",
+  "selectedSymbol": "JACK",
+  "seed": "v0.4.1-jack-run-2",
+  "roundCount": 1000000,
+  "totalWager": 1000000000,
+  "totalWin": 958805437,
+  "rtpPercent": 95.8805437,
+  "hitRatePercent": 93.83930000000001,
+  "maximumWinMultiplier": 1393.8,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 264969,
+  "winsAtLeast500x": 22699,
+  "winsAtLeast1000x": 69,
+  "winsAtLeast2000x": 0,
+  "standardDeviation": 1.3385914900608962,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 96.9504
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 96.38005
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.697398
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.8805437
+    }
+  ],
+  "createdAt": "2026-09-29T09:22:41.276Z"
+}

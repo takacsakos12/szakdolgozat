@@ -1,0 +1,37 @@
+{
+  "configVersion": "0.4.1",
+  "mode": "bonus-choice",
+  "selectedSymbol": "KING",
+  "seed": "v0.4.1-king",
+  "roundCount": 1000000,
+  "totalWager": 1000000000,
+  "totalWin": 964713022,
+  "rtpPercent": 96.4713022,
+  "hitRatePercent": 93.022,
+  "maximumWinMultiplier": 1582.8,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 247553,
+  "winsAtLeast500x": 18568,
+  "winsAtLeast1000x": 517,
+  "winsAtLeast2000x": 0,
+  "standardDeviation": 1.492597877659623,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 93.717
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 98.1758
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 96.682938
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 96.4713022
+    }
+  ],
+  "createdAt": "2026-09-29T09:14:07.704Z"
+}

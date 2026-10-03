@@ -1,0 +1,33 @@
+{
+  "configVersion": "0.4.0",
+  "mode": "bonus-choice",
+  "selectedSymbol": "ACE",
+  "seed": "v0.4.0-ace",
+  "roundCount": 100000,
+  "totalWager": 100000000,
+  "totalWin": 102886889,
+  "rtpPercent": 102.886889,
+  "hitRatePercent": 92.822,
+  "maximumWinMultiplier": 1909.3,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 33852,
+  "winsAtLeast500x": 3578,
+  "winsAtLeast1000x": 63,
+  "winsAtLeast2000x": 0,
+  "standardDeviation": 1.6552113429789237,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 107.82050000000001
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 104.13456000000001
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 102.886889
+    }
+  ],
+  "createdAt": "2026-09-28T12:14:09.741Z"
+}

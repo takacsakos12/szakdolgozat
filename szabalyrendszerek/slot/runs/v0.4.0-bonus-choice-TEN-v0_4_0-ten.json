@@ -1,0 +1,33 @@
+{
+  "configVersion": "0.4.0",
+  "mode": "bonus-choice",
+  "selectedSymbol": "TEN",
+  "seed": "v0.4.0-ten",
+  "roundCount": 100000,
+  "totalWager": 100000000,
+  "totalWin": 101155559,
+  "rtpPercent": 101.155559,
+  "hitRatePercent": 94.87400000000001,
+  "maximumWinMultiplier": 1205,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 28439,
+  "winsAtLeast500x": 1903,
+  "winsAtLeast1000x": 8,
+  "winsAtLeast2000x": 0,
+  "standardDeviation": 1.3506076817125185,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 96.2255
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 99.62377000000001
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 101.155559
+    }
+  ],
+  "createdAt": "2026-09-28T12:07:27.454Z"
+}

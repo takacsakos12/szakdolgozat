@@ -1,0 +1,37 @@
+{
+  "configVersion": "0.4.1",
+  "mode": "bonus-choice",
+  "selectedSymbol": "SCARAB",
+  "seed": "v0.4.1-scarab-run-2",
+  "roundCount": 1000000,
+  "totalWager": 1000000000,
+  "totalWin": 957493577,
+  "rtpPercent": 95.7493577,
+  "hitRatePercent": 91.18039999999999,
+  "maximumWinMultiplier": 2666.6,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 199517,
+  "winsAtLeast500x": 55981,
+  "winsAtLeast1000x": 4603,
+  "winsAtLeast2000x": 24,
+  "standardDeviation": 2.033750060462678,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 97.731
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 94.04625
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.401839
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.7493577
+    }
+  ],
+  "createdAt": "2026-09-29T09:34:31.858Z"
+}

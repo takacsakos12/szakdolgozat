@@ -1,0 +1,37 @@
+{
+  "configVersion": "0.4.2",
+  "mode": "bonus-choice",
+  "selectedSymbol": "PHARAOH",
+  "seed": "v0.4.2-pharaoh-run-4",
+  "roundCount": 1000000,
+  "totalWager": 1000000000,
+  "totalWin": 950200978,
+  "rtpPercent": 95.0200978,
+  "hitRatePercent": 92.9874,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 1898,
+  "winsAtLeast100x": 87001,
+  "winsAtLeast500x": 74837,
+  "winsAtLeast1000x": 21624,
+  "winsAtLeast2000x": 12105,
+  "standardDeviation": 3.9320646680684423,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 99.3152
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 98.63858
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 93.779709
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.0200978
+    }
+  ],
+  "createdAt": "2026-09-29T12:07:33.303Z"
+}

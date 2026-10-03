@@ -1,0 +1,43 @@
+{
+  "configVersion": "0.2.0",
+  "seed": "v0.2.1-run-2",
+  "spinCount": 10000000,
+  "totalBet": 100000000,
+  "totalWin": 95798452.38001937,
+  "baseGameWin": 86071399,
+  "bonusWin": 9727053.380001143,
+  "rtpPercent": 95.79845238001937,
+  "baseGameRtpPercent": 86.071399,
+  "bonusRtpPercent": 9.727053380001143,
+  "hitRatePercent": 22.70439,
+  "bonusTriggerRatePercent": 1.21916,
+  "bonusTriggers": 121916,
+  "averageBonusWin": 79.78487958923473,
+  "averageBonusSpins": 11.225269857934972,
+  "bonusRetriggers": 14938,
+  "maximumWin": 9342.2,
+  "standardDeviation": 4.689791810502659,
+  "convergence": [
+    {
+      "spins": 1000,
+      "rtpPercent": 89.0942
+    },
+    {
+      "spins": 10000,
+      "rtpPercent": 85.20960000000002
+    },
+    {
+      "spins": 100000,
+      "rtpPercent": 94.77916399999987
+    },
+    {
+      "spins": 1000000,
+      "rtpPercent": 95.38845500000141
+    },
+    {
+      "spins": 10000000,
+      "rtpPercent": 95.79845238001937
+    }
+  ],
+  "createdAt": "2026-09-26T12:36:15.157Z"
+}
