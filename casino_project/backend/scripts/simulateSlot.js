@@ -13,8 +13,13 @@ const {
 const MODES = {
   BASE: "base-book",
   FEATURE: "feature-spin",
-  BONUS_RANDOM: "bonus-random",
-  BONUS_CHOICE: "bonus-choice",
+  BONUS: "bonus-book",
+
+  /*
+   * Kizárólag statisztikai vizsgálathoz.
+   * A játékban a szimbólum mindig random.
+   */
+  BONUS_SYMBOL: "bonus-symbol",
 };
 
 function hashSeed(text) {
@@ -25,11 +30,14 @@ function hashSeed(text) {
     index < text.length;
     index += 1
   ) {
-    hash ^= text.charCodeAt(index);
-    hash = Math.imul(
-      hash,
-      16777619
-    );
+    hash ^=
+      text.charCodeAt(index);
+
+    hash =
+      Math.imul(
+        hash,
+        16777619
+      );
   }
 
   return hash >>> 0;
@@ -43,15 +51,18 @@ function createSeededRandom(seed) {
 
     let value = state;
 
-    value = Math.imul(
-      value ^ (value >>> 15),
-      value | 1
-    );
+    value =
+      Math.imul(
+        value ^
+          (value >>> 15),
+        value | 1
+      );
 
     value ^=
       value +
       Math.imul(
-        value ^ (value >>> 7),
+        value ^
+          (value >>> 7),
         value | 61
       );
 
@@ -77,7 +88,9 @@ function playRound({
     });
   }
 
-  if (mode === MODES.FEATURE) {
+  if (
+    mode === MODES.FEATURE
+  ) {
     return featureSpin({
       lineBet,
       random,
@@ -85,34 +98,24 @@ function playRound({
   }
 
   if (
-    mode === MODES.BONUS_RANDOM
+    mode === MODES.BONUS
   ) {
     return buyBookBonus({
       lineBet,
       random,
-
-      bonusType:
-        slotConfig
-          .BOOK_BONUS
-          .bonusTypes
-          .RANDOM,
     });
   }
 
   if (
-    mode === MODES.BONUS_CHOICE
+    mode ===
+    MODES.BONUS_SYMBOL
   ) {
     return buyBookBonus({
       lineBet,
       random,
 
-      bonusType:
-        slotConfig
-          .BOOK_BONUS
-          .bonusTypes
-          .CHOICE,
-
-      selectedSymbol,
+      forcedSymbol:
+        selectedSymbol,
     });
   }
 
@@ -121,19 +124,27 @@ function playRound({
   );
 }
 
-function getWager(result, mode) {
+function getWager(
+  result,
+  mode
+) {
   if (mode === MODES.BASE) {
     return result.totalBet;
   }
 
-  if (mode === MODES.FEATURE) {
+  if (
+    mode === MODES.FEATURE
+  ) {
     return result.featureCost;
   }
 
   return result.purchaseCost;
 }
 
-function getBaseBet(result, mode) {
+function getBaseBet(
+  result,
+  mode
+) {
   return mode === MODES.BASE
     ? result.totalBet
     : result.baseBet;
@@ -154,20 +165,20 @@ function runSimulation({
     throw new Error(
       "Használható módok: " +
       "base-book, feature-spin, " +
-      "bonus-random, bonus-choice."
+      "bonus-book, bonus-symbol."
     );
   }
 
   if (
     mode ===
-      MODES.BONUS_CHOICE &&
+      MODES.BONUS_SYMBOL &&
     !slotConfig
       .BOOK_BONUS
       .expandableSymbols
       .includes(selectedSymbol)
   ) {
     throw new Error(
-      "A bonus-choice módhoz " +
+      "A bonus-symbol diagnosztikai módhoz " +
       "adj meg érvényes szimbólumot."
     );
   }
@@ -175,31 +186,35 @@ function runSimulation({
   const random =
     createSeededRandom(seed);
 
-  const checkpoints = new Set(
-    [
-      1000,
-      10000,
-      100000,
-      1000000,
-      10000000,
-      100000000,
-    ].filter(
-      (value) =>
-        value <= roundCount
-    )
-  );
+  const checkpoints =
+    new Set(
+      [
+        1000,
+        10000,
+        100000,
+        1000000,
+        10000000,
+        100000000,
+      ].filter(
+        (value) =>
+          value <= roundCount
+      )
+    );
 
   const convergence = [];
 
   let totalWager = 0;
   let totalWin = 0;
   let winningRounds = 0;
+
   let maximumWinMultiplier = 0;
   let maxWinHits = 0;
+
   let winsAtLeast100x = 0;
   let winsAtLeast500x = 0;
   let winsAtLeast1000x = 0;
   let winsAtLeast2000x = 0;
+
   let meanReturn = 0;
   let squareSum = 0;
 
@@ -208,33 +223,46 @@ function runSimulation({
     index <= roundCount;
     index += 1
   ) {
-    const result = playRound({
-      mode,
-      lineBet,
-      random,
-      selectedSymbol,
-    });
+    const result =
+      playRound({
+        mode,
+        lineBet,
+        random,
+        selectedSymbol,
+      });
 
     const wager =
-      getWager(result, mode);
+      getWager(
+        result,
+        mode
+      );
 
     const baseBet =
-      getBaseBet(result, mode);
+      getBaseBet(
+        result,
+        mode
+      );
 
     const winMultiplier =
-      result.totalWin / baseBet;
+      result.totalWin /
+      baseBet;
 
     const returnMultiplier =
-      result.totalWin / wager;
+      result.totalWin /
+      wager;
 
     totalWager += wager;
     totalWin += result.totalWin;
 
-    if (result.totalWin > 0) {
+    if (
+      result.totalWin > 0
+    ) {
       winningRounds += 1;
     }
 
-    if (result.maxWinReached) {
+    if (
+      result.maxWinReached
+    ) {
       maxWinHits += 1;
     }
 
@@ -244,24 +272,33 @@ function runSimulation({
         winMultiplier
       );
 
-    if (winMultiplier >= 100) {
+    if (
+      winMultiplier >= 100
+    ) {
       winsAtLeast100x += 1;
     }
 
-    if (winMultiplier >= 500) {
+    if (
+      winMultiplier >= 500
+    ) {
       winsAtLeast500x += 1;
     }
 
-    if (winMultiplier >= 1000) {
+    if (
+      winMultiplier >= 1000
+    ) {
       winsAtLeast1000x += 1;
     }
 
-    if (winMultiplier >= 2000) {
+    if (
+      winMultiplier >= 2000
+    ) {
       winsAtLeast2000x += 1;
     }
 
     const difference =
-      returnMultiplier - meanReturn;
+      returnMultiplier -
+      meanReturn;
 
     meanReturn +=
       difference / index;
@@ -273,7 +310,9 @@ function runSimulation({
         meanReturn
       );
 
-    if (checkpoints.has(index)) {
+    if (
+      checkpoints.has(index)
+    ) {
       convergence.push({
         rounds: index,
 
@@ -300,7 +339,7 @@ function runSimulation({
 
     selectedSymbol:
       mode ===
-        MODES.BONUS_CHOICE
+        MODES.BONUS_SYMBOL
         ? selectedSymbol
         : null,
 
@@ -336,13 +375,17 @@ function runSimulation({
 }
 
 function saveResult(result) {
-  const root = path.resolve(
-    __dirname,
-    "../../../szabalyrendszerek/slot"
-  );
+  const root =
+    path.resolve(
+      __dirname,
+      "../../../szabalyrendszerek/slot"
+    );
 
   const runDirectory =
-    path.join(root, "runs");
+    path.join(
+      root,
+      "runs"
+    );
 
   const configDirectory =
     path.join(
@@ -352,27 +395,36 @@ function saveResult(result) {
 
   fs.mkdirSync(
     runDirectory,
-    { recursive: true }
+    {
+      recursive: true,
+    }
   );
 
   fs.mkdirSync(
     configDirectory,
-    { recursive: true }
+    {
+      recursive: true,
+    }
   );
 
-  const configPath = path.join(
-    configDirectory,
-    `v${slotConfig.CONFIG_VERSION}.json`
-  );
+  const configPath =
+    path.join(
+      configDirectory,
+      `v${slotConfig.CONFIG_VERSION}.json`
+    );
 
-  if (!fs.existsSync(configPath)) {
+  if (
+    !fs.existsSync(configPath)
+  ) {
     fs.writeFileSync(
       configPath,
+
       JSON.stringify(
         slotConfig,
         null,
         2
       ),
+
       "utf8"
     );
   }
@@ -388,22 +440,25 @@ function saveResult(result) {
       ? `-${result.selectedSymbol}`
       : "";
 
-  const runPath = path.join(
-    runDirectory,
+  const runPath =
+    path.join(
+      runDirectory,
 
-    `v${slotConfig.CONFIG_VERSION}-` +
-    `${result.mode}` +
-    `${symbolPart}-` +
-    `${safeSeed}.json`
-  );
+      `v${slotConfig.CONFIG_VERSION}-` +
+      `${result.mode}` +
+      `${symbolPart}-` +
+      `${safeSeed}.json`
+    );
 
   fs.writeFileSync(
     runPath,
+
     JSON.stringify(
       result,
       null,
       2
     ),
+
     "utf8"
   );
 
@@ -413,7 +468,9 @@ function saveResult(result) {
   };
 }
 
-if (require.main === module) {
+if (
+  require.main === module
+) {
   const mode =
     process.argv[2] ||
     MODES.BASE;
@@ -421,7 +478,7 @@ if (require.main === module) {
   const roundCount =
     Number.parseInt(
       process.argv[3] ||
-        "1000000",
+      "1000000",
       10
     );
 
@@ -438,7 +495,9 @@ if (require.main === module) {
     null;
 
   if (
-    !Number.isInteger(roundCount) ||
+    !Number.isInteger(
+      roundCount
+    ) ||
     roundCount <= 0
   ) {
     throw new Error(
@@ -455,7 +514,8 @@ if (require.main === module) {
     }),
 
     createdAt:
-      new Date().toISOString(),
+      new Date()
+        .toISOString(),
   };
 
   const saved =

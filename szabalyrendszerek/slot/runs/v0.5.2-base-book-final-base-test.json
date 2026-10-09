@@ -1,0 +1,37 @@
+{
+  "configVersion": "0.5.2",
+  "mode": "base-book",
+  "selectedSymbol": null,
+  "seed": "final-base-test",
+  "roundCount": 1000000,
+  "totalWager": 10000000,
+  "totalWin": 9544150,
+  "rtpPercent": 95.4415,
+  "hitRatePercent": 33.3656,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 1,
+  "winsAtLeast100x": 1409,
+  "winsAtLeast500x": 41,
+  "winsAtLeast1000x": 12,
+  "winsAtLeast2000x": 2,
+  "standardDeviation": 10.551307707477314,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 108.45
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 94.395
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 103.925
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.4415
+    }
+  ],
+  "createdAt": "2026-10-03T12:18:12.198Z"
+}
