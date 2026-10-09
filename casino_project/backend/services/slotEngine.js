@@ -10,7 +10,8 @@ const {
   BOOK_BONUS,
   PAYLINES,
   REEL_STRIPS,
-  FEATURE_REEL_STRIPS_BY_SYMBOL,
+  BONUS_REEL_STRIPS_BY_SYMBOL,
+  FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL,
 } = require("../config/slotConfig");
 
 function generateGrid(
@@ -148,11 +149,8 @@ function countSymbol(
 
 function evaluateGrid(
   grid,
-  lineBet
+  totalBet
 ) {
-  const totalBet =
-    lineBet * PAYLINES.length;
-
   const lineWins = [];
 
   PAYLINES.forEach(
@@ -309,7 +307,7 @@ function expandBookSymbol(
 function evaluateExpandedSpin({
   originalGrid,
   expandingSymbol,
-  lineBet,
+  totalBet,
 }) {
   const expansion =
     expandBookSymbol(
@@ -320,7 +318,7 @@ function evaluateExpandedSpin({
   const originalEvaluation =
     evaluateGrid(
       originalGrid,
-      lineBet
+      totalBet
     );
 
   const expandingReelCount =
@@ -335,27 +333,13 @@ function evaluateExpandedSpin({
       expandingReelCount
     ] || 0;
 
-  const totalBet =
-    lineBet *
-    PAYLINES.length;
-
-  /*
-   * A bővülő szimbólum az érintett
-   * tárcsák elhelyezkedésétől
-   * függetlenül mind a tíz
-   * nyerővonalon fizet.
-   */
+  /*A bővülő szimbólum az érintett tárcsák elhelyezkedésétőlfüggetlenül mind a tíz nyerővonalon fizet.*/
   const expandingWin =
     expandingMultiplier *
     totalBet *
     PAYLINES.length;
 
-  /*
-   * A normál nyerővonalakat és
-   * Scattereket az eredeti rácson
-   * értékeljük. A bővülő szimbólum
-   * nyereményét külön adjuk hozzá.
-   */
+  /*A normál nyerővonalakat és Scattereket az eredeti rácson értékeljük. A bővülő szimbólum nyereményét külön adjuk hozzá.*/
   return {
     originalGrid,
     grid: expansion.grid,
@@ -390,7 +374,7 @@ function evaluateExpandedSpin({
 }
 
 function playBookBonus({
-  lineBet,
+  totalBet,
   random = Math.random,
   maxWinAmount = Infinity,
   selectedSymbol = null,
@@ -409,7 +393,7 @@ function playBookBonus({
 
   const reelStrips =
     useFeatureReels
-      ? FEATURE_REEL_STRIPS_BY_SYMBOL[
+      ? BONUS_REEL_STRIPS_BY_SYMBOL[
           expandingSymbol
         ]
       : REEL_STRIPS;
@@ -443,7 +427,7 @@ function playBookBonus({
       evaluateExpandedSpin({
         originalGrid,
         expandingSymbol,
-        lineBet,
+        totalBet,
       });
 
     if (
@@ -516,25 +500,21 @@ function playBookBonus({
 }
 
 function spin({
-  lineBet = 1,
+  totalBet = 1,
   random = Math.random,
   playBonus = true,
 } = {}) {
   if (
-    !Number.isFinite(lineBet) ||
-    lineBet <= 0
+    !Number.isFinite(totalBet) ||
+    totalBet <= 0
   ) {
     throw new Error(
-      "A vonalankénti tétnek pozitív számnak kell lennie."
+      "A teljes tétnek pozitív számnak kell lennie."
     );
   }
 
   const grid =
     generateGrid(random);
-
-  const totalBet =
-    lineBet *
-    PAYLINES.length;
 
   const maximumWinAmount =
     totalBet *
@@ -543,7 +523,7 @@ function spin({
   const baseResult =
     evaluateGrid(
       grid,
-      lineBet
+      totalBet
     );
 
   const uncappedBaseGameWin =
@@ -562,14 +542,14 @@ function spin({
 
   /*
    * A bővülő szimbólumot
-   * a játék minden esetben
+   * a bónusz minden esetben
    * véletlenszerűen választja.
    */
   const bonus =
     bonusTriggered &&
     playBonus
       ? playBookBonus({
-          lineBet,
+          totalBet,
           random,
 
           maxWinAmount:
@@ -608,37 +588,36 @@ function spin({
 }
 
 function featureSpin({
-  lineBet = 1,
+  totalBet = 1,
+  selectedSymbol,
   random = Math.random,
 } = {}) {
   if (
-    !Number.isFinite(lineBet) ||
-    lineBet <= 0
+    !Number.isFinite(totalBet) ||
+    totalBet <= 0
   ) {
     throw new Error(
-      "A vonalankénti tétnek pozitív számnak kell lennie."
+      "A teljes tétnek pozitív számnak kell lennie."
     );
   }
 
-  const baseBet =
-    lineBet *
-    PAYLINES.length;
+  validateSelectedSymbol(
+    selectedSymbol
+  );
 
   const featureCost =
-    baseBet *
+    totalBet *
     FEATURE_SPIN_COST_MULTIPLIER;
 
   const maximumWinAmount =
-    baseBet *
+    totalBet *
     MAX_WIN_MULTIPLIER;
 
   const expandingSymbol =
-    selectExpandableSymbol(
-      random
-    );
+    selectedSymbol;
 
   const reelStrips =
-    FEATURE_REEL_STRIPS_BY_SYMBOL[
+    FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL[
       expandingSymbol
     ];
 
@@ -652,7 +631,7 @@ function featureSpin({
     evaluateExpandedSpin({
       originalGrid,
       expandingSymbol,
-      lineBet,
+      totalBet,
     });
 
   const uncappedWin =
@@ -665,7 +644,7 @@ function featureSpin({
     );
 
   return {
-    baseBet,
+    totalBet,
     featureCost,
     expandingSymbol,
 
@@ -682,46 +661,37 @@ function featureSpin({
 }
 
 function buyBookBonus({
-  lineBet = 1,
+  totalBet = 1,
   random = Math.random,
   forcedSymbol = null,
 } = {}) {
   if (
-    !Number.isFinite(lineBet) ||
-    lineBet <= 0
+    !Number.isFinite(totalBet) ||
+    totalBet <= 0
   ) {
     throw new Error(
-      "A vonalankénti tétnek pozitív számnak kell lennie."
+      "A teljes tétnek pozitív számnak kell lennie."
     );
   }
 
-  /*
-   * A forcedSymbol kizárólag
-   * statisztikai vizsgálathoz
-   * használható. A játék normál
-   * működésében null marad.
-   */
+  /* A forcedSymbol kizárólag statisztikai vizsgálathoz használható. A játék normálműködésében null marad.*/
   if (forcedSymbol !== null) {
     validateSelectedSymbol(
       forcedSymbol
     );
   }
 
-  const baseBet =
-    lineBet *
-    PAYLINES.length;
-
   const purchaseCost =
-    baseBet *
+    totalBet *
     BONUS_BUY_COST_MULTIPLIER;
 
   const maximumWinAmount =
-    baseBet *
+    totalBet *
     MAX_WIN_MULTIPLIER;
 
   const bonus =
     playBookBonus({
-      lineBet,
+      totalBet,
       random,
       maxWinAmount:
         maximumWinAmount,
@@ -734,7 +704,7 @@ function buyBookBonus({
     });
 
   return {
-    baseBet,
+    totalBet,
     purchaseCost,
 
     expandingSymbol:

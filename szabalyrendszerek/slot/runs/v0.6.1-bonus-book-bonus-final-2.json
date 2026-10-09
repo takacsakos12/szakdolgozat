@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.1",
+  "mode": "bonus-book",
+  "selectedSymbol": null,
+  "seed": "bonus-final-2",
+  "roundCount": 1000000,
+  "totalBet": 2,
+  "totalWager": 200000000,
+  "totalWin": 192771127,
+  "rtpPercent": 96.3855635,
+  "hitRatePercent": 99.97409999999999,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 82,
+  "winsAtLeast100x": 320345,
+  "winsAtLeast500x": 10358,
+  "winsAtLeast1000x": 4084,
+  "winsAtLeast2000x": 704,
+  "standardDeviation": 1.282764050278661,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 95.43
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 94.4603
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 96.54638
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 96.3855635
+    }
+  ],
+  "createdAt": "2026-10-09T14:11:19.113Z"
+}

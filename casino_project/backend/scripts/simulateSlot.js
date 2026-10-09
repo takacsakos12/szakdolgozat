@@ -17,8 +17,7 @@ const MODES = {
 
   /*
    * Kizárólag statisztikai vizsgálathoz.
-   * A játékban a szimbólum mindig random.
-   */
+   * A játékban a bónusz szimbóluma mindig random.*/
   BONUS_SYMBOL: "bonus-symbol",
 };
 
@@ -77,13 +76,13 @@ function createSeededRandom(seed) {
 
 function playRound({
   mode,
-  lineBet,
+  totalBet,
   random,
   selectedSymbol,
 }) {
   if (mode === MODES.BASE) {
     return spin({
-      lineBet,
+      totalBet,
       random,
     });
   }
@@ -92,7 +91,8 @@ function playRound({
     mode === MODES.FEATURE
   ) {
     return featureSpin({
-      lineBet,
+      totalBet,
+      selectedSymbol,
       random,
     });
   }
@@ -101,7 +101,7 @@ function playRound({
     mode === MODES.BONUS
   ) {
     return buyBookBonus({
-      lineBet,
+      totalBet,
       random,
     });
   }
@@ -111,7 +111,7 @@ function playRound({
     MODES.BONUS_SYMBOL
   ) {
     return buyBookBonus({
-      lineBet,
+      totalBet,
       random,
 
       forcedSymbol:
@@ -141,13 +141,10 @@ function getWager(
   return result.purchaseCost;
 }
 
-function getBaseBet(
-  result,
-  mode
+function getReferenceBet(
+  result
 ) {
-  return mode === MODES.BASE
-    ? result.totalBet
-    : result.baseBet;
+  return result.totalBet;
 }
 
 function runSimulation({
@@ -155,7 +152,7 @@ function runSimulation({
   roundCount,
   seed,
   selectedSymbol = null,
-  lineBet = 1,
+  totalBet = 1,
 }) {
   if (
     !Object
@@ -170,15 +167,17 @@ function runSimulation({
   }
 
   if (
-    mode ===
-      MODES.BONUS_SYMBOL &&
+    (
+      mode === MODES.FEATURE ||
+      mode === MODES.BONUS_SYMBOL
+    ) &&
     !slotConfig
       .BOOK_BONUS
       .expandableSymbols
       .includes(selectedSymbol)
   ) {
     throw new Error(
-      "A bonus-symbol diagnosztikai módhoz " +
+      "A feature-spin és bonus-symbol módhoz " +
       "adj meg érvényes szimbólumot."
     );
   }
@@ -226,7 +225,7 @@ function runSimulation({
     const result =
       playRound({
         mode,
-        lineBet,
+        totalBet,
         random,
         selectedSymbol,
       });
@@ -237,15 +236,14 @@ function runSimulation({
         mode
       );
 
-    const baseBet =
-      getBaseBet(
-        result,
-        mode
+    const referenceBet =
+      getReferenceBet(
+        result
       );
 
     const winMultiplier =
       result.totalWin /
-      baseBet;
+      referenceBet;
 
     const returnMultiplier =
       result.totalWin /
@@ -338,13 +336,14 @@ function runSimulation({
     mode,
 
     selectedSymbol:
-      mode ===
-        MODES.BONUS_SYMBOL
+      mode === MODES.FEATURE ||
+      mode === MODES.BONUS_SYMBOL
         ? selectedSymbol
         : null,
 
     seed,
     roundCount,
+    totalBet,
     totalWager,
     totalWin,
 
@@ -490,9 +489,16 @@ if (
     );
 
   const selectedSymbol =
-    process.argv[5]
-      ?.toUpperCase() ||
-    null;
+    process.argv[5] &&
+    process.argv[5] !== "-"
+      ? process.argv[5]
+          .toUpperCase()
+      : null;
+
+  const totalBet =
+    Number.parseFloat(
+      process.argv[6] || "1"
+    );
 
   if (
     !Number.isInteger(
@@ -505,12 +511,22 @@ if (
     );
   }
 
+  if (
+    !Number.isFinite(totalBet) ||
+    totalBet <= 0
+  ) {
+    throw new Error(
+      "A teljes tét pozitív szám legyen."
+    );
+  }
+
   const result = {
     ...runSimulation({
       mode,
       roundCount,
       seed,
       selectedSymbol,
+      totalBet,
     }),
 
     createdAt:

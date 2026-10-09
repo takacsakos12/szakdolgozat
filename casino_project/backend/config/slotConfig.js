@@ -1,4 +1,4 @@
-const CONFIG_VERSION = "0.5.2";
+const CONFIG_VERSION = "0.6.1";
 
 const ROW_COUNT = 3;
 const REEL_COUNT = 5;
@@ -60,7 +60,7 @@ const BOOK_BONUS = {
   ],
 };
 
-const FEATURE_TARGET_COUNTS = {
+const BONUS_TARGET_COUNTS = {
   TEN: [102, 102, 103, 103, 103],
   JACK: [106, 107, 107, 107, 107],
   QUEEN: [104, 104, 103, 104, 104],
@@ -68,11 +68,26 @@ const FEATURE_TARGET_COUNTS = {
   KING: [90, 90, 90, 90, 89],
   ACE: [89, 90, 90, 90, 90],
 
-  SCARAB: [53, 53, 53, 54, 54],
+  SCARAB: [53, 53, 53, 54, 53],
   FALCON: [52, 53, 54, 53, 53],
 
   ANUBIS: [40, 40, 40, 40, 41],
-  PHARAOH: [36, 36, 37, 36, 8],
+  PHARAOH: [36, 36, 37, 35, 8],
+};
+
+const FEATURE_SPIN_TARGET_COUNTS = {
+  TEN: [110, 110, 110, 110, 110],
+  JACK: [113, 113, 113, 113, 113],
+  QUEEN: [110, 111, 110, 111, 111],
+
+  KING: [93, 94, 94, 93, 92],
+  ACE: [97, 97, 97, 97, 97],
+
+  SCARAB: [55, 54, 54, 55, 55],
+  FALCON: [56, 57, 57, 56, 56],
+
+  ANUBIS: [41, 41, 41, 40, 41],
+  PHARAOH: [39, 39, 40, 39, 8],
 };
 
 const PAYLINES = [
@@ -164,7 +179,7 @@ const REEL_SYMBOL_COUNTS = BASE_REEL_SYMBOL_COUNTS.map(
     )
 );
 
-const FEATURE_BASE_REEL_SYMBOL_COUNTS = [
+const BONUS_BASE_REEL_SYMBOL_COUNTS = [
   {
     TEN: 90,
     JACK: 80,
@@ -350,20 +365,23 @@ function createFeatureSymbolCounts(
   return counts;
 }
 
-const FEATURE_REEL_STRIPS_BY_SYMBOL =
-  Object.fromEntries(
+function createReelStripsBySymbol(
+  targetCountsBySymbol,
+  seedSaltOffset
+) {
+  return Object.fromEntries(
     BOOK_BONUS.expandableSymbols.map(
       (
         targetSymbol,
         symbolIndex
       ) => {
         const targetCounts =
-          FEATURE_TARGET_COUNTS[
+          targetCountsBySymbol[
             targetSymbol
           ];
 
         const strips =
-          FEATURE_BASE_REEL_SYMBOL_COUNTS.map(
+          BONUS_BASE_REEL_SYMBOL_COUNTS.map(
             (
               baseCounts,
               reelIndex
@@ -380,7 +398,8 @@ const FEATURE_REEL_STRIPS_BY_SYMBOL =
               return createDeterministicStrip(
                 counts,
                 reelIndex,
-                symbolIndex * 104729
+                seedSaltOffset +
+                  symbolIndex * 104729
               );
             }
           );
@@ -391,6 +410,19 @@ const FEATURE_REEL_STRIPS_BY_SYMBOL =
         ];
       }
     )
+  );
+}
+
+const BONUS_REEL_STRIPS_BY_SYMBOL =
+  createReelStripsBySymbol(
+    BONUS_TARGET_COUNTS,
+    0
+  );
+
+const FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL =
+  createReelStripsBySymbol(
+    FEATURE_SPIN_TARGET_COUNTS,
+    700001
   );
 
 module.exports = {
@@ -409,11 +441,13 @@ module.exports = {
   PAYTABLE,
   SCATTER_PAYTABLE,
   BOOK_BONUS,
-  FEATURE_TARGET_COUNTS,
+  BONUS_TARGET_COUNTS,
+  FEATURE_SPIN_TARGET_COUNTS,
 
   PAYLINES,
   REEL_SYMBOL_COUNTS,
-  FEATURE_BASE_REEL_SYMBOL_COUNTS,
+  BONUS_BASE_REEL_SYMBOL_COUNTS,
   REEL_STRIPS,
-  FEATURE_REEL_STRIPS_BY_SYMBOL,
+  BONUS_REEL_STRIPS_BY_SYMBOL,
+  FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL,
 };
