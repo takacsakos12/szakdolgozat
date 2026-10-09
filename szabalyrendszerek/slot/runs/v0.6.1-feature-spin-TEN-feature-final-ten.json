@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.1",
+  "mode": "feature-spin",
+  "selectedSymbol": "TEN",
+  "seed": "feature-final-ten",
+  "roundCount": 1000000,
+  "totalBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9572763.5,
+  "rtpPercent": 95.727635,
+  "hitRatePercent": 68.2705,
+  "maximumWinMultiplier": 558.5,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 32390,
+  "winsAtLeast500x": 13,
+  "winsAtLeast1000x": 0,
+  "winsAtLeast2000x": 0,
+  "standardDeviation": 1.9450263405306112,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 88.625
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 94.3185
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.7532
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.727635
+    }
+  ],
+  "createdAt": "2026-10-09T16:11:14.885Z"
+}
