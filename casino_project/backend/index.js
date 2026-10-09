@@ -7,6 +7,7 @@ const helmet = require("helmet");
 
 const connectDatabase = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const slotRoutes = require("./routes/slotRoutes");
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/slot", slotRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
