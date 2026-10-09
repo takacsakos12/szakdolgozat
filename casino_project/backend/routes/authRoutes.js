@@ -80,10 +80,7 @@ function isValidPassword(password) {
 }
 
 /*
- * Regisztráció
- *
- * A felhasználó létrejön, de nem jelentkezik be
- * automatikusan.
+ * A felhasználó létrejön, de nem jelentkezik be automatikusan.
  */
 router.post(
   "/register",
@@ -170,8 +167,8 @@ router.post(
 );
 
 /*
- * Bejelentkezés felhasználónévvel
- */
+Bejelentkezés felhasználónévvel
+*/
 router.post(
   "/login",
   authenticationLimiter,
