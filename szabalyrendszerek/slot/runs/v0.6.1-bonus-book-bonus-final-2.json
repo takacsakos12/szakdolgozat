@@ -4,9 +4,9 @@
   "selectedSymbol": null,
   "seed": "bonus-final-2",
   "roundCount": 1000000,
-  "totalBet": 2,
-  "totalWager": 200000000,
-  "totalWin": 192771127,
+  "totalBet": 1,
+  "totalWager": 100000000,
+  "totalWin": 96385563.5,
   "rtpPercent": 96.3855635,
   "hitRatePercent": 99.97409999999999,
   "maximumWinMultiplier": 5000,
@@ -34,5 +34,5 @@
       "rtpPercent": 96.3855635
     }
   ],
-  "createdAt": "2026-10-09T14:11:19.113Z"
+  "createdAt": "2026-10-09T15:52:03.706Z"
 }

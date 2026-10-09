@@ -25,13 +25,10 @@ const PAYTABLE = {
   TEN: { 3: 0.5, 4: 2.5, 5: 10 },
   JACK: { 3: 0.5, 4: 2.5, 5: 10 },
   QUEEN: { 3: 0.5, 4: 2.5, 5: 10 },
-
   KING: { 3: 0.5, 4: 4, 5: 15 },
   ACE: { 3: 0.5, 4: 4, 5: 15 },
-
   SCARAB: { 2: 0.5, 3: 3, 4: 10, 5: 75 },
   FALCON: { 2: 0.5, 3: 3, 4: 10, 5: 75 },
-
   ANUBIS: { 2: 0.5, 3: 4, 4: 40, 5: 200 },
   PHARAOH: { 2: 1, 3: 10, 4: 100, 5: 500 },
 };
@@ -105,7 +102,6 @@ const PAYLINES = [
 
 const REEL_STRIP_SCALE = 10;
 const BASE_REEL_SEED_SALT = 31;
-
 const BASE_REEL_SYMBOL_COUNTS = [
   {
     TEN: 9.1,
@@ -168,7 +164,6 @@ const BASE_REEL_SYMBOL_COUNTS = [
     BOOK: 1.1,
   },
 ];
-
 const REEL_SYMBOL_COUNTS = BASE_REEL_SYMBOL_COUNTS.map(
   (reelCounts) =>
     Object.fromEntries(
@@ -178,7 +173,6 @@ const REEL_SYMBOL_COUNTS = BASE_REEL_SYMBOL_COUNTS.map(
       ])
     )
 );
-
 const BONUS_BASE_REEL_SYMBOL_COUNTS = [
   {
     TEN: 90,
@@ -418,13 +412,11 @@ const BONUS_REEL_STRIPS_BY_SYMBOL =
     BONUS_TARGET_COUNTS,
     0
   );
-
 const FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL =
   createReelStripsBySymbol(
     FEATURE_SPIN_TARGET_COUNTS,
     700001
   );
-
 module.exports = {
   CONFIG_VERSION,
   ROW_COUNT,

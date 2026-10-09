@@ -79,9 +79,7 @@ function isValidPassword(password) {
   );
 }
 
-/*
- * A felhasználó létrejön, de nem jelentkezik be automatikusan.
- */
+/*A felhasználó létrejön, de nem jelentkezik be automatikusan.*/
 router.post(
   "/register",
   authenticationLimiter,
@@ -166,9 +164,7 @@ router.post(
   }
 );
 
-/*
-Bejelentkezés felhasználónévvel
-*/
+/*Bejelentkezés felhasználónévvel*/
 router.post(
   "/login",
   authenticationLimiter,
@@ -226,9 +222,7 @@ router.post(
   }
 );
 
-/*
- * Kijelentkezés
- */
+/*Kijelentkezés*/
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -242,9 +236,7 @@ router.post("/logout", (req, res) => {
   });
 });
 
-/*
- * Aktuális felhasználó lekérése
- */
+/*Aktuális felhasználó lekérése*/
 router.get("/me", protectRoute, (req, res) => {
   return res.status(200).json({
     user: {

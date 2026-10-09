@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.1",
+  "mode": "feature-spin",
+  "selectedSymbol": "SCARAB",
+  "seed": "feature-scarab-1",
+  "roundCount": 1000000,
+  "totalBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9594403.5,
+  "rtpPercent": 95.944035,
+  "hitRatePercent": 63.2382,
+  "maximumWinMultiplier": 902,
+  "maxWinHits": 0,
+  "winsAtLeast100x": 25689,
+  "winsAtLeast500x": 1885,
+  "winsAtLeast1000x": 0,
+  "winsAtLeast2000x": 0,
+  "standardDeviation": 3.7075259409801347,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 89.07000000000001
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 95.322
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 97.84089999999999
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.944035
+    }
+  ],
+  "createdAt": "2026-10-09T15:54:15.422Z"
+}

@@ -12,7 +12,6 @@ async function protectRoute(req, res, next) {
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
     const user = await User.findById(decodedToken.userId);
 
     if (!user) {
@@ -29,5 +28,4 @@ async function protectRoute(req, res, next) {
     });
   }
 }
-
 module.exports = protectRoute;

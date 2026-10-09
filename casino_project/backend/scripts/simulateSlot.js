@@ -495,10 +495,7 @@ if (
           .toUpperCase()
       : null;
 
-  const totalBet =
-    Number.parseFloat(
-      process.argv[6] || "1"
-    );
+  const totalBet = 1
 
   if (
     !Number.isInteger(
@@ -508,15 +505,6 @@ if (
   ) {
     throw new Error(
       "A körök száma pozitív egész szám legyen."
-    );
-  }
-
-  if (
-    !Number.isFinite(totalBet) ||
-    totalBet <= 0
-  ) {
-    throw new Error(
-      "A teljes tét pozitív szám legyen."
     );
   }
 
