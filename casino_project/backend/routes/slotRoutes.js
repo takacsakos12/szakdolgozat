@@ -100,6 +100,25 @@ router.post("/spin", (req, res) => {
     }
 });
 
+router.post("/bonus-buy", (req, res) => { 
+    const totalBet = getTotalBet(req.body.totalBet);
+    if (totalBet === null) {
+        return res.status(400).json({
+            message: "Érvénytelen tét.",
+            allowedBets: ALLOWED_BETS,
+        });
+    }
+    try {
+        const result = buyBookBonus({totalBet});
+        return res.status(200).json({
+            gameMode: "BOOK_BONUS",
+            result:result,
+        });
+    } catch (error) {
+        return sendErrorResponse(res, error);
+    }
+});
+
 router.post("/feature-spin", (req, res) => {
     const totalBet = getTotalBet(req.body.totalBet);
 

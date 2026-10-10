@@ -57,6 +57,7 @@ function sendAuthenticationResponse(
       id: user._id,
       username: user.username,
       email: user.email,
+      balance: user.balance,
     },
   });
 }
@@ -178,7 +179,7 @@ router.post(
       const password =
         typeof req.body.password === "string"
           ? req.body.password
-          : "";
+          : "";    
 
       if (!username || !password) {
         return res.status(400).json({
@@ -235,14 +236,13 @@ router.post("/logout", (req, res) => {
     message: "A kijelentkezés sikeres.",
   });
 });
-
-/*Aktuális felhasználó lekérése*/
 router.get("/me", protectRoute, (req, res) => {
   return res.status(200).json({
     user: {
       id: req.user._id,
       username: req.user.username,
       email: req.user.email,
+      balance: req.user.balance,
     },
   });
 });

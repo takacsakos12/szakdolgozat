@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "A jelszó legalább 8 karakter legyen."],
       select: false,
     },
+
+    balance: {
+      type: Number,
+      default: 10000,
+      min: [0, "Az egyenleg nem lehet negatív."],
+    },
   },
   {
     timestamps: true,
