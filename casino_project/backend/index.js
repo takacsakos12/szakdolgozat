@@ -12,8 +12,7 @@ const slotRoutes = require("./routes/slotRoutes");
 const app = express();
 
 const port = process.env.PORT || 5000;
-const frontendUrl =
-  process.env.FRONTEND_URL || "http://localhost:3000";
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 app.use(helmet());
 
@@ -21,7 +20,7 @@ app.use(
   cors({
     origin: frontendUrl,
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json({ limit: "10kb" }));

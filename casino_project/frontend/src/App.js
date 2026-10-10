@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Link,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { Link, Route, Routes } from "react-router-dom";
 
 import "./App.css";
 import AuthPage from "./AuthPage";
@@ -70,17 +66,11 @@ function Header({ user, onLogout }) {
           </>
         ) : (
           <>
-            <Link
-              className="button button-ghost"
-              to="/login"
-            >
+            <Link className="button button-ghost" to="/login">
               Bejelentkezés
             </Link>
 
-            <Link
-              className="button button-primary"
-              to="/register"
-            >
+            <Link className="button button-primary" to="/register">
               Regisztráció
             </Link>
           </>
@@ -115,9 +105,7 @@ function HomePage() {
     <main>
       <section className="hero" id="home">
         <div className="hero-content">
-          <span className="eyebrow">
-            BSc-szakdolgozati projekt
-          </span>
+          <span className="eyebrow">BSc-szakdolgozati projekt</span>
 
           <h1>
             Kaszinójátékok
@@ -125,17 +113,13 @@ function HomePage() {
           </h1>
 
           <p className="hero-description">
-            A projekt közérthetően mutatja be a kaszinójátékok
-            valódi esélyeit, kockázatait és matematikai
-            működését. Célja a szerencsejáték átláthatóbbá
-            tétele és a játékosok hiteles tájékoztatása.
+            A projekt közérthetően mutatja be a kaszinójátékok valódi esélyeit,
+            kockázatait és matematikai működését. Célja a szerencsejáték
+            átláthatóbbá tétele és a játékosok hiteles tájékoztatása.
           </p>
 
           <div className="hero-actions">
-            <a
-              className="button button-primary button-large"
-              href="#games"
-            >
+            <a className="button button-primary button-large" href="#games">
               Játékok megtekintése
             </a>
 
@@ -150,9 +134,7 @@ function HomePage() {
           <div className="author-information">
             <span>Készítette</span>
             <strong>Takács Ákos</strong>
-            <small>
-              Programtervező informatikus BSc · Miskolci Egyetem
-            </small>
+            <small>Programtervező informatikus BSc · Miskolci Egyetem</small>
           </div>
         </div>
 
@@ -163,10 +145,9 @@ function HomePage() {
           </div>
 
           <p className="project-introduction">
-            A projekt célja, hogy közérthetően bemutassa a
-            kaszinójátékok valódi esélyeit és matematikai
-            működését, ezzel segítve a játékosok tájékozottabb
-            döntéseit.
+            A projekt célja, hogy közérthetően bemutassa a kaszinójátékok valódi
+            esélyeit és matematikai működését, ezzel segítve a játékosok
+            tájékozottabb döntéseit.
           </p>
 
           <div className="project-goals">
@@ -175,10 +156,7 @@ function HomePage() {
 
               <div>
                 <strong>Tájékoztatás</strong>
-                <p>
-                  A nyerési esélyek és kockázatok érthető
-                  bemutatása.
-                </p>
+                <p>A nyerési esélyek és kockázatok érthető bemutatása.</p>
               </div>
             </div>
 
@@ -187,10 +165,7 @@ function HomePage() {
 
               <div>
                 <strong>Átláthatóság</strong>
-                <p>
-                  A játékok működésének és eredményeinek
-                  ellenőrizhetősége.
-                </p>
+                <p>A játékok működésének és eredményeinek ellenőrizhetősége.</p>
               </div>
             </div>
 
@@ -200,8 +175,8 @@ function HomePage() {
               <div>
                 <strong>Tudatosabb játék</strong>
                 <p>
-                  A tévhitek helyett valószínűségekre és
-                  adatokra épülő szemlélet.
+                  A tévhitek helyett valószínűségekre és adatokra épülő
+                  szemlélet.
                 </p>
               </div>
             </div>
@@ -225,24 +200,19 @@ function HomePage() {
       </section>
 
       <section className="information-grid">
-        <article
-          className="information-card"
-          id="statistics"
-        >
+        <article className="information-card" id="statistics">
           <div className="information-heading">
             <span className="card-index">01</span>
 
             <div>
-              <span className="eyebrow">
-                Statisztikai elemzés
-              </span>
+              <span className="eyebrow">Statisztikai elemzés</span>
               <h2>Elmélet és szimuláció</h2>
             </div>
           </div>
 
           <p>
-            A játékok elméleti értékeinek és szimulációs
-            eredményeinek összehasonlítása.
+            A játékok elméleti értékeinek és szimulációs eredményeinek
+            összehasonlítása.
           </p>
 
           <button className="text-button" type="button">
@@ -251,24 +221,19 @@ function HomePage() {
           </button>
         </article>
 
-        <article
-          className="information-card"
-          id="provably-fair"
-        >
+        <article className="information-card" id="provably-fair">
           <div className="information-heading">
             <span className="card-index">02</span>
 
             <div>
-              <span className="eyebrow">
-                Ellenőrizhető működés
-              </span>
+              <span className="eyebrow">Ellenőrizhető működés</span>
               <h2>Provably fair rendszer</h2>
             </div>
           </div>
 
           <p>
-            Itt megismerhető és ellenőrizhető a játékok
-            eredményének előállítása.
+            Itt megismerhető és ellenőrizhető a játékok eredményének
+            előállítása.
           </p>
 
           <button className="text-button" type="button">
@@ -293,10 +258,7 @@ function Footer() {
         </span>
       </Link>
 
-      <p>
-        Webalapú kaszinójátékok fejlesztése statisztikai
-        elemzéssel.
-      </p>
+      <p>Webalapú kaszinójátékok fejlesztése statisztikai elemzéssel.</p>
 
       <span>Szakdolgozati projekt</span>
     </footer>
@@ -305,8 +267,7 @@ function Footer() {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [isCheckingSession, setIsCheckingSession] =
-    useState(true);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
     async function checkCurrentUser() {
@@ -334,13 +295,10 @@ function App() {
 
   async function handleLogout() {
     try {
-      const response = await fetch(
-        `${API_URL}/auth/logout`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("A kijelentkezés sikertelen.");
@@ -353,11 +311,7 @@ function App() {
   }
 
   if (isCheckingSession) {
-    return (
-      <div className="session-loading">
-        Munkamenet ellenőrzése...
-      </div>
-    );
+    return <div className="session-loading">Munkamenet ellenőrzése...</div>;
   }
 
   return (
@@ -370,22 +324,14 @@ function App() {
         <Route
           path="/login"
           element={
-            <AuthPage
-              mode="login"
-              user={user}
-              onAuthenticated={setUser}
-            />
+            <AuthPage mode="login" user={user} onAuthenticated={setUser} />
           }
         />
 
         <Route
           path="/register"
           element={
-            <AuthPage
-              mode="register"
-              user={user}
-              onAuthenticated={setUser}
-            />
+            <AuthPage mode="register" user={user} onAuthenticated={setUser} />
           }
         />
       </Routes>

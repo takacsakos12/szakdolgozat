@@ -164,14 +164,13 @@ const BASE_REEL_SYMBOL_COUNTS = [
     BOOK: 1.1,
   },
 ];
-const REEL_SYMBOL_COUNTS = BASE_REEL_SYMBOL_COUNTS.map(
-  (reelCounts) =>
-    Object.fromEntries(
-      Object.entries(reelCounts).map(([symbol, count]) => [
-        symbol,
-        count * REEL_STRIP_SCALE,
-      ])
-    )
+const REEL_SYMBOL_COUNTS = BASE_REEL_SYMBOL_COUNTS.map((reelCounts) =>
+  Object.fromEntries(
+    Object.entries(reelCounts).map(([symbol, count]) => [
+      symbol,
+      count * REEL_STRIP_SCALE,
+    ]),
+  ),
 );
 const BONUS_BASE_REEL_SYMBOL_COUNTS = [
   {
@@ -236,11 +235,7 @@ const BONUS_BASE_REEL_SYMBOL_COUNTS = [
   },
 ];
 
-function createDeterministicStrip(
-  symbolCounts,
-  reelIndex,
-  seedSalt = 0
-) {
+function createDeterministicStrip(symbolCounts, reelIndex, seedSalt = 0) {
   const strip = [];
 
   for (const [symbol, count] of Object.entries(symbolCounts)) {
@@ -249,88 +244,45 @@ function createDeterministicStrip(
     }
   }
 
-  let state =
-    1009 +
-    reelIndex * 7919 +
-    seedSalt;
+  let state = 1009 + reelIndex * 7919 + seedSalt;
 
-  for (
-    let index = strip.length - 1;
-    index > 0;
-    index -= 1
-  ) {
-    state =
-      (state * 1664525 + 1013904223) >>> 0;
+  for (let index = strip.length - 1; index > 0; index -= 1) {
+    state = (state * 1664525 + 1013904223) >>> 0;
 
-    const targetIndex =
-      state % (index + 1);
+    const targetIndex = state % (index + 1);
 
-    [
-      strip[index],
-      strip[targetIndex],
-    ] = [
-      strip[targetIndex],
-      strip[index],
-    ];
+    [strip[index], strip[targetIndex]] = [strip[targetIndex], strip[index]];
   }
 
   return strip;
 }
 
-const REEL_STRIPS = REEL_SYMBOL_COUNTS.map(
-  (symbolCounts, reelIndex) =>
-    createDeterministicStrip(
-      symbolCounts,
-      reelIndex,
-      BASE_REEL_SEED_SALT
-    )
+const REEL_STRIPS = REEL_SYMBOL_COUNTS.map((symbolCounts, reelIndex) =>
+  createDeterministicStrip(symbolCounts, reelIndex, BASE_REEL_SEED_SALT),
 );
 
-function createFeatureSymbolCounts(
-  baseCounts,
-  targetSymbol,
-  targetCount
-) {
+function createFeatureSymbolCounts(baseCounts, targetSymbol, targetCount) {
   const counts = { ...baseCounts };
 
-  const originalTargetCount =
-    counts[targetSymbol];
+  const originalTargetCount = counts[targetSymbol];
 
-  counts[targetSymbol] =
-    targetCount;
+  counts[targetSymbol] = targetCount;
 
-  const donorSymbols =
-    BOOK_BONUS.expandableSymbols
-      .filter(
-        (symbol) =>
-          symbol !== targetSymbol
-      )
-      .sort(
-        (left, right) =>
-          counts[right] -
-          counts[left]
-      );
+  const donorSymbols = BOOK_BONUS.expandableSymbols
+    .filter((symbol) => symbol !== targetSymbol)
+    .sort((left, right) => counts[right] - counts[left]);
 
-  const difference =
-    targetCount -
-    originalTargetCount;
+  const difference = targetCount - originalTargetCount;
 
   if (difference > 0) {
-    let remainingRemoval =
-      difference;
+    let remainingRemoval = difference;
 
     let donorIndex = 0;
 
     while (remainingRemoval > 0) {
-      const donorSymbol =
-        donorSymbols[
-          donorIndex %
-            donorSymbols.length
-        ];
+      const donorSymbol = donorSymbols[donorIndex % donorSymbols.length];
 
-      if (
-        counts[donorSymbol] > 1
-      ) {
+      if (counts[donorSymbol] > 1) {
         counts[donorSymbol] -= 1;
         remainingRemoval -= 1;
       }
@@ -338,19 +290,10 @@ function createFeatureSymbolCounts(
       donorIndex += 1;
     }
   } else if (difference < 0) {
-    const remainingAddition =
-      -difference;
+    const remainingAddition = -difference;
 
-    for (
-      let index = 0;
-      index < remainingAddition;
-      index += 1
-    ) {
-      const donorSymbol =
-        donorSymbols[
-          index %
-            donorSymbols.length
-        ];
+    for (let index = 0; index < remainingAddition; index += 1) {
+      const donorSymbol = donorSymbols[index % donorSymbols.length];
 
       counts[donorSymbol] += 1;
     }
@@ -359,64 +302,40 @@ function createFeatureSymbolCounts(
   return counts;
 }
 
-function createReelStripsBySymbol(
-  targetCountsBySymbol,
-  seedSaltOffset
-) {
+function createReelStripsBySymbol(targetCountsBySymbol, seedSaltOffset) {
   return Object.fromEntries(
-    BOOK_BONUS.expandableSymbols.map(
-      (
-        targetSymbol,
-        symbolIndex
-      ) => {
-        const targetCounts =
-          targetCountsBySymbol[
-            targetSymbol
-          ];
+    BOOK_BONUS.expandableSymbols.map((targetSymbol, symbolIndex) => {
+      const targetCounts = targetCountsBySymbol[targetSymbol];
 
-        const strips =
-          BONUS_BASE_REEL_SYMBOL_COUNTS.map(
-            (
-              baseCounts,
-              reelIndex
-            ) => {
-              const counts =
-                createFeatureSymbolCounts(
-                  baseCounts,
-                  targetSymbol,
-                  targetCounts[
-                    reelIndex
-                  ]
-                );
-
-              return createDeterministicStrip(
-                counts,
-                reelIndex,
-                seedSaltOffset +
-                  symbolIndex * 104729
-              );
-            }
+      const strips = BONUS_BASE_REEL_SYMBOL_COUNTS.map(
+        (baseCounts, reelIndex) => {
+          const counts = createFeatureSymbolCounts(
+            baseCounts,
+            targetSymbol,
+            targetCounts[reelIndex],
           );
 
-        return [
-          targetSymbol,
-          strips,
-        ];
-      }
-    )
+          return createDeterministicStrip(
+            counts,
+            reelIndex,
+            seedSaltOffset + symbolIndex * 104729,
+          );
+        },
+      );
+
+      return [targetSymbol, strips];
+    }),
   );
 }
 
-const BONUS_REEL_STRIPS_BY_SYMBOL =
-  createReelStripsBySymbol(
-    BONUS_TARGET_COUNTS,
-    0
-  );
-const FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL =
-  createReelStripsBySymbol(
-    FEATURE_SPIN_TARGET_COUNTS,
-    700001
-  );
+const BONUS_REEL_STRIPS_BY_SYMBOL = createReelStripsBySymbol(
+  BONUS_TARGET_COUNTS,
+  0,
+);
+const FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL = createReelStripsBySymbol(
+  FEATURE_SPIN_TARGET_COUNTS,
+  700001,
+);
 module.exports = {
   CONFIG_VERSION,
   ROW_COUNT,

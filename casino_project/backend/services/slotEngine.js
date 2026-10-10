@@ -14,64 +14,33 @@ const {
   FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL,
 } = require("../config/slotConfig");
 
-function generateGrid(
-  random = Math.random,
-  reelStrips = REEL_STRIPS
-) {
-  const grid = Array.from(
-    { length: ROW_COUNT },
-    () =>
-      Array(REEL_COUNT).fill(null)
+function generateGrid(random = Math.random, reelStrips = REEL_STRIPS) {
+  const grid = Array.from({ length: ROW_COUNT }, () =>
+    Array(REEL_COUNT).fill(null),
   );
 
-  for (
-    let reelIndex = 0;
-    reelIndex < REEL_COUNT;
-    reelIndex += 1
-  ) {
-    const strip =
-      reelStrips[reelIndex];
+  for (let reelIndex = 0; reelIndex < REEL_COUNT; reelIndex += 1) {
+    const strip = reelStrips[reelIndex];
 
-    const stopIndex =
-      Math.floor(
-        random() * strip.length
-      );
+    const stopIndex = Math.floor(random() * strip.length);
 
-    for (
-      let rowIndex = 0;
-      rowIndex < ROW_COUNT;
-      rowIndex += 1
-    ) {
-      grid[rowIndex][reelIndex] =
-        strip[
-          (
-            stopIndex +
-            rowIndex
-          ) % strip.length
-        ];
+    for (let rowIndex = 0; rowIndex < ROW_COUNT; rowIndex += 1) {
+      grid[rowIndex][reelIndex] = strip[(stopIndex + rowIndex) % strip.length];
     }
   }
 
   return grid;
 }
 
-function countMatchingSymbols(
-  lineSymbols,
-  targetSymbol
-) {
+function countMatchingSymbols(lineSymbols, targetSymbol) {
   let matchCount = 0;
 
   for (const symbol of lineSymbols) {
-    const matchesTarget =
-      symbol === targetSymbol;
+    const matchesTarget = symbol === targetSymbol;
 
-    const isWild =
-      symbol === SYMBOLS.WILD;
+    const isWild = symbol === SYMBOLS.WILD;
 
-    if (
-      !matchesTarget &&
-      !isWild
-    ) {
+    if (!matchesTarget && !isWild) {
       break;
     }
 
@@ -81,46 +50,25 @@ function countMatchingSymbols(
   return matchCount;
 }
 
-function evaluatePayline(
-  grid,
-  payline,
-  payoutUnit
-) {
-  const lineSymbols =
-    payline.map(
-      (rowIndex, reelIndex) =>
-        grid[rowIndex][reelIndex]
-    );
+function evaluatePayline(grid, payline, payoutUnit) {
+  const lineSymbols = payline.map(
+    (rowIndex, reelIndex) => grid[rowIndex][reelIndex],
+  );
 
   let bestWin = null;
 
-  for (
-    const [
-      targetSymbol,
-      payouts,
-    ] of Object.entries(PAYTABLE)
-  ) {
-    const matchCount =
-      countMatchingSymbols(
-        lineSymbols,
-        targetSymbol
-      );
+  for (const [targetSymbol, payouts] of Object.entries(PAYTABLE)) {
+    const matchCount = countMatchingSymbols(lineSymbols, targetSymbol);
 
-    const multiplier =
-      payouts[matchCount];
+    const multiplier = payouts[matchCount];
 
     if (!multiplier) {
       continue;
     }
 
-    const winAmount =
-      multiplier * payoutUnit;
+    const winAmount = multiplier * payoutUnit;
 
-    if (
-      !bestWin ||
-      winAmount >
-        bestWin.winAmount
-    ) {
+    if (!bestWin || winAmount > bestWin.winAmount) {
       bestWin = {
         symbol: targetSymbol,
         matchCount,
@@ -134,70 +82,34 @@ function evaluatePayline(
   return bestWin;
 }
 
-function countSymbol(
-  grid,
-  targetSymbol
-) {
-  return grid
-    .flat()
-    .filter(
-      (symbol) =>
-        symbol === targetSymbol
-    )
-    .length;
+function countSymbol(grid, targetSymbol) {
+  return grid.flat().filter((symbol) => symbol === targetSymbol).length;
 }
 
-function evaluateGrid(
-  grid,
-  baseBet
-) {
+function evaluateGrid(grid, baseBet) {
   const lineWins = [];
 
-  PAYLINES.forEach(
-    (payline, lineIndex) => {
-      const win =
-        evaluatePayline(
-          grid,
-          payline,
-          baseBet
-        );
+  PAYLINES.forEach((payline, lineIndex) => {
+    const win = evaluatePayline(grid, payline, baseBet);
 
-      if (win) {
-        lineWins.push({
-          lineIndex:
-            lineIndex + 1,
-          ...win,
-        });
-      }
+    if (win) {
+      lineWins.push({
+        lineIndex: lineIndex + 1,
+        ...win,
+      });
     }
-  );
+  });
 
-  const scatterCount =
-    countSymbol(
-      grid,
-      SYMBOLS.SCATTER
-    );
+  const scatterCount = countSymbol(grid, SYMBOLS.SCATTER);
 
-  const scatterMultiplier =
-    SCATTER_PAYTABLE[
-      scatterCount
-    ] || 0;
+  const scatterMultiplier = SCATTER_PAYTABLE[scatterCount] || 0;
 
-  const scatterWin =
-    scatterMultiplier *
-    baseBet;
+  const scatterWin = scatterMultiplier * baseBet;
 
-  const lineWinTotal =
-    lineWins.reduce(
-      (sum, win) =>
-        sum + win.winAmount,
-      0
-    );
+  const lineWinTotal = lineWins.reduce((sum, win) => sum + win.winAmount, 0);
 
   return {
-    totalWin:
-      lineWinTotal +
-      scatterWin,
+    totalWin: lineWinTotal + scatterWin,
 
     lineWinTotal,
     scatterWin,
@@ -206,73 +118,34 @@ function evaluateGrid(
   };
 }
 
-function selectExpandableSymbol(
-  random
-) {
-  const symbols =
-    BOOK_BONUS
-      .expandableSymbols;
+function selectExpandableSymbol(random) {
+  const symbols = BOOK_BONUS.expandableSymbols;
 
-  return symbols[
-    Math.floor(
-      random() *
-      symbols.length
-    )
-  ];
+  return symbols[Math.floor(random() * symbols.length)];
 }
 
-function validateSelectedSymbol(
-  selectedSymbol
-) {
-  if (
-    !BOOK_BONUS
-      .expandableSymbols
-      .includes(selectedSymbol)
-  ) {
-    throw new Error(
-      "A kiválasztott bővülő szimbólum nem érvényes."
-    );
+function validateSelectedSymbol(selectedSymbol) {
+  if (!BOOK_BONUS.expandableSymbols.includes(selectedSymbol)) {
+    throw new Error("A kiválasztott bővülő szimbólum nem érvényes.");
   }
 }
 
-function expandBookSymbol(
-  grid,
-  expandingSymbol
-) {
-  const expandedGrid =
-    grid.map(
-      (row) => [...row]
-    );
+function expandBookSymbol(grid, expandingSymbol) {
+  const expandedGrid = grid.map((row) => [...row]);
 
   const reelsWithSymbol = [];
 
-  for (
-    let reelIndex = 0;
-    reelIndex < REEL_COUNT;
-    reelIndex += 1
-  ) {
-    const hasSymbol =
-      grid.some(
-        (row) =>
-          row[reelIndex] ===
-          expandingSymbol
-      );
+  for (let reelIndex = 0; reelIndex < REEL_COUNT; reelIndex += 1) {
+    const hasSymbol = grid.some((row) => row[reelIndex] === expandingSymbol);
 
     if (hasSymbol) {
-      reelsWithSymbol.push(
-        reelIndex
-      );
+      reelsWithSymbol.push(reelIndex);
     }
   }
 
-  const hasWinningReelCount =
-    Boolean(
-      PAYTABLE[
-        expandingSymbol
-      ]?.[
-        reelsWithSymbol.length
-      ]
-    );
+  const hasWinningReelCount = Boolean(
+    PAYTABLE[expandingSymbol]?.[reelsWithSymbol.length],
+  );
 
   if (!hasWinningReelCount) {
     return {
@@ -281,95 +154,51 @@ function expandBookSymbol(
     };
   }
 
-  for (
-    const reelIndex
-    of reelsWithSymbol
-  ) {
-    for (
-      let rowIndex = 0;
-      rowIndex < ROW_COUNT;
-      rowIndex += 1
-    ) {
-      expandedGrid[
-        rowIndex
-      ][reelIndex] =
-        expandingSymbol;
+  for (const reelIndex of reelsWithSymbol) {
+    for (let rowIndex = 0; rowIndex < ROW_COUNT; rowIndex += 1) {
+      expandedGrid[rowIndex][reelIndex] = expandingSymbol;
     }
   }
 
   return {
     grid: expandedGrid,
-    expandedReels:
-      reelsWithSymbol,
+    expandedReels: reelsWithSymbol,
   };
 }
 
-function evaluateExpandedSpin({
-  originalGrid,
-  expandingSymbol,
-  baseBet,
-}) {
-  const expansion =
-    expandBookSymbol(
-      originalGrid,
-      expandingSymbol
-    );
+function evaluateExpandedSpin({ originalGrid, expandingSymbol, baseBet }) {
+  const expansion = expandBookSymbol(originalGrid, expandingSymbol);
 
-  const originalEvaluation =
-    evaluateGrid(
-      originalGrid,
-      baseBet
-    );
+  const originalEvaluation = evaluateGrid(originalGrid, baseBet);
 
-  const expandingReelCount =
-    expansion
-      .expandedReels
-      .length;
+  const expandingReelCount = expansion.expandedReels.length;
 
   const expandingMultiplier =
-    PAYTABLE[
-      expandingSymbol
-    ]?.[
-      expandingReelCount
-    ] || 0;
+    PAYTABLE[expandingSymbol]?.[expandingReelCount] || 0;
 
   /*A bővülő szimbólum az érintett tárcsák elhelyezkedésétőlfüggetlenül mind a tíz nyerővonalon fizet.*/
-  const expandingWin =
-    expandingMultiplier *
-    baseBet *
-    PAYLINES.length;
+  const expandingWin = expandingMultiplier * baseBet * PAYLINES.length;
 
   /*A normál nyerővonalakat és Scattereket az eredeti rácson értékeljük. A bővülő szimbólum nyereményét külön adjuk hozzá.*/
   return {
     originalGrid,
     grid: expansion.grid,
 
-    expandedReels:
-      expansion.expandedReels,
+    expandedReels: expansion.expandedReels,
 
-    lineWins:
-      originalEvaluation.lineWins,
+    lineWins: originalEvaluation.lineWins,
 
-    lineWinTotal:
-      originalEvaluation
-        .lineWinTotal,
+    lineWinTotal: originalEvaluation.lineWinTotal,
 
     expandingReelCount,
     expandingMultiplier,
     expandingWin,
 
-    scatterCount:
-      originalEvaluation
-        .scatterCount,
+    scatterCount: originalEvaluation.scatterCount,
 
-    scatterWin:
-      originalEvaluation
-        .scatterWin,
+    scatterWin: originalEvaluation.scatterWin,
 
-    totalWin:
-      originalEvaluation
-        .totalWin +
-      expandingWin,
+    totalWin: originalEvaluation.totalWin + expandingWin,
   };
 }
 
@@ -381,28 +210,17 @@ function playBookBonus({
   useFeatureReels = false,
   allowRetrigger = true,
 }) {
-  const expandingSymbol =
-    selectedSymbol ||
-    selectExpandableSymbol(
-      random
-    );
+  const expandingSymbol = selectedSymbol || selectExpandableSymbol(random);
 
-  validateSelectedSymbol(
-    expandingSymbol
-  );
+  validateSelectedSymbol(expandingSymbol);
 
-  const reelStrips =
-    useFeatureReels
-      ? BONUS_REEL_STRIPS_BY_SYMBOL[
-          expandingSymbol
-        ]
-      : REEL_STRIPS;
+  const reelStrips = useFeatureReels
+    ? BONUS_REEL_STRIPS_BY_SYMBOL[expandingSymbol]
+    : REEL_STRIPS;
 
   const freeSpinResults = [];
 
-  let remainingFreeSpins =
-    BOOK_BONUS
-      .initialFreeSpins;
+  let remainingFreeSpins = BOOK_BONUS.initialFreeSpins;
 
   let totalFreeSpins = 0;
   let retriggerCount = 0;
@@ -410,75 +228,49 @@ function playBookBonus({
   let uncappedTotalWin = 0;
   let maxWinApplied = false;
 
-  while (
-    remainingFreeSpins > 0 &&
-    totalWin < maxWinAmount
-  ) {
+  while (remainingFreeSpins > 0 && totalWin < maxWinAmount) {
     remainingFreeSpins -= 1;
     totalFreeSpins += 1;
 
-    const originalGrid =
-      generateGrid(
-        random,
-        reelStrips
-      );
+    const originalGrid = generateGrid(random, reelStrips);
 
-    const evaluated =
-      evaluateExpandedSpin({
-        originalGrid,
-        expandingSymbol,
-        baseBet,
-      });
+    const evaluated = evaluateExpandedSpin({
+      originalGrid,
+      expandingSymbol,
+      baseBet,
+    });
 
     if (
       allowRetrigger &&
-      evaluated.scatterCount >=
-        BOOK_BONUS
-          .triggerScatterCount
+      evaluated.scatterCount >= BOOK_BONUS.triggerScatterCount
     ) {
-      remainingFreeSpins +=
-        BOOK_BONUS
-          .retriggerFreeSpins;
+      remainingFreeSpins += BOOK_BONUS.retriggerFreeSpins;
 
       retriggerCount += 1;
     }
 
-    const remainingCapacity =
-      maxWinAmount -
-      totalWin;
+    const remainingCapacity = maxWinAmount - totalWin;
 
-    const creditedWin =
-      Math.min(
-        evaluated.totalWin,
-        remainingCapacity
-      );
+    const creditedWin = Math.min(evaluated.totalWin, remainingCapacity);
 
-    uncappedTotalWin +=
-      evaluated.totalWin;
+    uncappedTotalWin += evaluated.totalWin;
 
     totalWin += creditedWin;
 
-    const spinWasCapped =
-      creditedWin <
-      evaluated.totalWin;
+    const spinWasCapped = creditedWin < evaluated.totalWin;
 
-    maxWinApplied ||=
-      spinWasCapped;
+    maxWinApplied ||= spinWasCapped;
 
     freeSpinResults.push({
-      spinNumber:
-        totalFreeSpins,
+      spinNumber: totalFreeSpins,
 
       ...evaluated,
 
-      uncappedWin:
-        evaluated.totalWin,
+      uncappedWin: evaluated.totalWin,
 
-      totalWin:
-        creditedWin,
+      totalWin: creditedWin,
 
-      maxWinApplied:
-        spinWasCapped,
+      maxWinApplied: spinWasCapped,
     });
   }
 
@@ -486,9 +278,7 @@ function playBookBonus({
     type: "BOOK",
     expandingSymbol,
 
-    initialFreeSpins:
-      BOOK_BONUS
-        .initialFreeSpins,
+    initialFreeSpins: BOOK_BONUS.initialFreeSpins,
 
     totalFreeSpins,
     retriggerCount,
@@ -499,46 +289,23 @@ function playBookBonus({
   };
 }
 
-function spin({
-  baseBet = 1,
-  random = Math.random,
-  playBonus = true,
-} = {}) {
-  if (
-    !Number.isFinite(baseBet) ||
-    baseBet <= 0
-  ) {
-    throw new Error(
-      "A teljes tétnek pozitív számnak kell lennie."
-    );
+function spin({ baseBet = 1, random = Math.random, playBonus = true } = {}) {
+  if (!Number.isFinite(baseBet) || baseBet <= 0) {
+    throw new Error("A teljes tétnek pozitív számnak kell lennie.");
   }
 
-  const grid =
-    generateGrid(random);
+  const grid = generateGrid(random);
 
-  const maximumWinAmount =
-    baseBet *
-    MAX_WIN_MULTIPLIER;
+  const maximumWinAmount = baseBet * MAX_WIN_MULTIPLIER;
 
-  const baseResult =
-    evaluateGrid(
-      grid,
-      baseBet
-    );
+  const baseResult = evaluateGrid(grid, baseBet);
 
-  const uncappedBaseGameWin =
-    baseResult.totalWin;
+  const uncappedBaseGameWin = baseResult.totalWin;
 
-  const baseGameWin =
-    Math.min(
-      uncappedBaseGameWin,
-      maximumWinAmount
-    );
+  const baseGameWin = Math.min(uncappedBaseGameWin, maximumWinAmount);
 
   const bonusTriggered =
-    baseResult.scatterCount >=
-    BOOK_BONUS
-      .triggerScatterCount;
+    baseResult.scatterCount >= BOOK_BONUS.triggerScatterCount;
 
   /*
    * A bővülő szimbólumot
@@ -546,31 +313,25 @@ function spin({
    * véletlenszerűen választja.
    */
   const bonus =
-    bonusTriggered &&
-    playBonus
+    bonusTriggered && playBonus
       ? playBookBonus({
           baseBet,
           random,
 
-          maxWinAmount:
-            maximumWinAmount -
-            baseGameWin,
+          maxWinAmount: maximumWinAmount - baseGameWin,
 
           useFeatureReels: true,
         })
       : null;
 
-  const bonusWin =
-    bonus?.totalWin || 0;
+  const bonusWin = bonus?.totalWin || 0;
 
-  const totalWin =
-    baseGameWin +
-    bonusWin;
+  const totalWin = baseGameWin + bonusWin;
 
   return {
     grid,
     baseBet,
-    cost: result.cost,
+    cost: baseBet,
 
     ...baseResult,
 
@@ -582,9 +343,7 @@ function spin({
     bonus,
     maximumWinAmount,
 
-    maxWinReached:
-      totalWin >=
-      maximumWinAmount,
+    maxWinReached: totalWin >= maximumWinAmount,
   };
 }
 
@@ -593,60 +352,35 @@ function featureSpin({
   selectedSymbol,
   random = Math.random,
 } = {}) {
-  if (
-    !Number.isFinite(baseBet) ||
-    baseBet <= 0
-  ) {
-    throw new Error(
-      "A teljes tétnek pozitív számnak kell lennie."
-    );
+  if (!Number.isFinite(baseBet) || baseBet <= 0) {
+    throw new Error("A teljes tétnek pozitív számnak kell lennie.");
   }
 
-  validateSelectedSymbol(
-    selectedSymbol
-  );
+  validateSelectedSymbol(selectedSymbol);
 
-  const featureCost =
-    baseBet *
-    FEATURE_SPIN_COST_MULTIPLIER;
+  const featureCost = baseBet * FEATURE_SPIN_COST_MULTIPLIER;
 
-  const maximumWinAmount =
-    baseBet *
-    MAX_WIN_MULTIPLIER;
+  const maximumWinAmount = baseBet * MAX_WIN_MULTIPLIER;
 
-  const expandingSymbol =
-    selectedSymbol;
+  const expandingSymbol = selectedSymbol;
 
-  const reelStrips =
-    FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL[
-      expandingSymbol
-    ];
+  const reelStrips = FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL[expandingSymbol];
 
-  const originalGrid =
-    generateGrid(
-      random,
-      reelStrips
-    );
+  const originalGrid = generateGrid(random, reelStrips);
 
-  const evaluated =
-    evaluateExpandedSpin({
-      originalGrid,
-      expandingSymbol,
-      baseBet,
-    });
+  const evaluated = evaluateExpandedSpin({
+    originalGrid,
+    expandingSymbol,
+    baseBet,
+  });
 
-  const uncappedWin =
-    evaluated.totalWin;
+  const uncappedWin = evaluated.totalWin;
 
-  const totalWin =
-    Math.min(
-      uncappedWin,
-      maximumWinAmount
-    );
+  const totalWin = Math.min(uncappedWin, maximumWinAmount);
 
   return {
     baseBet,
-    cost: result.cost,
+    featureCost,
     expandingSymbol,
 
     ...evaluated,
@@ -655,9 +389,7 @@ function featureSpin({
     uncappedWin,
     maximumWinAmount,
 
-    maxWinReached:
-      totalWin >=
-      maximumWinAmount,
+    maxWinReached: totalWin >= maximumWinAmount,
   };
 }
 
@@ -666,60 +398,42 @@ function buyBookBonus({
   random = Math.random,
   forcedSymbol = null,
 } = {}) {
-  if (
-    !Number.isFinite(baseBet) ||
-    baseBet <= 0
-  ) {
-    throw new Error(
-      "A teljes tétnek pozitív számnak kell lennie."
-    );
+  if (!Number.isFinite(baseBet) || baseBet <= 0) {
+    throw new Error("A teljes tétnek pozitív számnak kell lennie.");
   }
 
   /* A forcedSymbol kizárólag statisztikai vizsgálathoz használható. A játék normálműködésében null marad.*/
   if (forcedSymbol !== null) {
-    validateSelectedSymbol(
-      forcedSymbol
-    );
+    validateSelectedSymbol(forcedSymbol);
   }
 
-  const purchaseCost =
-    baseBet *
-    BONUS_BUY_COST_MULTIPLIER;
+  const purchaseCost = baseBet * BONUS_BUY_COST_MULTIPLIER;
 
-  const maximumWinAmount =
-    baseBet *
-    MAX_WIN_MULTIPLIER;
+  const maximumWinAmount = baseBet * MAX_WIN_MULTIPLIER;
 
-  const bonus =
-    playBookBonus({
-      baseBet,
-      random,
-      maxWinAmount:
-        maximumWinAmount,
+  const bonus = playBookBonus({
+    baseBet,
+    random,
+    maxWinAmount: maximumWinAmount,
 
-      selectedSymbol:
-        forcedSymbol,
+    selectedSymbol: forcedSymbol,
 
-      useFeatureReels: true,
-      allowRetrigger: true,
-    });
+    useFeatureReels: true,
+    allowRetrigger: true,
+  });
 
   return {
     baseBet,
-    cost: result.cost,
+    cost: purchaseCost,
 
-    expandingSymbol:
-      bonus.expandingSymbol,
+    expandingSymbol: bonus.expandingSymbol,
 
-    totalWin:
-      bonus.totalWin,
+    totalWin: bonus.totalWin,
 
     bonus,
     maximumWinAmount,
 
-    maxWinReached:
-      bonus.totalWin >=
-      maximumWinAmount,
+    maxWinReached: bonus.totalWin >= maximumWinAmount,
   };
 }
 
