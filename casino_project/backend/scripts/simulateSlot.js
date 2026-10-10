@@ -76,13 +76,13 @@ function createSeededRandom(seed) {
 
 function playRound({
   mode,
-  totalBet,
+  baseBet,
   random,
   selectedSymbol,
 }) {
   if (mode === MODES.BASE) {
     return spin({
-      totalBet,
+      baseBet,
       random,
     });
   }
@@ -91,7 +91,7 @@ function playRound({
     mode === MODES.FEATURE
   ) {
     return featureSpin({
-      totalBet,
+      baseBet,
       selectedSymbol,
       random,
     });
@@ -101,7 +101,7 @@ function playRound({
     mode === MODES.BONUS
   ) {
     return buyBookBonus({
-      totalBet,
+      baseBet,
       random,
     });
   }
@@ -111,7 +111,7 @@ function playRound({
     MODES.BONUS_SYMBOL
   ) {
     return buyBookBonus({
-      totalBet,
+      baseBet,
       random,
 
       forcedSymbol:
@@ -129,7 +129,7 @@ function getWager(
   mode
 ) {
   if (mode === MODES.BASE) {
-    return result.totalBet;
+    return result.baseBet;
   }
 
   if (
@@ -144,7 +144,7 @@ function getWager(
 function getReferenceBet(
   result
 ) {
-  return result.totalBet;
+  return result.baseBet;
 }
 
 function runSimulation({
@@ -152,7 +152,7 @@ function runSimulation({
   roundCount,
   seed,
   selectedSymbol = null,
-  totalBet = 1,
+  baseBet = 1,
 }) {
   if (
     !Object
@@ -225,7 +225,7 @@ function runSimulation({
     const result =
       playRound({
         mode,
-        totalBet,
+        baseBet,
         random,
         selectedSymbol,
       });
@@ -343,7 +343,7 @@ function runSimulation({
 
     seed,
     roundCount,
-    totalBet,
+    baseBet,
     totalWager,
     totalWin,
 
@@ -495,7 +495,7 @@ if (
           .toUpperCase()
       : null;
 
-  const totalBet = 1
+  const baseBet = 1;
 
   if (
     !Number.isInteger(
@@ -514,7 +514,7 @@ if (
       roundCount,
       seed,
       selectedSymbol,
-      totalBet,
+      baseBet,
     }),
 
     createdAt:

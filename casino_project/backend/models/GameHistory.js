@@ -6,7 +6,7 @@ const slotDetailsSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        bonussource: { 
+        bonusSource: { 
             type: String,
             enum: ["NATURAL", "PURCHASED"],
             default: null,
@@ -43,7 +43,7 @@ const gameHistorySchema = new mongoose.Schema(
     gameMode: {
       type: String,
       required: true,
-        enum: ["BASE_GAME", "BONUS_GAME", "BONUS_BUY", "FEATURE_SPIN","STANDARD"],
+        enum: ["BASE_GAME", "BONUS_BUY", "FEATURE_SPIN","STANDARD"],
     },
     slotDetails: {
         type: slotDetailsSchema,
@@ -65,7 +65,7 @@ const gameHistorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    bet: {
+    baseBet: {
       type: Number,
       required: true,
       min: [0, "A tét nem lehet negatív."],

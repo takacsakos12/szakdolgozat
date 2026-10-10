@@ -149,7 +149,7 @@ function countSymbol(
 
 function evaluateGrid(
   grid,
-  totalBet
+  baseBet
 ) {
   const lineWins = [];
 
@@ -159,7 +159,7 @@ function evaluateGrid(
         evaluatePayline(
           grid,
           payline,
-          totalBet
+          baseBet
         );
 
       if (win) {
@@ -185,7 +185,7 @@ function evaluateGrid(
 
   const scatterWin =
     scatterMultiplier *
-    totalBet;
+    baseBet;
 
   const lineWinTotal =
     lineWins.reduce(
@@ -307,7 +307,7 @@ function expandBookSymbol(
 function evaluateExpandedSpin({
   originalGrid,
   expandingSymbol,
-  totalBet,
+  baseBet,
 }) {
   const expansion =
     expandBookSymbol(
@@ -318,7 +318,7 @@ function evaluateExpandedSpin({
   const originalEvaluation =
     evaluateGrid(
       originalGrid,
-      totalBet
+      baseBet
     );
 
   const expandingReelCount =
@@ -336,7 +336,7 @@ function evaluateExpandedSpin({
   /*A bővülő szimbólum az érintett tárcsák elhelyezkedésétőlfüggetlenül mind a tíz nyerővonalon fizet.*/
   const expandingWin =
     expandingMultiplier *
-    totalBet *
+    baseBet *
     PAYLINES.length;
 
   /*A normál nyerővonalakat és Scattereket az eredeti rácson értékeljük. A bővülő szimbólum nyereményét külön adjuk hozzá.*/
@@ -374,7 +374,7 @@ function evaluateExpandedSpin({
 }
 
 function playBookBonus({
-  totalBet,
+  baseBet,
   random = Math.random,
   maxWinAmount = Infinity,
   selectedSymbol = null,
@@ -427,7 +427,7 @@ function playBookBonus({
       evaluateExpandedSpin({
         originalGrid,
         expandingSymbol,
-        totalBet,
+        baseBet,
       });
 
     if (
@@ -500,13 +500,13 @@ function playBookBonus({
 }
 
 function spin({
-  totalBet = 1,
+  baseBet = 1,
   random = Math.random,
   playBonus = true,
 } = {}) {
   if (
-    !Number.isFinite(totalBet) ||
-    totalBet <= 0
+    !Number.isFinite(baseBet) ||
+    baseBet <= 0
   ) {
     throw new Error(
       "A teljes tétnek pozitív számnak kell lennie."
@@ -517,13 +517,13 @@ function spin({
     generateGrid(random);
 
   const maximumWinAmount =
-    totalBet *
+    baseBet *
     MAX_WIN_MULTIPLIER;
 
   const baseResult =
     evaluateGrid(
       grid,
-      totalBet
+      baseBet
     );
 
   const uncappedBaseGameWin =
@@ -549,7 +549,7 @@ function spin({
     bonusTriggered &&
     playBonus
       ? playBookBonus({
-          totalBet,
+          baseBet,
           random,
 
           maxWinAmount:
@@ -569,7 +569,7 @@ function spin({
 
   return {
     grid,
-    totalBet,
+    baseBet,
 
     ...baseResult,
 
@@ -588,13 +588,13 @@ function spin({
 }
 
 function featureSpin({
-  totalBet = 1,
+  baseBet = 1,
   selectedSymbol,
   random = Math.random,
 } = {}) {
   if (
-    !Number.isFinite(totalBet) ||
-    totalBet <= 0
+    !Number.isFinite(baseBet) ||
+    baseBet <= 0
   ) {
     throw new Error(
       "A teljes tétnek pozitív számnak kell lennie."
@@ -606,11 +606,11 @@ function featureSpin({
   );
 
   const featureCost =
-    totalBet *
+    baseBet *
     FEATURE_SPIN_COST_MULTIPLIER;
 
   const maximumWinAmount =
-    totalBet *
+    baseBet *
     MAX_WIN_MULTIPLIER;
 
   const expandingSymbol =
@@ -631,7 +631,7 @@ function featureSpin({
     evaluateExpandedSpin({
       originalGrid,
       expandingSymbol,
-      totalBet,
+      baseBet,
     });
 
   const uncappedWin =
@@ -644,7 +644,7 @@ function featureSpin({
     );
 
   return {
-    totalBet,
+    baseBet,
     featureCost,
     expandingSymbol,
 
@@ -661,13 +661,13 @@ function featureSpin({
 }
 
 function buyBookBonus({
-  totalBet = 1,
+  baseBet = 1,
   random = Math.random,
   forcedSymbol = null,
 } = {}) {
   if (
-    !Number.isFinite(totalBet) ||
-    totalBet <= 0
+    !Number.isFinite(baseBet) ||
+    baseBet <= 0
   ) {
     throw new Error(
       "A teljes tétnek pozitív számnak kell lennie."
@@ -682,16 +682,16 @@ function buyBookBonus({
   }
 
   const purchaseCost =
-    totalBet *
+    baseBet *
     BONUS_BUY_COST_MULTIPLIER;
 
   const maximumWinAmount =
-    totalBet *
+    baseBet *
     MAX_WIN_MULTIPLIER;
 
   const bonus =
     playBookBonus({
-      totalBet,
+      baseBet,
       random,
       maxWinAmount:
         maximumWinAmount,
@@ -704,7 +704,7 @@ function buyBookBonus({
     });
 
   return {
-    totalBet,
+    baseBet,
     purchaseCost,
 
     expandingSymbol:

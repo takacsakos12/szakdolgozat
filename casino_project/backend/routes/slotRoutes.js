@@ -21,15 +21,15 @@ const {
 const router = express.Router();
 const ALLOWED_BETS = [1, 2, 5, 10, 20, 50, 100];
 
-function getTotalBet(value) {
-    const totalBet = Number(value);
+function getBaseBet(value) {
+    const baseBet = Number(value);
 
-    if (!Number.isFinite(totalBet) ||
-        !ALLOWED_BETS.includes(totalBet)
+    if (!Number.isFinite(baseBet) ||
+        !ALLOWED_BETS.includes(baseBet)
     ) {
         return null;
     }
-    return totalBet;
+    return baseBet;
 }
 
 function sendErrorResponse(res, error) {
@@ -47,8 +47,8 @@ router.get("/config", (req, res) => {
         rows: ROW_COUNT,
         reels: REEL_COUNT,
         symbols: SYMBOLS,
-        paylines: PAYLINES,
-        paytables: PAYTABLE,
+        payline: PAYLINES,
+        paytable: PAYTABLE,
         scatterPaytable: SCATTER_PAYTABLE,
         allowedBets: ALLOWED_BETS,
 
@@ -56,10 +56,10 @@ router.get("/config", (req, res) => {
             initialFreeSpins:
                 BOOK_BONUS.initialFreeSpins,
 
-            triggerscatterCount:
+            triggerScatterCount:
                 BOOK_BONUS.triggerScatterCount,
 
-            expendableSymbols:
+            expandableSymbols:
                 BOOK_BONUS.expandableSymbols,
 
             purchaseCostMultiplier:
@@ -80,8 +80,8 @@ router.get("/config", (req, res) => {
 });
 
 router.post("/spin", (req, res) => {
-    const totalBet =getTotalBet(req.body.totalBet);
-    if (totalBet === null) {
+    const baseBet =getBaseBet(req.body.baseBet);
+    if (baseBet === null) {
         return res.status(400).json({
             message: "Érvénytelen tét.",
             allowedBets: ALLOWED_BETS,
@@ -89,7 +89,7 @@ router.post("/spin", (req, res) => {
     }
 
     try {
-        const result = spin({totalBet});
+        const result = spin({baseBet});
 
         return res.status(200).json({
             gameMode: "BASE_GAME",
@@ -101,15 +101,15 @@ router.post("/spin", (req, res) => {
 });
 
 router.post("/bonus-buy", (req, res) => { 
-    const totalBet = getTotalBet(req.body.totalBet);
-    if (totalBet === null) {
+    const baseBet = getBaseBet(req.body.baseBet);
+    if (baseBet === null) {
         return res.status(400).json({
             message: "Érvénytelen tét.",
             allowedBets: ALLOWED_BETS,
         });
     }
     try {
-        const result = buyBookBonus({totalBet});
+        const result = buyBookBonus({baseBet});
         return res.status(200).json({
             gameMode: "BOOK_BONUS",
             result:result,
@@ -120,11 +120,11 @@ router.post("/bonus-buy", (req, res) => {
 });
 
 router.post("/feature-spin", (req, res) => {
-    const totalBet = getTotalBet(req.body.totalBet);
+    const baseBet = getBaseBet(req.body.baseBet);
 
     const selectedSymbol = typeof req.body.selectedSymbol === "string" ? req.body.selectedSymbol.trim().toUpperCase(): "";
 
-    if (totalBet === null) {
+    if (baseBet === null) {
         return res.status(400).json({message: "Érvénytelen tét.",allowedBets: ALLOWED_BETS,});
     }
 
@@ -140,7 +140,7 @@ router.post("/feature-spin", (req, res) => {
     }
 
     try {
-        const result = featureSpin({totalBet,selectedSymbol});
+        const result = featureSpin({baseBet,selectedSymbol});
 
         return res.status(200).json({ gameMode: "FEATURE_SPIN",result: result,});
     } catch (error) {return sendErrorResponse( res,error);
