@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
     balance: {
       type: Number,
       default: 10000,
+      required: true,
       min: [0, "Az egyenleg nem lehet negatív."],
     },
   },
