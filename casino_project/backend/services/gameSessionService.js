@@ -192,7 +192,7 @@ async function settleGameResult({
       });
 
       if (existingHistory) {
-        verifyExistingRequest(existingHistory, { gameMode, baseBet });
+        verifyExistingRequest(existingHistory, { gameMode, baseBet, selectedSy});
         return toSettlement(existingHistory, true);
       }
     }

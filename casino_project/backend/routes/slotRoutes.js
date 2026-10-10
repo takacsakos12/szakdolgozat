@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   getSettledGame,
-  SettleGameResult,
+  settleGameResult,
 } = require("../services/gameSessionService");
 
 const protectRoute = require("../middleware/authMiddleware");
