@@ -47,7 +47,7 @@ router.get("/config", (req, res) => {
         rows: ROW_COUNT,
         reels: REEL_COUNT,
         symbols: SYMBOLS,
-        payline: PAYLINES,
+        paylines: PAYLINES,
         paytable: PAYTABLE,
         scatterPaytable: SCATTER_PAYTABLE,
         allowedBets: ALLOWED_BETS,
@@ -111,7 +111,7 @@ router.post("/bonus-buy", (req, res) => {
     try {
         const result = buyBookBonus({baseBet});
         return res.status(200).json({
-            gameMode: "BOOK_BONUS",
+            gameMode: "BONUS_BUY",
             result:result,
         });
     } catch (error) {

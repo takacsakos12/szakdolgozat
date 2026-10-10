@@ -20,7 +20,7 @@ const slotDetailsSchema = new mongoose.Schema(
             type: String,
             default: null,
         },
-        bonusWinAmount: {
+        bonusWin: {
             type: Number,
             default: 0,
             min: 0,
