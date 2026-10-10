@@ -8,11 +8,7 @@ const slotDetailsSchema = new mongoose.Schema(
         },
         bonussource: { 
             type: String,
-            enum: ["NATURAL", "PURCHASE"],
-            default: null,
-        },
-        expandableSymbols: {
-            type: String,
+            enum: ["NATURAL", "PURCHASED"],
             default: null,
         },
         totalFreeSpins: {
@@ -20,16 +16,20 @@ const slotDetailsSchema = new mongoose.Schema(
             default: null,
             min: [0, "A teljes ingyenes pörgetések száma nem lehet negatív."],
         },
-        bonusWinamount: {
-            type: Number,
+        expandingSymbol: {
+            type: String,
             default: null,
-            min: [0, "A bónusz nyeremény összege nem lehet negatív."],
+        },
+        bonusWinAmount: {
+            type: Number,
+            default: 0,
+            min: 0,
         },        
     },
     { _id: false }
 );
 
-const gameSessionSchema = new mongoose.Schema(
+const gameHistorySchema = new mongoose.Schema(
   { userId: { 
     type: mongoose.Schema.Types.ObjectId, ref: "User",
     required: true,
@@ -38,7 +38,7 @@ const gameSessionSchema = new mongoose.Schema(
     gameType: {
       type: String,
       required: true,
-      enum: ["SLOT", "ROULETTE", "BLACKJACK", "BACCAT",],
+      enum: ["SLOT", "ROULETTE", "BLACKJACK", "BACCARAT",],
     },
     gameMode: {
       type: String,
@@ -65,7 +65,7 @@ const gameSessionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    totalBet: {
+    bet: {
       type: Number,
       required: true,
       min: [0, "A tét nem lehet negatív."],
@@ -75,7 +75,7 @@ const gameSessionSchema = new mongoose.Schema(
       required: true,
       min: [0, "A költség nem lehet negatív."],
     },
-    netresult: {
+    netResult: {
       type: Number,
       required: true
     },
@@ -101,7 +101,7 @@ const gameSessionSchema = new mongoose.Schema(
     }
 );
     
-gameSessionSchema.index({ userId: 1, createdAt: -1 });
-module.exports = mongoose.model("GameSession", gameSessionSchema);
+gameHistorySchema.index({ userId: 1, createdAt: -1 });
+module.exports = mongoose.model("GameHistory", gameHistorySchema);
 
     
