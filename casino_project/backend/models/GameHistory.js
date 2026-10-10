@@ -118,5 +118,20 @@ const gameHistorySchema = new mongoose.Schema(
   },
 );
 
+gameHistorySchema.index(
+  {
+    userId: 1,
+    requestId: 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      requestId: {
+        $type: "string",
+      },
+    },
+  },
+);
+
 gameHistorySchema.index({ userId: 1, createdAt: -1 });
 module.exports = mongoose.model("GameHistory", gameHistorySchema);

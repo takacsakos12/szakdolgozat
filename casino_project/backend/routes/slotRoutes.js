@@ -5,14 +5,6 @@ const {
 } = require("../services/gameSessionService");
 
 const protectRoute = require("../middleware/authMiddleware");
-
-const {
-  getSettledGame,
-  settleGameResult,
-} = require("../services/gameSessionService");
-
-const protectRoute = require("../middleware/authMiddleware");
-
 const {
   CONFIG_VERSION,
   ROW_COUNT,
@@ -110,12 +102,18 @@ function validateGameRequest(req, res) {
   };
 }
 
-async function findPreviousResult(req, requestData, gameMode) {
+async function findPreviousResult(
+  req,
+  requestData,
+  gameMode,
+  selectedSymbol = null,
+) {
   return getSettledGame({
     userId: req.user._id,
     requestId: requestData.requestId,
     gameMode,
     baseBet: requestData.baseBet,
+    selectedSymbol,
   });
 }
 
@@ -289,6 +287,7 @@ router.post("/feature-spin", protectRoute, async (req, res) => {
       req,
       requestData,
       "FEATURE_SPIN",
+      selectedSymbol,
     );
 
     if (previousResult) {
@@ -327,6 +326,7 @@ router.post("/feature-spin", protectRoute, async (req, res) => {
       result,
       slotDetails,
       requestId,
+      selectedSymbol,
     });
 
     return sendGameResponse(res, settlement);

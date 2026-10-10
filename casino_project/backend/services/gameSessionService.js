@@ -24,14 +24,23 @@ function normalizeRequestId(requestId) {
   return normalizedRequestId;
 }
 
-function verifyExistingRequest(existingHistory, { gameMode, baseBet }) {
-  if (
-    existingHistory.gameMode !== gameMode ||
-    Number(existingHistory.baseBet) !== Number(baseBet)
-  ) {
+function verifyExistingRequest(
+  existingHistory,
+  { gameMode, baseBet, selectedSymbol = null },
+) {
+  const differentGame = existingHistory.gameMode !== gameMode;
+
+  const differentBet = Number(existingHistory.baseBet) !== Number(baseBet);
+
+  const differentFeatureSymbol =
+    gameMode === "FEATURE_SPIN" &&
+    selectedSymbol !== null &&
+    existingHistory.result?.expandingSymbol !== selectedSymbol;
+
+  if (differentGame || differentBet || differentFeatureSymbol) {
     throw createRequestError(
-      "A kérés már feldolgozásra került egy másik játékmóddal vagy téttel.",
-      400,
+      "A kérésazonosítót már másik játékkéréshez használták.",
+      409,
     );
   }
 }
@@ -49,7 +58,13 @@ function toSettlement(history, replayed = false) {
   };
 }
 
-async function getSettledGame({ userId, requestId, gameMode, baseBet }) {
+async function getSettledGame({
+  userId,
+  requestId,
+  gameMode,
+  baseBet,
+  selectedSymbol = null,
+}) {
   if (!userId) {
     throw createRequestError("Az userId hiányzik.");
   }
@@ -68,6 +83,7 @@ async function getSettledGame({ userId, requestId, gameMode, baseBet }) {
   verifyExistingRequest(existingHistory, {
     gameMode,
     baseBet,
+    selectedSymbol,
   });
 
   return toSettlement(existingHistory, true);
@@ -84,6 +100,7 @@ async function settleGameResult({
   result,
   slotDetails,
   requestId,
+  selectedSymbol = null
 }) {
   if (!userId) {
     throw createRequestError("Az userId hiányzik.");
@@ -115,7 +132,7 @@ async function settleGameResult({
       }).session(session);
 
       if (existingHistory) {
-        verifyExistingRequest(existingHistory, { gameMode, baseBet });
+        verifyExistingRequest(existingHistory, { gameMode, baseBet, selectedSymbol});
         settlement = toSettlement(existingHistory, true);
         return;
       }

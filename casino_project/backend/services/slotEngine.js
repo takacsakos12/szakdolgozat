@@ -380,6 +380,7 @@ function featureSpin({
 
   return {
     baseBet,
+    cost: featureCost,
     featureCost,
     expandingSymbol,
 
