@@ -570,6 +570,7 @@ function spin({
   return {
     grid,
     baseBet,
+    cost: result.cost,
 
     ...baseResult,
 
@@ -645,7 +646,7 @@ function featureSpin({
 
   return {
     baseBet,
-    featureCost,
+    cost: result.cost,
     expandingSymbol,
 
     ...evaluated,
@@ -705,7 +706,7 @@ function buyBookBonus({
 
   return {
     baseBet,
-    purchaseCost,
+    cost: result.cost,
 
     expandingSymbol:
       bonus.expandingSymbol,

@@ -79,11 +79,15 @@ const gameHistorySchema = new mongoose.Schema(
       type: Number,
       required: true
     },
-     winAmount: {
-        type: Number,
-        required: true,
-        min: 0,
+    winAmount: {
+      type: Number,
+      required: true,
+      min: 0,
       },
+    result: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+}, 
 
     balanceBefore: {
       type: Number,
