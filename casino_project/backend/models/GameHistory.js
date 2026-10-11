@@ -22,6 +22,16 @@ const slotDetailsSchema = new mongoose.Schema(
       enum: BOOK_BONUS.expandableSymbols,
       default: null,
     },
+    baseGameWin: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    retriggerCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     bonusWin: {
       type: Number,
       default: 0,

@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const GameHistory = require("../models/GameHistory");
+const {
+  getOrCreateActiveSeed,
+  reserveNonce,
+  createRandomGenerator,
+} = require("./provablyFairService");
 
 function createRequestError(message, statusCode = 400) {
   const error = new Error(message);
@@ -50,6 +55,7 @@ function toSettlement(history, replayed = false) {
     requestId: history.requestId,
     gameMode: history.gameMode,
     result: history.result,
+    provablyFair: history.provablyFair,
     balanceBefore: history.balanceBefore,
     balanceAfter: history.balanceAfter,
     netResult: history.netResult,
@@ -95,12 +101,10 @@ async function settleGameResult({
   gameMode,
   configVersion,
   baseBet,
-  cost,
-  winAmount,
-  result,
-  slotDetails,
   requestId,
-  selectedSymbol = null
+  gameDomain,
+  createGameResult,
+  selectedSymbol = null,
 }) {
   if (!userId) {
     throw createRequestError("Az userId hiányzik.");
@@ -110,16 +114,21 @@ async function settleGameResult({
     throw createRequestError("Az alaptét érvénytelen.");
   }
 
-  if (!Number.isFinite(cost) || cost <= 0) {
-    throw createRequestError("A költség érvénytelen.");
+  if (typeof createGameResult !== "function") {
+    throw createRequestError(
+      "A játékeredményt előállító függvény hiányzik.",
+      500,
+    );
   }
 
-  if (!Number.isFinite(winAmount) || winAmount < 0) {
-    throw createRequestError("A nyeremény érvénytelen.");
+  if (typeof gameDomain !== "string" || !gameDomain.trim()) {
+    throw createRequestError("A Provably Fair játékazonosító hiányzik.", 500);
   }
 
   const normalizedRequestId = normalizeRequestId(requestId);
-  const netResult = winAmount - cost;
+
+  await getOrCreateActiveSeed({ userId });
+
   const session = await mongoose.startSession();
 
   try {
@@ -132,10 +141,47 @@ async function settleGameResult({
       }).session(session);
 
       if (existingHistory) {
-        verifyExistingRequest(existingHistory, { gameMode, baseBet, selectedSymbol});
+        verifyExistingRequest(existingHistory, {
+          gameMode,
+          baseBet,
+          selectedSymbol,
+        });
+
         settlement = toSettlement(existingHistory, true);
         return;
       }
+
+      const fairSeed = await reserveNonce({
+        userId,
+        session,
+      });
+
+      const randomGenerator = createRandomGenerator({
+        serverSeed: fairSeed.serverSeed,
+        clientSeed: fairSeed.clientSeed,
+        nonce: fairSeed.nonce,
+        gameDomain,
+      });
+
+      const gameData = createGameResult(() => randomGenerator.randomFloat());
+
+      if (!gameData || typeof gameData !== "object") {
+        throw createRequestError("A játékeredmény formátuma érvénytelen.", 500);
+      }
+
+      const { result, slotDetails } = gameData;
+      const cost = result?.cost;
+      const winAmount = result?.totalWin;
+
+      if (!Number.isFinite(cost) || cost <= 0) {
+        throw createRequestError("A költség érvénytelen.");
+      }
+
+      if (!Number.isFinite(winAmount) || winAmount < 0) {
+        throw createRequestError("A nyeremény érvénytelen.");
+      }
+
+      const netResult = winAmount - cost;
 
       const user = await User.findOneAndUpdate(
         {
@@ -173,6 +219,14 @@ async function settleGameResult({
             netResult,
             result,
             slotDetails,
+            provablyFair: {
+              seedId: fairSeed.seedId,
+              serverSeedHash: fairSeed.serverSeedHash,
+              clientSeed: fairSeed.clientSeed,
+              nonce: fairSeed.nonce,
+              gameDomain,
+              algorithmVersion: fairSeed.algorithmVersion,
+            },
             balanceBefore,
             balanceAfter,
           },
@@ -192,7 +246,12 @@ async function settleGameResult({
       });
 
       if (existingHistory) {
-        verifyExistingRequest(existingHistory, { gameMode, baseBet, selectedSy});
+        verifyExistingRequest(existingHistory, {
+          gameMode,
+          baseBet,
+          selectedSymbol,
+        });
+
         return toSettlement(existingHistory, true);
       }
     }
