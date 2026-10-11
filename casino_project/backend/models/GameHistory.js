@@ -31,6 +31,38 @@ const slotDetailsSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const provablyFairDetailsSchema = new mongoose.Schema(
+  {
+    seedId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProvablyFairSeed",
+      required: true,
+    },
+    serverSeedHash: {
+      type: String,
+      required: true,
+    },
+    clientSeed: {
+      type: String,
+      required: true,
+    },
+    nonce: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    gameDomain: {
+      type: String,
+      required: true,
+    },
+    algorithmVersion: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
 const gameHistorySchema = new mongoose.Schema(
   {
     userId: {
@@ -65,6 +97,10 @@ const gameHistorySchema = new mongoose.Schema(
 
         message: "A slotDetails mező kizárólag SLOT játékhoz használható.",
       },
+    },
+    provablyFair: {
+      type: provablyFairDetailsSchema,
+      default: undefined,
     },
     configVersion: {
       type: String,
