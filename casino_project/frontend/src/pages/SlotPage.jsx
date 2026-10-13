@@ -71,8 +71,11 @@ function SlotPage({ user }) {
   }
 
   function handleBetChange(newBet) {
+    if (pendingRequest || isSpinning) {
+      return;
+    }
+
     setSelectedBet(newBet);
-    setPendingRequest(null);
     setErrorMessage("");
   }
 
@@ -158,7 +161,7 @@ function SlotPage({ user }) {
             allowedBets={allowedBets}
             selectedBet={selectedBet}
             onBetChange={handleBetChange}
-            disabled={isSpinning || isLoadingConfig}
+            disabled={isSpinning || isLoadingConfig || Boolean(pendingRequest)}
           />
 
           <button
