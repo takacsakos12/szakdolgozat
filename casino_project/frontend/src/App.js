@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
-
+import SlotPage from "./pages/SlotPage";
 import "./App.css";
 import AuthPage from "./AuthPage";
 
@@ -11,21 +11,25 @@ const games = [
     id: "slot",
     label: "SLOT",
     title: "Nyerőgép",
+    path: "/games/slot",
   },
   {
     id: "roulette",
     label: "0–36",
     title: "Európai rulett",
+    path: "/games/roulette",
   },
   {
     id: "blackjack",
     label: "21",
     title: "Blackjack",
+    path: "/games/blackjack",
   },
   {
     id: "baccarat",
     label: "P / B",
     title: "Baccarat",
+    path: "/games/baccarat",
   },
 ];
 
@@ -88,13 +92,12 @@ function GameCard({ game }) {
       </div>
 
       <div className="game-information">
-        <span className="game-status">Fejlesztés alatt</span>
         <h3>{game.title}</h3>
 
-        <button className="game-button" type="button">
+        <Link className="game-button" to={game.path}>
           <span>Megnyitás</span>
           <span aria-hidden="true">→</span>
-        </button>
+        </Link>
       </div>
     </article>
   );
@@ -334,6 +337,7 @@ function App() {
             <AuthPage mode="register" user={user} onAuthenticated={setUser} />
           }
         />
+        <Route path="/games/slot" element={<SlotPage user={user} />} />
       </Routes>
 
       <Footer />
