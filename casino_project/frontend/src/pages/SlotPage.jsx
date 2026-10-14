@@ -15,7 +15,7 @@ function createRequestId() {
   return window.crypto.randomUUID();
 }
 
-const BONUS_SPIN_DURATION = 5000;
+const BONUS_SPIN_DURATION = 2000;
 
 function wait(milliseconds) {
   return new Promise((resolve) => {
@@ -38,6 +38,7 @@ function SlotPage({ user, onUserChange }) {
 
   const [isLoadingConfig, setIsLoadingConfig] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [isGridSpinning, setIsGridSpinning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pendingRequest, setPendingRequest] = useState(null);
   const [bonusPlayback, setBonusPlayback] = useState(null);
@@ -176,7 +177,9 @@ function SlotPage({ user, onUserChange }) {
   async function executeGame(mode, request) {
     try {
       setIsSpinning(true);
+      setIsGridSpinning(true);
       setErrorMessage("");
+      setBonusPlayback(null);
 
       let response;
 
@@ -188,7 +191,7 @@ function SlotPage({ user, onUserChange }) {
         response = await spinSlot(request);
       }
 
-      setGameMode(mode);
+      setIsGridSpinning(false);
       setGameMode(mode);
 
       const freeSpins = response.result.bonus?.freeSpinResults || [];
@@ -220,6 +223,7 @@ function SlotPage({ user, onUserChange }) {
         setPendingRequest(null);
       }
     } finally {
+      setIsGridSpinning(false);
       setIsSpinning(false);
     }
   }
@@ -346,7 +350,13 @@ function SlotPage({ user, onUserChange }) {
                   grid={displayedGrid}
                   rowCount={rowCount}
                   reelCount={reelCount}
-                  isSpinning={isSpinning}
+                  isSpinning={isSpinning && !bonusPlayback}
+                  expandingSymbol={
+                    bonusPlayback?.expandingSymbol ||
+                    (gameMode === "FEATURE_SPIN"
+                      ? gameResult?.expandingSymbol || selectedSymbol
+                      : null)
+                  }
                 />
               )}
 

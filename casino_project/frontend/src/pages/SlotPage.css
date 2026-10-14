@@ -117,6 +117,26 @@
   border-color: var(--primary);
 }
 
+/* Bónuszjáték kiválasztott bővülő szimbóluma */
+.slot-symbol-expanding {
+  color: #151515;
+  background: linear-gradient(
+    145deg,
+    #fff3a0 0%,
+    #f5c542 55%,
+    #d99a16 100%
+  );
+  border: 2px solid #ffe080;
+  box-shadow:
+    0 0 12px rgba(245, 197, 66, 0.45),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.slot-symbol-expanding span {
+  color: #151515;
+  font-weight: 900;
+}
+
 .slot-grid-spinning .slot-symbol {
   opacity: 0.5;
   transform: translateY(3px);
@@ -183,7 +203,7 @@
   box-shadow: 0 0 22px rgba(245, 197, 66, 0.15);
 }
 
-.slot-side-action-label {
+.slot-side-action-title {
   color: var(--text);
   font-size: 0.9rem;
   font-weight: 900;
@@ -709,7 +729,7 @@
     padding: 12px 8px;
   }
 
-  .slot-side-action-label {
+  .slot-side-action-title {
     font-size: 0.72rem;
   }
 

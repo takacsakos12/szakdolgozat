@@ -15,7 +15,13 @@ function createEmptyGrid(rowCount, reelCount) {
   return Array.from({ length: rowCount }, () => Array(reelCount).fill(null));
 }
 
-function SlotGrid({ grid, rowCount = 3, reelCount = 5, isSpinning = false }) {
+function SlotGrid({
+  grid,
+  rowCount = 3,
+  reelCount = 5,
+  isSpinning = false,
+  expandingSymbol = null,
+}) {
   const hasValidGrid =
     Array.isArray(grid) &&
     grid.length === rowCount &&
@@ -36,23 +42,34 @@ function SlotGrid({ grid, rowCount = 3, reelCount = 5, isSpinning = false }) {
       aria-busy={isSpinning}
     >
       {displayedGrid.map((row, rowIndex) =>
-        row.map((symbol, reelIndex) => (
-          <div
-            className={`slot-symbol ${
-              symbol ? `slot-symbol-${symbol.toLowerCase()}` : ""
-            }`}
-            data-symbol={symbol || undefined}
-            key={`${rowIndex}-${reelIndex}`}
-            role="gridcell"
-            aria-label={
-              symbol
-                ? `Szimbólum: ${SYMBOL_LABELS[symbol] || symbol}`
-                : "Üres pozíció"
-            }
-          >
-            <span>{symbol ? SYMBOL_LABELS[symbol] || symbol : "—"}</span>
-          </div>
-        )),
+        row.map((symbol, reelIndex) => {
+          const isExpandingSymbol =
+            symbol !== null && symbol === expandingSymbol;
+
+          const symbolClasses = [
+            "slot-symbol",
+            symbol ? `slot-symbol-${symbol.toLowerCase()}` : "",
+            isExpandingSymbol ? "slot-symbol-expanding" : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
+
+          return (
+            <div
+              className={symbolClasses}
+              data-symbol={symbol || undefined}
+              key={`${rowIndex}-${reelIndex}`}
+              role="gridcell"
+              aria-label={
+                symbol
+                  ? `Szimbólum: ${SYMBOL_LABELS[symbol] || symbol}`
+                  : "Üres pozíció"
+              }
+            >
+              <span>{symbol ? SYMBOL_LABELS[symbol] || symbol : "—"}</span>
+            </div>
+          );
+        }),
       )}
     </div>
   );
