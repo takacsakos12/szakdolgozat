@@ -140,7 +140,7 @@ function FeatureSpinSelector({
               disabled={disabled || !selectedSymbol}
               onClick={onConfirm}
             >
-              {disabled ? "Indítás..." : "Feature Spin indítása"}
+              {disabled ? "Betöltés..." : "Feature bekapcsolása"}
             </button>
           </div>
         </footer>

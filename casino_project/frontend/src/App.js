@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import SlotPage from "./pages/SlotPage";
 import "./App.css";
 import AuthPage from "./AuthPage";
+import GameHistoryPage from "./pages/GameHistoryPage";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -340,6 +341,10 @@ function App() {
         <Route
           path="/games/slot"
           element={<SlotPage user={user} onUserChange={setUser} />}
+        />
+        <Route
+          path="/games/history"
+          element={<GameHistoryPage user={user} />}
         />
       </Routes>
 

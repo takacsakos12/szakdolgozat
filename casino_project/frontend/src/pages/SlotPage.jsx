@@ -353,9 +353,9 @@ function SlotPage({ user, onUserChange }) {
                   reelCount={reelCount}
                   isSpinning={isGridSpinning}
                   expandingSymbol={
-                    bonusPlayback?.expandingSymbol ||
+                    bonusPlayback?.expandingSymbol ??
                     (gameMode === "FEATURE_SPIN"
-                      ? gameResult?.expandingSymbol || selectedSymbol
+                      ? (gameResult?.expandingSymbol ?? null)
                       : null)
                   }
                 />
