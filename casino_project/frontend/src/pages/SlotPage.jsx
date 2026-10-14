@@ -15,6 +15,14 @@ function createRequestId() {
   return window.crypto.randomUUID();
 }
 
+const BONUS_SPIN_DURATION = 5000;
+
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
 function SlotPage({ user, onUserChange }) {
   const [slotConfig, setSlotConfig] = useState(null);
   const [selectedBet, setSelectedBet] = useState(null);
@@ -32,6 +40,7 @@ function SlotPage({ user, onUserChange }) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pendingRequest, setPendingRequest] = useState(null);
+  const [bonusPlayback, setBonusPlayback] = useState(null);
 
   useEffect(() => {
     setBalance(user?.balance ?? 0);
@@ -125,6 +134,45 @@ function SlotPage({ user, onUserChange }) {
       });
   }
 
+  async function playBonusSpins(result) {
+    const bonus = result?.bonus;
+    const freeSpins = bonus?.freeSpinResults || [];
+
+    if (freeSpins.length === 0) {
+      return;
+    }
+
+    let accumulatedWin = 0;
+
+    for (let index = 0; index < freeSpins.length; index += 1) {
+      const freeSpin = freeSpins[index];
+
+      accumulatedWin += Number(freeSpin.totalWin) || 0;
+
+      setDisplayedGrid(freeSpin.grid);
+
+      setBonusPlayback({
+        currentSpin: index + 1,
+        totalSpins: freeSpins.length,
+        spinWin: freeSpin.totalWin,
+        accumulatedWin,
+        expandingSymbol: bonus.expandingSymbol,
+        finished: false,
+      });
+
+      await wait(BONUS_SPIN_DURATION);
+    }
+
+    setBonusPlayback({
+      currentSpin: freeSpins.length,
+      totalSpins: freeSpins.length,
+      spinWin: freeSpins[freeSpins.length - 1]?.totalWin || 0,
+      accumulatedWin: bonus.totalWin,
+      expandingSymbol: bonus.expandingSymbol,
+      finished: true,
+    });
+  }
+
   async function executeGame(mode, request) {
     try {
       setIsSpinning(true);
@@ -141,20 +189,23 @@ function SlotPage({ user, onUserChange }) {
       }
 
       setGameMode(mode);
-      setGameResult(response.result);
+      setGameMode(mode);
+
+      const freeSpins = response.result.bonus?.freeSpinResults || [];
 
       if (response.result.grid) {
         setDisplayedGrid(response.result.grid);
-      } else {
-        const freeSpins = response.result.bonus?.freeSpinResults || [];
-
-        const lastFreeSpin = freeSpins[freeSpins.length - 1];
-
-        if (lastFreeSpin?.grid) {
-          setDisplayedGrid(lastFreeSpin.grid);
-        }
       }
 
+      if (freeSpins.length > 0) {
+        if (response.result.grid) {
+          await wait(BONUS_SPIN_DURATION);
+        }
+
+        await playBonusSpins(response.result);
+      }
+
+      setGameResult(response.result);
       updateDisplayedBalance(response);
       setPendingRequest(null);
     } catch (error) {
@@ -287,16 +338,46 @@ function SlotPage({ user, onUserChange }) {
 
         <div className="slot-game-layout">
           <div className="game-stage">
-            {isLoadingConfig ? (
-              <p>Játék betöltése...</p>
-            ) : (
-              <SlotGrid
-                grid={displayedGrid}
-                rowCount={rowCount}
-                reelCount={reelCount}
-                isSpinning={isSpinning}
-              />
-            )}
+            <div className="game-stage-content">
+              {isLoadingConfig ? (
+                <p>Játék betöltése...</p>
+              ) : (
+                <SlotGrid
+                  grid={displayedGrid}
+                  rowCount={rowCount}
+                  reelCount={reelCount}
+                  isSpinning={isSpinning}
+                />
+              )}
+
+              {bonusPlayback && (
+                <div className="bonus-playback">
+                  {bonusPlayback && (
+                    <div className="bonus-playback">
+                      <strong className="bonus-playback-title">
+                        {bonusPlayback.finished
+                          ? "Bónuszjáték vége"
+                          : `Ingyenes pörgetés ${bonusPlayback.currentSpin} / ${bonusPlayback.totalSpins}`}
+                      </strong>
+
+                      <span>
+                        Bővülő szimbólum: {bonusPlayback.expandingSymbol}
+                      </span>
+
+                      {!bonusPlayback.finished && (
+                        <span>
+                          Pörgetés nyereménye: {bonusPlayback.spinWin} CR
+                        </span>
+                      )}
+
+                      <span>
+                        Bónusznyeremény: {bonusPlayback.accumulatedWin} CR
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <SlotFeatures
