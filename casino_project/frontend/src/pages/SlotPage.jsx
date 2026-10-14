@@ -1,23 +1,34 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
-import { getSlotConfig, spinSlot } from "../api/slotApi";
-import BetSelector from "../components/slot/BetSelector";
+import { getCurrentUser } from "../api/authApi";
+import { buyBonus, featureSpin, getSlotConfig, spinSlot } from "../api/slotApi";
+
+import FeatureSpinSelector from "../components/slot/FeatureSpinSelector";
+import SlotControls from "../components/slot/SlotControls";
+import SlotFeatures from "../components/slot/SlotFeatures";
 import SlotGrid from "../components/slot/SlotGrid";
+
 import "./SlotPage.css";
 
 function createRequestId() {
   return window.crypto.randomUUID();
 }
 
-function SlotPage({ user }) {
+function SlotPage({ user, onUserChange }) {
   const [slotConfig, setSlotConfig] = useState(null);
   const [selectedBet, setSelectedBet] = useState(null);
+  const [selectedSymbol, setSelectedSymbol] = useState("");
+  const [featureEnabled, setFeatureEnabled] = useState(false);
+
   const [gameResult, setGameResult] = useState(null);
+  const [displayedGrid, setDisplayedGrid] = useState(null);
+  const [gameMode, setGameMode] = useState("BASE_GAME");
   const [balance, setBalance] = useState(user?.balance ?? 0);
 
-  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
+  const [isFeatureSelectorOpen, setIsFeatureSelectorOpen] = useState(false);
 
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pendingRequest, setPendingRequest] = useState(null);
@@ -47,6 +58,12 @@ function SlotPage({ user }) {
           config.allowedBets.length > 0
         ) {
           setSelectedBet(config.allowedBets[0]);
+        }
+
+        const selectableSymbols = config.featureSpin?.selectableSymbols || [];
+
+        if (selectableSymbols.length > 0) {
+          setSelectedSymbol(selectableSymbols[0]);
         }
       } catch (error) {
         if (componentIsActive) {
@@ -79,42 +96,173 @@ function SlotPage({ user }) {
     setErrorMessage("");
   }
 
-  async function executeSpin(request) {
+  function updateDisplayedBalance(response) {
+    if (!response.replayed) {
+      setBalance(response.balanceAfter);
+
+      if (onUserChange) {
+        onUserChange({
+          ...user,
+          balance: response.balanceAfter,
+        });
+      }
+
+      return;
+    }
+
+    getCurrentUser()
+      .then((currentUserResponse) => {
+        const currentUser = currentUserResponse.user || currentUserResponse;
+
+        setBalance(currentUser.balance);
+
+        if (onUserChange) {
+          onUserChange(currentUser);
+        }
+      })
+      .catch(() => {
+        setBalance(response.balanceAfter);
+      });
+  }
+
+  async function executeGame(mode, request) {
     try {
       setIsSpinning(true);
       setErrorMessage("");
 
-      const response = await spinSlot(request);
+      let response;
 
+      if (mode === "BONUS_BUY") {
+        response = await buyBonus(request);
+      } else if (mode === "FEATURE_SPIN") {
+        response = await featureSpin(request);
+      } else {
+        response = await spinSlot(request);
+      }
+
+      setGameMode(mode);
       setGameResult(response.result);
-      setBalance(response.balanceAfter);
+
+      if (response.result.grid) {
+        setDisplayedGrid(response.result.grid);
+      } else {
+        const freeSpins = response.result.bonus?.freeSpinResults || [];
+
+        const lastFreeSpin = freeSpins[freeSpins.length - 1];
+
+        if (lastFreeSpin?.grid) {
+          setDisplayedGrid(lastFreeSpin.grid);
+        }
+      }
+
+      updateDisplayedBalance(response);
       setPendingRequest(null);
     } catch (error) {
       setErrorMessage(error.message);
-      setPendingRequest(request);
+
+      if (!error.statusCode) {
+        setPendingRequest({
+          mode,
+          request,
+        });
+      } else {
+        setPendingRequest(null);
+      }
     } finally {
       setIsSpinning(false);
     }
   }
 
   function handleSpin() {
-    if (selectedBet === null || isSpinning) {
+    if (selectedBet === null || isSpinning || isLoadingConfig) {
       return;
     }
 
-    const request = pendingRequest || {
+    if (pendingRequest) {
+      executeGame(pendingRequest.mode, pendingRequest.request);
+
+      return;
+    }
+
+    if (featureEnabled) {
+      executeGame("FEATURE_SPIN", {
+        baseBet: selectedBet,
+        selectedSymbol,
+        requestId: createRequestId(),
+      });
+
+      return;
+    }
+
+    executeGame("BASE_GAME", {
       baseBet: selectedBet,
       requestId: createRequestId(),
-    };
+    });
+  }
 
-    executeSpin(request);
+  function handleBonusBuy() {
+    if (selectedBet === null || isSpinning || pendingRequest) {
+      return;
+    }
+
+    const bonusMultiplier = slotConfig?.bonus?.purchaseCostMultiplier || 100;
+
+    const bonusCost = selectedBet * bonusMultiplier;
+
+    const confirmed = window.confirm(
+      `Biztosan megvásárolod a bónuszt ${bonusCost} CR összegért?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    executeGame("BONUS_BUY", {
+      baseBet: selectedBet,
+      requestId: createRequestId(),
+    });
+  }
+
+  function handleFeatureToggle() {
+    if (isSpinning || pendingRequest) {
+      return;
+    }
+
+    if (featureEnabled) {
+      setFeatureEnabled(false);
+      setIsFeatureSelectorOpen(false);
+      return;
+    }
+
+    setIsFeatureSelectorOpen(true);
+  }
+
+  function handleFeatureConfirm() {
+    if (!selectedSymbol) {
+      setErrorMessage("Válassz egy szimbólumot a Feature Spinhez.");
+
+      return;
+    }
+
+    setFeatureEnabled(true);
+    setIsFeatureSelectorOpen(false);
+    setErrorMessage("");
   }
 
   const allowedBets = slotConfig?.allowedBets || [];
   const rowCount = slotConfig?.rows || 3;
   const reelCount = slotConfig?.reels || 5;
 
+  const bonusCostMultiplier = slotConfig?.bonus?.purchaseCostMultiplier || 100;
+
+  const featureCostMultiplier = slotConfig?.featureSpin?.costMultiplier || 10;
+
+  const selectableSymbols = slotConfig?.featureSpin?.selectableSymbols || [];
+
   const lastWin = gameResult?.totalWin ?? 0;
+
+  const controlsDisabled =
+    isSpinning || isLoadingConfig || Boolean(pendingRequest);
 
   return (
     <main className="slot-page">
@@ -127,56 +275,53 @@ function SlotPage({ user }) {
               {reelCount} tárcsa · {rowCount} sor · 10 nyerővonal
             </p>
           </div>
+
+          <span className="game-mode-indicator">
+            {gameMode === "FEATURE_SPIN"
+              ? "Feature Spin"
+              : gameMode === "BONUS_BUY"
+                ? "Bónuszjáték"
+                : "Alapjáték"}
+          </span>
         </header>
 
-        <div className="game-stage">
-          {isLoadingConfig ? (
-            <p>Játék betöltése...</p>
-          ) : (
-            <SlotGrid
-              grid={gameResult?.grid}
-              rowCount={rowCount}
-              reelCount={reelCount}
-              isSpinning={isSpinning}
-            />
-          )}
-        </div>
-
-        <div className="slot-toolbar">
-          <div className="slot-information">
-            <div className="slot-stat">
-              <span className="slot-stat-label">Egyenleg</span>
-
-              <span className="slot-stat-value">{balance} CR</span>
-            </div>
-
-            <div className="slot-stat">
-              <span className="slot-stat-label">Utolsó nyeremény</span>
-
-              <span className="slot-stat-value">{lastWin} CR</span>
-            </div>
+        <div className="slot-game-layout">
+          <div className="game-stage">
+            {isLoadingConfig ? (
+              <p>Játék betöltése...</p>
+            ) : (
+              <SlotGrid
+                grid={displayedGrid}
+                rowCount={rowCount}
+                reelCount={reelCount}
+                isSpinning={isSpinning}
+              />
+            )}
           </div>
 
-          <BetSelector
-            allowedBets={allowedBets}
+          <SlotFeatures
             selectedBet={selectedBet}
-            onBetChange={handleBetChange}
-            disabled={isSpinning || isLoadingConfig || Boolean(pendingRequest)}
+            bonusCostMultiplier={bonusCostMultiplier}
+            featureCostMultiplier={featureCostMultiplier}
+            featureEnabled={featureEnabled}
+            selectedSymbol={selectedSymbol}
+            disabled={controlsDisabled}
+            onBonusBuy={handleBonusBuy}
+            onFeatureToggle={handleFeatureToggle}
           />
-
-          <button
-            className="slot-spin-button"
-            type="button"
-            disabled={isSpinning || isLoadingConfig || selectedBet === null}
-            onClick={handleSpin}
-          >
-            {isSpinning
-              ? "PÖRGETÉS..."
-              : pendingRequest
-                ? "ÚJRAPRÓBÁLÁS"
-                : "SPIN"}
-          </button>
         </div>
+
+        <SlotControls
+          allowedBets={allowedBets}
+          selectedBet={selectedBet}
+          balance={balance}
+          lastWin={lastWin}
+          isPlaying={isSpinning}
+          isLoading={isLoadingConfig}
+          hasPendingRequest={Boolean(pendingRequest)}
+          onBetChange={handleBetChange}
+          onSpin={handleSpin}
+        />
       </section>
 
       {errorMessage && (
@@ -184,6 +329,19 @@ function SlotPage({ user }) {
           {errorMessage}
         </div>
       )}
+
+      <FeatureSpinSelector
+        isOpen={isFeatureSelectorOpen}
+        symbols={selectableSymbols}
+        selectedSymbol={selectedSymbol}
+        featureSpinCost={
+          selectedBet === null ? 0 : selectedBet * featureCostMultiplier
+        }
+        disabled={isSpinning}
+        onSymbolChange={setSelectedSymbol}
+        onConfirm={handleFeatureConfirm}
+        onClose={() => setIsFeatureSelectorOpen(false)}
+      />
     </main>
   );
 }

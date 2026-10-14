@@ -18,7 +18,33 @@ function spinSlot({ baseBet, requestId }) {
   });
 }
 
-export {
-  getSlotConfig,
-  spinSlot,
-};
+function buyBonus({ baseBet, requestId }) {
+  return apiRequest("/slot/bonus-buy", {
+    method: "POST",
+
+    headers: {
+      "Idempotency-Key": requestId,
+    },
+
+    body: JSON.stringify({
+      baseBet,
+    }),
+  });
+}
+
+function featureSpin({ baseBet, selectedSymbol, requestId }) {
+  return apiRequest("/slot/feature-spin", {
+    method: "POST",
+
+    headers: {
+      "Idempotency-Key": requestId,
+    },
+
+    body: JSON.stringify({
+      baseBet,
+      selectedSymbol,
+    }),
+  });
+}
+
+export { getSlotConfig, spinSlot, buyBonus, featureSpin };

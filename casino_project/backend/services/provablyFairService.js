@@ -147,7 +147,7 @@ async function reserveNonce({ userId, session }) {
       },
     },
     {
-      new: false,
+      returnDocument: "before",
       runValidators: true,
     },
   ).select("+serverSeed");
@@ -294,7 +294,7 @@ async function rotateSeed({ userId, clientSeed }) {
           },
         },
         {
-          new: true,
+          returnDocument: "after",
           runValidators: true,
           session,
         },

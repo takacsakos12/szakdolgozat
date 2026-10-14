@@ -42,12 +42,20 @@
   font-size: 0.82rem;
 }
 
+/* Játéktábla és jobb oldali funkciópanel */
+
+.slot-game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  min-height: 480px;
+}
+
 .game-stage {
   display: flex;
-  min-height: 480px;
+  min-width: 0;
   align-items: center;
   justify-content: center;
-  padding: 48px;
+  padding: 42px;
   background:
     linear-gradient(
       rgba(13, 14, 16, 0.82),
@@ -59,6 +67,8 @@
       transparent 60%
     );
 }
+
+/* Slot rács */
 
 .slot-grid {
   display: grid;
@@ -91,10 +101,14 @@
     #191b1f;
   border: 1px solid var(--border);
   border-radius: 8px;
-  font-weight: 800;
   font-size: clamp(0.7rem, 1.5vw, 1rem);
+  font-weight: 800;
   letter-spacing: 0.04em;
   text-align: center;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .slot-symbol-book {
@@ -104,126 +118,223 @@
 }
 
 .slot-grid-spinning .slot-symbol {
-  opacity: 0.55;
+  opacity: 0.5;
+  transform: translateY(3px);
 }
 
-.slot-toolbar {
-  display: grid;
-  grid-template-columns: minmax(160px, 1fr) minmax(280px, 2fr) auto;
+/* Bonus Buy és Feature Spin */
+
+.slot-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 16px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(245, 197, 66, 0.05),
+      transparent 50%
+    ),
+    #141518;
+  border-left: 1px solid var(--border);
+}
+
+.slot-side-action {
+  display: flex;
+  flex: 1;
+  min-height: 170px;
+  flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 20px 24px;
-  background: #151619;
+  justify-content: center;
+  gap: 9px;
+  padding: 18px 12px;
+  color: var(--text);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(245, 197, 66, 0.11),
+      rgba(245, 197, 66, 0.025)
+    ),
+    #1b1c20;
+  border: 1px solid rgba(245, 197, 66, 0.35);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.slot-side-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(245, 197, 66, 0.1);
+}
+
+.slot-side-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.slot-side-action-active {
+  border-color: var(--primary);
+  box-shadow: 0 0 22px rgba(245, 197, 66, 0.15);
+}
+
+.slot-side-action-label {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.slot-side-action-price {
+  color: var(--primary);
+  font-size: 1.45rem;
+}
+
+.slot-side-action-detail {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Alsó vezérlősáv */
+
+.slot-controls {
+  display: flex;
+  min-height: 118px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 14px 28px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(245, 197, 66, 0.04),
+      transparent
+    ),
+    #151619;
   border-top: 1px solid var(--border);
 }
 
-.slot-information {
+.slot-control-information {
   display: flex;
-  gap: 28px;
+  align-items: center;
+  gap: 38px;
 }
 
-.slot-stat {
+.slot-control-value {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.slot-stat-label {
+.slot-control-value span {
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
-.slot-stat-value {
+.slot-control-value strong {
   color: var(--text);
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  white-space: nowrap;
 }
 
-.bet-selector {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.bet-selector legend {
-  margin-bottom: 9px;
-  color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.bet-options {
+.slot-spin-controls {
   display: flex;
-  gap: 7px;
-  overflow-x: auto;
-  padding-bottom: 2px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 14px;
 }
 
-.bet-option {
-  flex: 0 0 auto;
-  padding: 9px 13px;
-  color: var(--text-muted);
-  background: var(--surface-light);
+.slot-bet-button {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--text);
+  background: #202126;
   border: 1px solid var(--border);
-  border-radius: 7px;
-  font-weight: 700;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  font-weight: 400;
   cursor: pointer;
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
-    background 0.2s ease;
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
-.bet-option:hover:not(:disabled) {
-  color: var(--text);
+.slot-bet-button:hover:not(:disabled) {
+  color: var(--primary);
   border-color: var(--primary);
+  transform: scale(1.05);
 }
 
-.bet-option-selected {
-  color: #111214;
-  background: var(--primary);
-  border-color: var(--primary);
-}
-
-.bet-selector:disabled .bet-option {
+.slot-bet-button:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  opacity: 0.35;
 }
 
-.bet-selector-empty {
-  color: var(--text-muted);
-}
-
-.slot-spin-button {
-  min-width: 132px;
-  padding: 16px 28px;
+.slot-main-spin-button {
+  display: flex;
+  width: 88px;
+  height: 88px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   color: #111214;
-  background: var(--primary);
-  border: 0;
-  border-radius: 9px;
-  font-size: 1rem;
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #ffe582,
+      var(--primary) 52%,
+      #c79516
+    );
+  border: 4px solid #f8d768;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 5px rgba(245, 197, 66, 0.12),
+    0 8px 25px rgba(0, 0, 0, 0.4);
+  font-size: 0.87rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   cursor: pointer;
   transition:
     transform 0.2s ease,
+    box-shadow 0.2s ease,
     opacity 0.2s ease;
 }
 
-.slot-spin-button:hover:not(:disabled) {
-  transform: translateY(-2px);
+.slot-main-spin-button:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 7px rgba(245, 197, 66, 0.16),
+    0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
-.slot-spin-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+.slot-main-spin-button:active:not(:disabled) {
+  transform: scale(0.96);
 }
+
+.slot-main-spin-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Állapot- és hibaüzenetek */
 
 .slot-status {
   width: min(1180px, 100%);
@@ -240,9 +351,200 @@
   border-color: rgba(255, 87, 87, 0.45);
 }
 
+/* Feature Spin szimbólumválasztó */
+
+.feature-selector-backdrop {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(6, 7, 8, 0.82);
+  backdrop-filter: blur(5px);
+}
+
+.feature-selector {
+  width: min(680px, 100%);
+  overflow: hidden;
+  color: var(--text);
+  background: #18191d;
+  border: 1px solid rgba(245, 197, 66, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65);
+}
+
+.feature-selector-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-selector-header h2 {
+  margin: 5px 0 0;
+  font-size: 1.4rem;
+}
+
+.feature-selector-eyebrow {
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.feature-selector-close {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.feature-selector-close:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+.feature-selector-description {
+  margin: 0;
+  padding: 20px 24px 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.feature-symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding: 22px 24px;
+}
+
+.feature-symbol-option {
+  display: flex;
+  min-width: 0;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: var(--text);
+  background: #202126;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.feature-symbol-option:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.feature-symbol-option-selected {
+  color: #111214;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.feature-symbol-name {
+  overflow-wrap: anywhere;
+  font-size: 0.77rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.feature-selector-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 24px;
+  background: #141518;
+  border-top: 1px solid var(--border);
+}
+
+.feature-selector-cost {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feature-selector-cost span {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.feature-selector-cost strong {
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.feature-selector-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.feature-selector-cancel,
+.feature-selector-confirm {
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.feature-selector-cancel {
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.feature-selector-confirm {
+  color: #111214;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.feature-selector-cancel:hover:not(:disabled) {
+  border-color: var(--text-muted);
+}
+
+.feature-selector-confirm:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+
+.feature-selector-cancel:disabled,
+.feature-selector-confirm:disabled,
+.feature-selector-close:disabled,
+.feature-symbol-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Tablet */
+
 @media (max-width: 850px) {
   .slot-page {
     padding: 28px 18px;
+  }
+
+  .slot-game-layout {
+    grid-template-columns: 1fr;
   }
 
   .game-stage {
@@ -250,14 +552,34 @@
     padding: 28px 18px;
   }
 
-  .slot-toolbar {
-    grid-template-columns: 1fr;
+  .slot-side-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--border);
+    border-left: 0;
   }
 
-  .slot-spin-button {
+  .slot-side-action {
+    min-height: 130px;
+  }
+
+  .slot-controls {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .slot-control-information {
     width: 100%;
+    justify-content: space-between;
+  }
+
+  .feature-symbol-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Mobil */
 
 @media (max-width: 520px) {
   .game-embed-header {
@@ -280,12 +602,67 @@
     font-size: 0.6rem;
   }
 
-  .slot-toolbar {
-    gap: 18px;
+  .slot-side-panel {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .slot-side-action {
+    min-height: 110px;
+    padding: 12px 8px;
+  }
+
+  .slot-side-action-label {
+    font-size: 0.72rem;
+  }
+
+  .slot-side-action-price {
+    font-size: 1.1rem;
+  }
+
+  .slot-control-information {
+    gap: 12px;
+  }
+
+  .slot-control-value strong {
+    font-size: 0.85rem;
+  }
+
+  .slot-main-spin-button {
+    width: 78px;
+    height: 78px;
+  }
+
+  .slot-bet-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .feature-selector-backdrop {
+    padding: 12px;
+  }
+
+  .feature-selector-header,
+  .feature-selector-footer {
+    padding: 16px;
+  }
+
+  .feature-selector-description {
+    padding: 16px 16px 0;
+  }
+
+  .feature-symbol-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 18px 16px;
   }
 
-  .slot-information {
-    justify-content: space-between;
+  .feature-selector-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .feature-selector-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }

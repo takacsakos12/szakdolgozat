@@ -192,7 +192,7 @@ async function settleGameResult({
           $inc: { balance: netResult },
         },
         {
-          new: true,
+          returnDocument: "after",
           runValidators: true,
           session,
         },
