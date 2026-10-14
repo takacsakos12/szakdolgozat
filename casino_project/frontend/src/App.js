@@ -337,7 +337,10 @@ function App() {
             <AuthPage mode="register" user={user} onAuthenticated={setUser} />
           }
         />
-        <Route path="/games/slot" element={<SlotPage user={user} />} />
+        <Route
+          path="/games/slot"
+          element={<SlotPage user={user} onUserChange={setUser} />}
+        />
       </Routes>
 
       <Footer />

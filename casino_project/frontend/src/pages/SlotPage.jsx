@@ -180,6 +180,8 @@ function SlotPage({ user, onUserChange }) {
       setIsGridSpinning(true);
       setErrorMessage("");
       setBonusPlayback(null);
+      setGameResult(null);
+      setGameMode(mode);
 
       let response;
 
@@ -192,7 +194,6 @@ function SlotPage({ user, onUserChange }) {
       }
 
       setIsGridSpinning(false);
-      setGameMode(mode);
 
       const freeSpins = response.result.bonus?.freeSpinResults || [];
 
@@ -350,7 +351,7 @@ function SlotPage({ user, onUserChange }) {
                   grid={displayedGrid}
                   rowCount={rowCount}
                   reelCount={reelCount}
-                  isSpinning={isSpinning && !bonusPlayback}
+                  isSpinning={isGridSpinning}
                   expandingSymbol={
                     bonusPlayback?.expandingSymbol ||
                     (gameMode === "FEATURE_SPIN"
@@ -362,29 +363,21 @@ function SlotPage({ user, onUserChange }) {
 
               {bonusPlayback && (
                 <div className="bonus-playback">
-                  {bonusPlayback && (
-                    <div className="bonus-playback">
-                      <strong className="bonus-playback-title">
-                        {bonusPlayback.finished
-                          ? "Bónuszjáték vége"
-                          : `Ingyenes pörgetés ${bonusPlayback.currentSpin} / ${bonusPlayback.totalSpins}`}
-                      </strong>
+                  <strong className="bonus-playback-title">
+                    {bonusPlayback.finished
+                      ? "Bónuszjáték vége"
+                      : `Ingyenes pörgetés ${bonusPlayback.currentSpin} / ${bonusPlayback.totalSpins}`}
+                  </strong>
 
-                      <span>
-                        Bővülő szimbólum: {bonusPlayback.expandingSymbol}
-                      </span>
+                  <span>Bővülő szimbólum: {bonusPlayback.expandingSymbol}</span>
 
-                      {!bonusPlayback.finished && (
-                        <span>
-                          Pörgetés nyereménye: {bonusPlayback.spinWin} CR
-                        </span>
-                      )}
-
-                      <span>
-                        Bónusznyeremény: {bonusPlayback.accumulatedWin} CR
-                      </span>
-                    </div>
+                  {!bonusPlayback.finished && (
+                    <span>Pörgetés nyereménye: {bonusPlayback.spinWin} CR</span>
                   )}
+
+                  <span>
+                    Bónusznyeremény: {bonusPlayback.accumulatedWin} CR
+                  </span>
                 </div>
               )}
             </div>
