@@ -1,10 +1,11 @@
-const {isStrictDeepEqual} = require("node:util");
-const { gameHistory } = require("../models/GameHistory");
+const { isDeepStrictEqual } = require("node:util");
+
+const GameHistory = require("../models/GameHistory");
 const { CONFIG_VERSION } = require("../config/slotConfig");
 
 const { spin, featureSpin, buyBookBonus } = require("./slotEngine");
 
-const { ALGORITHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed, createServiceError } = require("./provablyFairService");
+const { ALGORITHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed} = require("./provablyFairService");
 
 function createServiceError(message, statusCode = 400) {
   const error = new Error(message);
@@ -53,61 +54,66 @@ function recreateSlotResult(history, random) {
   }
 }
 
-async function verifySlotGameResult(userId ,historyId) {
-    if (!userId || !historyId) { 
-        throw createServiceError("A felhasználó azonosítója és a történelem azonosítója kötelező.", 400);
-    }
+async function verifySlotGameResult({ userId, historyId }) {
+  if (!userId || !historyId) {
+    throw createServiceError("A felhasználó azonosítója és a történelem azonosítója kötelező.", 400);
+  }
 
-    const history = await GameHistory.findOne({ _id: historyId, userId }).lean();
+  const history = await GameHistory.findOne({ _id: historyId, userId }).lean();
 
-    if (!history) {
-        throw createServiceError("A játékelőzmény nem található.", 404);
-    }
+  if (!history) {
+    throw createServiceError("A játékelőzmény nem található.", 404);
+  }
 
-    if (history.gameType !== "SLOT") {
-        throw createServiceError("A játéktípus ellenőrzése nem támogatott.", 409);
-    }
+  if (history.gameType !== "SLOT") {
+    throw createServiceError("A játéktípus ellenőrzése nem támogatott.", 409);
+  }
 
-    if (history.configVersion !== CONFIG_VERSION) {
-        throw createServiceError("A játékkonfiguráció verziója nem egyezik.", 409);
-    }
+  if (history.configVersion !== CONFIG_VERSION) {
+     throw createServiceError("A játékkonfiguráció verziója nem egyezik.", 409);
+  }
 
-    if (history.provablyFair.algorithmVersion !== ALGORITHM_VERSION) {
-        throw createServiceError("A provably fair algoritmus verziója nem egyezik.", 409);
-    }
+  if (history.provablyFair.algorithmVersion !== ALGORITHM_VERSION) {
+    throw createServiceError("A provably fair algoritmus verziója nem egyezik.", 409);
+  }
 
-    const revealedSeed = await getRevealedSeed({userId: history.userId, seedId: history.provablyFair.seedId});
+  const revealedSeed = await getRevealedSeed({userId: history.userId, seedId: history.provablyFair.seedId});
 
-    const seedHashMatches = verifyServerSeed({serverSeed: revealedSeed.serverSeed, serverSeedHash: history.provablyFair.serverSeedHash});
+  const seedHashMatches = verifyServerSeed({serverSeed: revealedSeed.serverSeed, serverSeedHash: history.provablyFair.serverSeedHash});
 
-    const seedDetailsMatch = revealedSeed.serverSeed === history.provablyFair.serverSeed &&
+  const seedDetailsMatch =
+    revealedSeed.serverSeedHash === history.provablyFair.serverSeedHash &&
     revealedSeed.clientSeed === history.provablyFair.clientSeed &&
     revealedSeed.algorithmVersion === history.provablyFair.algorithmVersion &&
     history.provablyFair.nonce < revealedSeed.finalNonce;
 
-    const random = createRandomGenerator({
-        serverSeed: revealedSeed.serverSeed,
-        clientSeed: revealedSeed.clientSeed,
-        nonce: history.provablyFair.nonce,
-        gameDomain: history.provablyFair.gameDomain,
-    });
+  const randomGenerator = createRandomGenerator({
+    serverSeed: revealedSeed.serverSeed,
+    clientSeed: history.provablyFair.clientSeed,
+    nonce: history.provablyFair.nonce,
+    gameDomain: history.provablyFair.gameDomain,
+  });
 
-    const recreatedResult = recreatedSlotResult(history, () => randomgenerator.randomfloat());
+  const recreatedResult = recreatedSlotResult(history, () => randomgenerator.randomfloat());
 
-    const gameresultMatch = isStrictDeepEqual(normalizeResultForComparison(recreatedResult), normalizeResultForComparison(history.result));
+  const gameResultMatches = isDeepStrictEqual(
+    normalizeResultForComparison(recreatedResult),
+    normalizeResultForComparison(history.result),
+  );
 
-    return {
-        verified: seedHashMatches && seedDetailsMatch && gameresultMatch,
+  return {
+    verified: seedHashMatches && seedDetailsMatch && gameResultMatches,
 
-        seedHashMatches, seedDetailsMatch, gameresultMatch,
+    seedHashMatches,
+    seedDetailsMatch,
+    gameResultMatches,
 
-        historyId: history._id,
-        gameType: history.gameType,
-        gamemode: history.gameMode,
-        configVersion: history.configVersion,
-        algorithmVersion: history.provablyFair.algorithmVersion,
-    };
+    historyId: history._id,
+    gameType: history.gameType,
+    gameMode: history.gameMode,
+    configVersion: history.configVersion,
+    algorithmVersion: history.provablyFair.algorithmVersion,
+  };
 }
 
 module.exports = { verifySlotGameResult };
-

@@ -11,7 +11,6 @@ function createServiceError(message, statusCode = 400) {
   error.statusCode = statusCode;
   return error;
 }
-exports.createServiceError = createServiceError;
 
 function generateServerSeed() {
   return crypto.randomBytes(32).toString("hex");
