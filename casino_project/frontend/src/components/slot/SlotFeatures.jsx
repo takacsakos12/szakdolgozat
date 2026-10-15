@@ -1,7 +1,7 @@
 function SlotFeatures({
   selectedBet,
-  bonusCostMultiplier = 100,
-  featureCostMultiplier = 10,
+  bonusCostMultiplier,
+  featureCostMultiplier,
   featureEnabled,
   selectedSymbol,
   disabled,

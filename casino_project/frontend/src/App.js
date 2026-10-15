@@ -51,6 +51,7 @@ function Header({ user, onLogout }) {
         <Link to="/#games">Játékok</Link>
         <Link to="/#statistics">Statisztikák</Link>
         <Link to="/#provably-fair">Provably fair</Link>
+        {user && <Link to="/games/history">Játéktörténet</Link>}
       </nav>
 
       <div className="auth-actions">
@@ -287,7 +288,7 @@ function App() {
 
         const data = await response.json();
         setUser(data.user);
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setIsCheckingSession(false);

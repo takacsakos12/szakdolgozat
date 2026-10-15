@@ -110,28 +110,19 @@ function SlotPage({ user, onUserChange }) {
     if (!response.replayed) {
       setBalance(response.balanceAfter);
 
-      if (onUserChange) {
-        onUserChange({
-          ...user,
-          balance: response.balanceAfter,
-        });
-      }
-
       return;
     }
 
     getCurrentUser()
       .then((currentUserResponse) => {
-        const currentUser = currentUserResponse.user || currentUserResponse;
+        const currentUser = currentUserResponse.user;
 
         setBalance(currentUser.balance);
 
-        if (onUserChange) {
-          onUserChange(currentUser);
-        }
+        onUserChange(currentUser);
       })
       .catch(() => {
-        setBalance(response.balanceAfter);
+        setErrorMessage("Az aktuális egyenleget nem sikerült frissíteni.");
       });
   }
 
@@ -148,7 +139,7 @@ function SlotPage({ user, onUserChange }) {
     for (let index = 0; index < freeSpins.length; index += 1) {
       const freeSpin = freeSpins[index];
 
-      accumulatedWin += Number(freeSpin.totalWin) || 0;
+      accumulatedWin += Number(freeSpin.totalWin);
 
       setDisplayedGrid(freeSpin.grid);
 
@@ -167,7 +158,7 @@ function SlotPage({ user, onUserChange }) {
     setBonusPlayback({
       currentSpin: freeSpins.length,
       totalSpins: freeSpins.length,
-      spinWin: freeSpins[freeSpins.length - 1]?.totalWin || 0,
+      spinWin: freeSpins[freeSpins.length - 1]?.totalWin,
       accumulatedWin: bonus.totalWin,
       expandingSymbol: bonus.expandingSymbol,
       finished: true,
@@ -261,9 +252,7 @@ function SlotPage({ user, onUserChange }) {
       return;
     }
 
-    const bonusMultiplier = slotConfig?.bonus?.purchaseCostMultiplier || 100;
-
-    const bonusCost = selectedBet * bonusMultiplier;
+    const bonusCost = selectedBet * bonusCostMultiplier;
 
     const confirmed = window.confirm(
       `Biztosan megvásárolod a bónuszt ${bonusCost} CR összegért?`,
@@ -294,12 +283,6 @@ function SlotPage({ user, onUserChange }) {
   }
 
   function handleFeatureConfirm() {
-    if (!selectedSymbol) {
-      setErrorMessage("Válassz egy szimbólumot a Feature Spinhez.");
-
-      return;
-    }
-
     setFeatureEnabled(true);
     setIsFeatureSelectorOpen(false);
     setErrorMessage("");
@@ -309,9 +292,9 @@ function SlotPage({ user, onUserChange }) {
   const rowCount = slotConfig?.rows || 3;
   const reelCount = slotConfig?.reels || 5;
 
-  const bonusCostMultiplier = slotConfig?.bonus?.purchaseCostMultiplier || 100;
+  const bonusCostMultiplier = slotConfig?.bonus?.purchaseCostMultiplier;
 
-  const featureCostMultiplier = slotConfig?.featureSpin?.costMultiplier || 10;
+  const featureCostMultiplier = slotConfig?.featureSpin?.costMultiplier;
 
   const selectableSymbols = slotConfig?.featureSpin?.selectableSymbols || [];
 

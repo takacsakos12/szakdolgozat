@@ -1,10 +1,9 @@
 const express = require("express");
-const {
-  getSettledGame,
-  settleGameResult,
-} = require("../services/gameSessionService");
+
+const { settleGameResult } = require("../services/gameSessionService");
 
 const protectRoute = require("../middleware/authMiddleware");
+
 const {
   CONFIG_VERSION,
   ROW_COUNT,
@@ -20,7 +19,9 @@ const {
 } = require("../config/slotConfig");
 
 const { spin, featureSpin, buyBookBonus } = require("../services/slotEngine");
+
 const router = express.Router();
+
 const ALLOWED_BETS = [1, 2, 5, 10, 20, 50, 100];
 
 function getBaseBet(value) {
@@ -29,6 +30,7 @@ function getBaseBet(value) {
   if (!Number.isFinite(baseBet) || !ALLOWED_BETS.includes(baseBet)) {
     return null;
   }
+
   return baseBet;
 }
 
@@ -46,19 +48,6 @@ function getRequestId(req) {
   }
 
   return normalizedRequestId;
-}
-
-function sendErrorResponse(res, error) {
-  console.error("Slot API hiba:", error);
-
-  const statusCode = error.statusCode || 500;
-
-  return res.status(statusCode).json({
-    message:
-      statusCode === 500
-        ? "A játékkör végrehajtása közben szerverhiba történt."
-        : error.message,
-  });
 }
 
 function sendGameResponse(res, settlement) {
@@ -103,21 +92,6 @@ function validateGameRequest(req, res) {
   };
 }
 
-async function findPreviousResult(
-  req,
-  requestData,
-  gameMode,
-  selectedSymbol = null,
-) {
-  return getSettledGame({
-    userId: req.user._id,
-    requestId: requestData.requestId,
-    gameMode,
-    baseBet: requestData.baseBet,
-    selectedSymbol,
-  });
-}
-
 router.get("/config", (req, res) => {
   return res.status(200).json({
     configVersion: CONFIG_VERSION,
@@ -131,17 +105,13 @@ router.get("/config", (req, res) => {
 
     bonus: {
       initialFreeSpins: BOOK_BONUS.initialFreeSpins,
-
       triggerScatterCount: BOOK_BONUS.triggerScatterCount,
-
       expandableSymbols: BOOK_BONUS.expandableSymbols,
-
       purchaseCostMultiplier: BONUS_BUY_COST_MULTIPLIER,
     },
 
     featureSpin: {
       costMultiplier: FEATURE_SPIN_COST_MULTIPLIER,
-
       selectableSymbols: BOOK_BONUS.expandableSymbols,
     },
 
@@ -158,53 +128,39 @@ router.post("/spin", protectRoute, async (req, res) => {
 
   const { baseBet, requestId } = requestData;
 
-  try {
-    const previousResult = await findPreviousResult(
-      req,
-      requestData,
-      "BASE_GAME",
-    );
+  const settlement = await settleGameResult({
+    userId: req.user._id,
+    gameType: "SLOT",
+    gameMode: "BASE_GAME",
+    configVersion: CONFIG_VERSION,
+    baseBet,
+    requestId,
+    gameDomain: "SLOT:BASE_GAME",
 
-    if (previousResult) {
-      return sendGameResponse(res, previousResult);
-    }
+    createGameResult: (random) => {
+      const result = spin({
+        baseBet,
+        random,
+      });
 
-    const settlement = await settleGameResult({
-      userId: req.user._id,
-      gameType: "SLOT",
-      gameMode: "BASE_GAME",
-      configVersion: CONFIG_VERSION,
-      baseBet,
-      requestId,
-      gameDomain: "SLOT:BASE_GAME",
+      const slotDetails = {
+        bonusTriggered: result.bonusTriggered,
+        bonusSource: result.bonusTriggered ? "NATURAL" : null,
+        baseGameWin: result.baseGameWin,
+        totalFreeSpins: result.bonus?.totalFreeSpins || 0,
+        retriggerCount: result.bonus?.retriggerCount || 0,
+        expandingSymbol: result.bonus?.expandingSymbol || null,
+        bonusWin: result.bonusWin,
+      };
 
-      createGameResult: (random) => {
-        const result = spin({
-          baseBet,
-          random,
-        });
+      return {
+        result,
+        slotDetails,
+      };
+    },
+  });
 
-        const slotDetails = {
-          bonusTriggered: result.bonusTriggered,
-          bonusSource: result.bonusTriggered ? "NATURAL" : null,
-          baseGameWin: result.baseGameWin,
-          totalFreeSpins: result.bonus?.totalFreeSpins || 0,
-          retriggerCount: result.bonus?.retriggerCount || 0,
-          expandingSymbol: result.bonus?.expandingSymbol || null,
-          bonusWin: result.bonusWin,
-        };
-
-        return {
-          result,
-          slotDetails,
-        };
-      },
-    });
-
-    return sendGameResponse(res, settlement);
-  } catch (error) {
-    return sendErrorResponse(res, error);
-  }
+  return sendGameResponse(res, settlement);
 });
 
 router.post("/bonus-buy", protectRoute, async (req, res) => {
@@ -216,53 +172,39 @@ router.post("/bonus-buy", protectRoute, async (req, res) => {
 
   const { baseBet, requestId } = requestData;
 
-  try {
-    const previousResult = await findPreviousResult(
-      req,
-      requestData,
-      "BONUS_BUY",
-    );
+  const settlement = await settleGameResult({
+    userId: req.user._id,
+    gameType: "SLOT",
+    gameMode: "BONUS_BUY",
+    configVersion: CONFIG_VERSION,
+    baseBet,
+    requestId,
+    gameDomain: "SLOT:BONUS_BUY",
 
-    if (previousResult) {
-      return sendGameResponse(res, previousResult);
-    }
+    createGameResult: (random) => {
+      const result = buyBookBonus({
+        baseBet,
+        random,
+      });
 
-    const settlement = await settleGameResult({
-      userId: req.user._id,
-      gameType: "SLOT",
-      gameMode: "BONUS_BUY",
-      configVersion: CONFIG_VERSION,
-      baseBet,
-      requestId,
-      gameDomain: "SLOT:BONUS_BUY",
+      const slotDetails = {
+        bonusTriggered: true,
+        bonusSource: "PURCHASED",
+        baseGameWin: 0,
+        totalFreeSpins: result.bonus.totalFreeSpins,
+        retriggerCount: result.bonus.retriggerCount,
+        expandingSymbol: result.expandingSymbol,
+        bonusWin: result.totalWin,
+      };
 
-      createGameResult: (random) => {
-        const result = buyBookBonus({
-          baseBet,
-          random,
-        });
+      return {
+        result,
+        slotDetails,
+      };
+    },
+  });
 
-        const slotDetails = {
-          bonusTriggered: true,
-          bonusSource: "PURCHASED",
-          baseGameWin: 0,
-          totalFreeSpins: result.bonus.totalFreeSpins,
-          retriggerCount: result.bonus.retriggerCount,
-          expandingSymbol: result.expandingSymbol,
-          bonusWin: result.totalWin,
-        };
-
-        return {
-          result,
-          slotDetails,
-        };
-      },
-    });
-
-    return sendGameResponse(res, settlement);
-  } catch (error) {
-    return sendErrorResponse(res, error);
-  }
+  return sendGameResponse(res, settlement);
 });
 
 router.post("/feature-spin", protectRoute, async (req, res) => {
@@ -286,65 +228,41 @@ router.post("/feature-spin", protectRoute, async (req, res) => {
 
   const { baseBet, requestId } = requestData;
 
-  try {
-    const previousResult = await findPreviousResult(
-      req,
-      requestData,
-      "FEATURE_SPIN",
-      selectedSymbol,
-    );
+  const settlement = await settleGameResult({
+    userId: req.user._id,
+    gameType: "SLOT",
+    gameMode: "FEATURE_SPIN",
+    configVersion: CONFIG_VERSION,
+    baseBet,
+    requestId,
+    gameDomain: "SLOT:FEATURE_SPIN",
+    selectedSymbol,
 
-    if (previousResult) {
-      if (previousResult.result.expandingSymbol !== selectedSymbol) {
-        const error = new Error(
-          "Ezt a kérésazonosítót már másik Feature Spinhez használták.",
-        );
+    createGameResult: (random) => {
+      const result = featureSpin({
+        baseBet,
+        selectedSymbol,
+        random,
+      });
 
-        error.statusCode = 409;
-        throw error;
-      }
+      const slotDetails = {
+        bonusTriggered: false,
+        bonusSource: null,
+        baseGameWin: 0,
+        totalFreeSpins: 0,
+        retriggerCount: 0,
+        expandingSymbol: result.expandingSymbol,
+        bonusWin: 0,
+      };
 
-      return sendGameResponse(res, previousResult);
-    }
+      return {
+        result,
+        slotDetails,
+      };
+    },
+  });
 
-    const settlement = await settleGameResult({
-      userId: req.user._id,
-      gameType: "SLOT",
-      gameMode: "FEATURE_SPIN",
-      configVersion: CONFIG_VERSION,
-      baseBet,
-      requestId,
-      gameDomain: "SLOT:FEATURE_SPIN",
-      selectedSymbol,
-
-      createGameResult: (random) => {
-        const result = featureSpin({
-          baseBet,
-          selectedSymbol,
-          random,
-        });
-
-        const slotDetails = {
-          bonusTriggered: false,
-          bonusSource: null,
-          baseGameWin: 0,
-          totalFreeSpins: 0,
-          retriggerCount: 0,
-          expandingSymbol: result.expandingSymbol,
-          bonusWin: 0,
-        };
-
-        return {
-          result,
-          slotDetails,
-        };
-      },
-    });
-
-    return sendGameResponse(res, settlement);
-  } catch (error) {
-    return sendErrorResponse(res, error);
-  }
+  return sendGameResponse(res, settlement);
 });
 
 module.exports = router;

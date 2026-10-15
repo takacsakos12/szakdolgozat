@@ -79,7 +79,6 @@ const gameHistorySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     gameType: {
       type: String,
@@ -179,5 +178,9 @@ gameHistorySchema.index(
   },
 );
 
-gameHistorySchema.index({ userId: 1, createdAt: -1 });
+gameHistorySchema.index({
+  userId: 1,
+  createdAt: -1,
+  _id: -1,
+});
 module.exports = mongoose.model("GameHistory", gameHistorySchema);

@@ -218,14 +218,10 @@ function getUnbiasedInteger(stream, range) {
   const maxAcceptable = UINT32_RANGE - (UINT32_RANGE % range);
 
   while (true) {
-    const nextValue = stream.next();
+    const { value } = stream.next();
 
-    if (nextValue.done) {
-      throw createServiceError("A véletlenszám-adatfolyam elfogyott.", 500);
-    }
-
-    if (nextValue.value < maxAcceptable) {
-      return nextValue.value % range;
+    if (value < maxAcceptable) {
+      return value % range;
     }
   }
 }
@@ -244,13 +240,7 @@ function createRandomGenerator({ serverSeed, clientSeed, nonce, gameDomain }) {
     },
 
     randomFloat() {
-      const nextValue = stream.next();
-
-      if (nextValue.done) {
-        throw createServiceError("A véletlenszám-adatfolyam elfogyott.", 500);
-      }
-
-      return nextValue.value / UINT32_RANGE;
+      return stream.next().value / UINT32_RANGE;
     },
 
     pick(values) {
@@ -427,10 +417,6 @@ async function verifyGameResult({ userId, historyId }) {
     throw createServiceError("Az userId hiányzik.");
   }
 
-  if (!mongoose.isValidObjectId(historyId)) {
-    throw createServiceError("A játékelőzmény azonosítója érvénytelen.");
-  }
-
   const history = await GameHistory.findOne({
     _id: historyId,
     userId,
@@ -479,7 +465,6 @@ async function verifyGameResult({ userId, historyId }) {
   });
 
   const seedDetailsMatch =
-    String(revealedSeed.seedId) === String(history.provablyFair.seedId) &&
     revealedSeed.serverSeedHash === history.provablyFair.serverSeedHash &&
     revealedSeed.clientSeed === history.provablyFair.clientSeed &&
     revealedSeed.algorithmVersion === history.provablyFair.algorithmVersion &&

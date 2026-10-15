@@ -64,37 +64,6 @@ function toSettlement(history, replayed = false) {
   };
 }
 
-async function getSettledGame({
-  userId,
-  requestId,
-  gameMode,
-  baseBet,
-  selectedSymbol = null,
-}) {
-  if (!userId) {
-    throw createRequestError("Az userId hiányzik.");
-  }
-
-  const normalizedRequestId = normalizeRequestId(requestId);
-
-  const existingHistory = await GameHistory.findOne({
-    userId,
-    requestId: normalizedRequestId,
-  }).lean();
-
-  if (!existingHistory) {
-    return null;
-  }
-
-  verifyExistingRequest(existingHistory, {
-    gameMode,
-    baseBet,
-    selectedSymbol,
-  });
-
-  return toSettlement(existingHistory, true);
-}
-
 async function settleGameResult({
   userId,
   gameType,
@@ -262,7 +231,4 @@ async function settleGameResult({
   }
 }
 
-module.exports = {
-  getSettledGame,
-  settleGameResult,
-};
+module.exports = { settleGameResult };

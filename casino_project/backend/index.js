@@ -9,7 +9,6 @@ const connectDatabase = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const slotRoutes = require("./routes/slotRoutes");
 const provablyFairRoutes = require("./routes/provablyFairRoutes");
-const gamehistoryRoutes = require("./routes/gameHistoryRoutes");
 
 const app = express();
 
@@ -48,8 +47,13 @@ app.use((req, res) => {
 app.use((error, req, res, next) => {
   console.error("Szerverhiba:", error);
 
-  res.status(500).json({
-    message: "Váratlan szerverhiba történt.",
+  const statusCode = Number.isInteger(error.statusCode)
+    ? error.statusCode
+    : 500;
+
+  return res.status(statusCode).json({
+    message:
+      statusCode >= 500 ? "Váratlan szerverhiba történt." : error.message,
   });
 });
 
