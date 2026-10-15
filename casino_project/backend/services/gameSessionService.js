@@ -31,9 +31,11 @@ function normalizeRequestId(requestId) {
 
 function verifyExistingRequest(
   existingHistory,
-  { gameMode, baseBet, selectedSymbol = null },
+  { gameType, gameMode, baseBet, selectedSymbol = null },
 ) {
-  const differentGame = existingHistory.gameMode !== gameMode;
+  const differentGameType = existingHistory.gameType !== gameType;
+
+  const differentGameMode = existingHistory.gameMode !== gameMode;
 
   const differentBet = Number(existingHistory.baseBet) !== Number(baseBet);
 
@@ -42,7 +44,12 @@ function verifyExistingRequest(
     selectedSymbol !== null &&
     existingHistory.result?.expandingSymbol !== selectedSymbol;
 
-  if (differentGame || differentBet || differentFeatureSymbol) {
+  if (
+    differentGameType ||
+    differentGameMode ||
+    differentBet ||
+    differentFeatureSymbol
+  ) {
     throw createRequestError(
       "A kérésazonosítót már másik játékkéréshez használták.",
       409,
@@ -111,6 +118,7 @@ async function settleGameResult({
 
       if (existingHistory) {
         verifyExistingRequest(existingHistory, {
+          gameType,
           gameMode,
           baseBet,
           selectedSymbol,
@@ -216,6 +224,7 @@ async function settleGameResult({
 
       if (existingHistory) {
         verifyExistingRequest(existingHistory, {
+          gameType,
           gameMode,
           baseBet,
           selectedSymbol,

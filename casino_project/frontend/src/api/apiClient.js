@@ -18,6 +18,7 @@ async function apiRequest(path, options = {}) {
   } catch (error) {
     const connectionError = new Error("Nem sikerült kapcsolódni a szerverhez.");
 
+    connectionError.code = "NETWORK_ERROR";
     connectionError.cause = error;
     throw connectionError;
   }

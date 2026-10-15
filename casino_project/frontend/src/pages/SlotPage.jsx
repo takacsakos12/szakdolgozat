@@ -110,6 +110,11 @@ function SlotPage({ user, onUserChange }) {
     if (!response.replayed) {
       setBalance(response.balanceAfter);
 
+      onUserChange?.((currentUser) => ({
+        ...currentUser,
+        balance: response.balanceAfter,
+      }));
+
       return;
     }
 
@@ -118,8 +123,7 @@ function SlotPage({ user, onUserChange }) {
         const currentUser = currentUserResponse.user;
 
         setBalance(currentUser.balance);
-
-        onUserChange(currentUser);
+        onUserChange?.(currentUser);
       })
       .catch(() => {
         setErrorMessage("Az aktuális egyenleget nem sikerült frissíteni.");
@@ -206,7 +210,7 @@ function SlotPage({ user, onUserChange }) {
     } catch (error) {
       setErrorMessage(error.message);
 
-      if (!error.statusCode) {
+      if (error.code === "NETWORK_ERROR") {
         setPendingRequest({
           mode,
           request,

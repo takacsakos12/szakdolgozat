@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { getGameHistory } from "../api/gameHistoryApi";
@@ -53,6 +53,7 @@ function GameHistoryPage({ user }) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const lastSuccessfulPage = useRef(1);
   const userId = user?.id;
 
   useEffect(() => {
@@ -76,11 +77,14 @@ function GameHistoryPage({ user }) {
 
         setGames(response.games);
         setPagination(response.pagination);
+        lastSuccessfulPage.current = response.pagination.page;
       } catch (error) {
         if (componentIsActive) {
           setErrorMessage(
-            error.message,
+            `${error.message} Az előzőleg betöltött oldal adatai maradtak láthatók.`,
           );
+
+          setPage(lastSuccessfulPage.current);
         }
       } finally {
         if (componentIsActive) {
@@ -217,8 +221,7 @@ function GameHistoryPage({ user }) {
               </button>
 
               <span>
-                {pagination?.page} / {pagination?.totalPages}.
-                oldal
+                {pagination?.page} / {pagination?.totalPages}. oldal
               </span>
 
               <button
