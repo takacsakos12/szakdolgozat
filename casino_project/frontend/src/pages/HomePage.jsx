@@ -1,5 +1,4 @@
 import GameCard from "../games/GameCard";
-
 const games = [
   {
     id: "slot",

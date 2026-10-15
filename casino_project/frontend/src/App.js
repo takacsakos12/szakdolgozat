@@ -4,12 +4,12 @@ import SlotPage from "./pages/SlotPage";
 import "./App.css";
 import AuthPage from "./AuthPage";
 import GameHistoryPage from "./pages/GameHistoryPage";
+import { getCurrentUser, logoutUser } from "./api/authApi";
+
 
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import HomePage from "./pages/HomePage";
-
-const API_URL = "http://localhost:5000/api";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -18,17 +18,8 @@ function App() {
   useEffect(() => {
     async function checkCurrentUser() {
       try {
-        const response = await fetch(`${API_URL}/auth/me`, {
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          setUser(null);
-          return;
-        }
-
-        const data = await response.json();
-        setUser(data.user);
+        const response = await getCurrentUser();
+          setUser(response.user);
       } catch {
         setUser(null);
       } finally {
@@ -41,15 +32,7 @@ function App() {
 
   async function handleLogout() {
     try {
-      const response = await fetch(`${API_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("A kijelentkezés sikertelen.");
-      }
-
+      await logoutUser();
       setUser(null);
     } catch (error) {
       console.error(error.message);

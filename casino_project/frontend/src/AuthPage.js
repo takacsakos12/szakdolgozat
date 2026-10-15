@@ -5,10 +5,9 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { loginUser, registerUser } from "./api/authApi";
 
 import "./AuthPage.css";
-
-const API_URL = "http://localhost:5000/api";
 
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -151,26 +150,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
 
     try {
       setIsSubmitting(true);
-
-      const response = await fetch(
-        `${API_URL}/auth/${isLogin ? "login" : "register"}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "A művelet nem sikerült."
-        );
-      }
+      const data = isLogin ? await loginUser(requestBody) : await registerUser(requestBody);
 
       if (isLogin) {
         onAuthenticated(data.user);
@@ -187,7 +167,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
       });
     } catch (error) {
       setServerMessage(error.message);
-    } finally {
+    } finally { 
       setIsSubmitting(false);
     }
   }
