@@ -1,13 +1,7 @@
 const crypto = require("crypto");
 const mongoose = require("mongoose");
-const { isDeepStrictEqual } = require("node:util");
 
 const ProvablyFairSeed = require("../models/ProvablyFairSeed");
-const GameHistory = require("../models/GameHistory");
-
-const { CONFIG_VERSION } = require("../config/slotConfig");
-
-const { spin, featureSpin, buyBookBonus } = require("./slotEngine");
 
 const UINT32_RANGE = 0x100000000;
 const ALGORITHM_VERSION = "HMAC_SHA512_V1";
@@ -372,97 +366,6 @@ function verifyServerSeed({ serverSeed, serverSeedHash }) {
   return hashServerSeed(serverSeed) === serverSeedHash.toLowerCase();
 }
 
-
-
-async function verifyGameResult({ userId, historyId }) {
-  if (!userId) {
-    throw createServiceError("Az userId hiányzik.");
-  }
-
-  const history = await GameHistory.findOne({
-    _id: historyId,
-    userId,
-  }).lean();
-
-  if (!history) {
-    throw createServiceError("A játékelőzmény nem található.", 404);
-  }
-
-  if (history.gameType !== "SLOT") {
-    throw createServiceError(
-      "Jelenleg csak sloteredmény ellenőrzése támogatott.",
-      409,
-    );
-  }
-
-  if (!history.provablyFair) {
-    throw createServiceError(
-      "A játékelőzmény nem tartalmaz Provably Fair adatokat.",
-      409,
-    );
-  }
-
-  if (history.configVersion !== CONFIG_VERSION) {
-    throw createServiceError(
-      `A ${history.configVersion} konfigurációverzió ellenőrzése jelenleg nem támogatott.`,
-      409,
-    );
-  }
-
-  if (history.provablyFair.algorithmVersion !== ALGORITHM_VERSION) {
-    throw createServiceError(
-      `A ${history.provablyFair.algorithmVersion} algoritmusverzió ellenőrzése jelenleg nem támogatott.`,
-      409,
-    );
-  }
-
-  const revealedSeed = await getRevealedSeed({
-    userId,
-    seedId: history.provablyFair.seedId,
-  });
-
-  const seedHashMatches = verifyServerSeed({
-    serverSeed: revealedSeed.serverSeed,
-    serverSeedHash: history.provablyFair.serverSeedHash,
-  });
-
-  const seedDetailsMatch =
-    revealedSeed.serverSeedHash === history.provablyFair.serverSeedHash &&
-    revealedSeed.clientSeed === history.provablyFair.clientSeed &&
-    revealedSeed.algorithmVersion === history.provablyFair.algorithmVersion &&
-    history.provablyFair.nonce < revealedSeed.finalNonce;
-
-  const randomGenerator = createRandomGenerator({
-    serverSeed: revealedSeed.serverSeed,
-    clientSeed: history.provablyFair.clientSeed,
-    nonce: history.provablyFair.nonce,
-    gameDomain: history.provablyFair.gameDomain,
-  });
-
-  const recreatedResult = recreateSlotResult(history, () =>
-    randomGenerator.randomFloat(),
-  );
-
-  const gameResultMatches = isDeepStrictEqual(
-    normalizeResultForComparison(recreatedResult),
-    normalizeResultForComparison(history.result),
-  );
-
-  return {
-    verified: seedHashMatches && seedDetailsMatch && gameResultMatches,
-
-    seedHashMatches,
-    seedDetailsMatch,
-    gameResultMatches,
-
-    historyId: history._id,
-    gameType: history.gameType,
-    gameMode: history.gameMode,
-    configVersion: history.configVersion,
-    algorithmVersion: history.provablyFair.algorithmVersion,
-  };
-}
-
 module.exports = {
   ALGORITHM_VERSION,
   generateServerSeed,
@@ -474,5 +377,4 @@ module.exports = {
   rotateSeed,
   getRevealedSeed,
   verifyServerSeed,
-  verifyGameResult,
 };

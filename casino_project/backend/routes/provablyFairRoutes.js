@@ -7,9 +7,9 @@ const {
   getCurrentSeed,
   rotateSeed,
   getRevealedSeed,
-  verifyServerSeed,
-  verifyGameResult,
 } = require("../services/provablyFairService");
+
+const { verifySlotGameResult } = require("../services/slotVerificationService");
 
 const router = express.Router();
 
@@ -64,34 +64,18 @@ router.post("/verify", protectRoute, async (req, res) => {
       ? req.body.historyId.trim()
       : "";
 
-  const verification = await verifyGameResult({
+  if (!mongoose.isValidObjectId(historyId)) {
+    return res.status(400).json({
+      message: "A játékelőzmény azonosítója érvénytelen.",
+    });
+  }
+
+  const verification = await verifySlotGameResult({
     userId: req.user._id,
     historyId,
   });
 
   return res.status(200).json(verification);
-});
-
-router.post("/verify", protectRoute, async (req, res) => {
-  try {
-    const historyId =
-      typeof req.body.historyId === "string" ? req.body.historyId.trim() : "";
-
-    if (!mongoose.isValidObjectId(historyId)) {
-      return res.status(400).json({
-        message: "A játékelőzmény azonosítója érvénytelen.",
-      });
-    }
-
-    const verification = await verifyGameResult({
-      userId: req.user._id,
-      historyId,
-    });
-
-    return res.status(200).json(verification);
-  } catch (error) {
-    return sendErrorResponse(res, error);
-  }
 });
 
 module.exports = router;

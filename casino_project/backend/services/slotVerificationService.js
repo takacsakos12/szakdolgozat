@@ -4,8 +4,7 @@ const { CONFIG_VERSION } = require("../config/slotConfig");
 
 const { spin, featureSpin, buyBookBonus } = require("./slotEngine");
 
-const { ALGORITMHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed, createServiceError } = require("./provablyFairService");
-const GameHistory = require("../models/GameHistory");
+const { ALGORITHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed, createServiceError } = require("./provablyFairService");
 
 function createServiceError(message, statusCode = 400) {
   const error = new Error(message);
@@ -73,7 +72,7 @@ async function verifySlotGameResult(userId ,historyId) {
         throw createServiceError("A játékkonfiguráció verziója nem egyezik.", 409);
     }
 
-    if (history.provablyFairVersion !== ALGORITMHM_VERSION) {
+    if (history.provablyFair.algorithmVersion !== ALGORITHM_VERSION) {
         throw createServiceError("A provably fair algoritmus verziója nem egyezik.", 409);
     }
 
@@ -90,10 +89,10 @@ async function verifySlotGameResult(userId ,historyId) {
         serverSeed: revealedSeed.serverSeed,
         clientSeed: revealedSeed.clientSeed,
         nonce: history.provablyFair.nonce,
-        gamedomain: history.provablyFair.gameDomain,
+        gameDomain: history.provablyFair.gameDomain,
     });
 
-    const recreatedResult = recreateSlotResult(history, () => randomgenerator.randomfloat());
+    const recreatedResult = recreatedSlotResult(history, () => randomgenerator.randomfloat());
 
     const gameresultMatch = isStrictDeepEqual(normalizeResultForComparison(recreatedResult), normalizeResultForComparison(history.result));
 
