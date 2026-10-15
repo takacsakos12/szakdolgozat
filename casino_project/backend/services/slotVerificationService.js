@@ -17,7 +17,7 @@ function normalizeResultForComparison(result) {
   return JSON.parse(JSON.stringify(result));
 }
 
-function recreateSlotResult(history, random) {
+function recreatedSlotResult(history, random) {
   switch (history.gameMode) {
     case "BASE_GAME":
       return spin({
@@ -94,7 +94,7 @@ async function verifySlotGameResult({ userId, historyId }) {
     gameDomain: history.provablyFair.gameDomain,
   });
 
-  const recreatedResult = recreatedSlotResult(history, () => randomgenerator.randomfloat());
+  const recreatedResult = recreatedSlotResult(history, () => randomGenerator.randomFloat());
 
   const gameResultMatches = isDeepStrictEqual(
     normalizeResultForComparison(recreatedResult),
