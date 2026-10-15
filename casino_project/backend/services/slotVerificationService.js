@@ -1,0 +1,114 @@
+const {isStrictDeepEqual} = require("node:util");
+const { gameHistory } = require("../models/GameHistory");
+const { CONFIG_VERSION } = require("../config/slotConfig");
+
+const { spin, featureSpin, buyBookBonus } = require("./slotEngine");
+
+const { ALGORITMHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed, createServiceError } = require("./provablyFairService");
+const GameHistory = require("../models/GameHistory");
+
+function createServiceError(message, statusCode = 400) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
+
+function normalizeResultForComparison(result) {
+  return JSON.parse(JSON.stringify(result));
+}
+
+function recreateSlotResult(history, random) {
+  switch (history.gameMode) {
+    case "BASE_GAME":
+      return spin({
+        baseBet: history.baseBet,
+        random,
+      });
+
+    case "BONUS_BUY":
+      return buyBookBonus({
+        baseBet: history.baseBet,
+        random,
+      });
+
+    case "FEATURE_SPIN": {
+      const selectedSymbol =
+        history.slotDetails?.expandingSymbol || history.result?.expandingSymbol;
+
+      if (!selectedSymbol) {
+        throw createServiceError(
+          "A Feature Spin kiválasztott szimbóluma hiányzik.",
+          409,
+        );
+      }
+
+      return featureSpin({
+        baseBet: history.baseBet,
+        selectedSymbol,
+        random,
+      });
+    }
+
+    default:
+      throw createServiceError("A játékmód ellenőrzése nem támogatott.", 409);
+  }
+}
+
+async function verifySlotGameResult(userId ,historyId) {
+    if (!userId || !historyId) { 
+        throw createServiceError("A felhasználó azonosítója és a történelem azonosítója kötelező.", 400);
+    }
+
+    const history = await GameHistory.findOne({ _id: historyId, userId }).lean();
+
+    if (!history) {
+        throw createServiceError("A játékelőzmény nem található.", 404);
+    }
+
+    if (history.gameType !== "SLOT") {
+        throw createServiceError("A játéktípus ellenőrzése nem támogatott.", 409);
+    }
+
+    if (history.configVersion !== CONFIG_VERSION) {
+        throw createServiceError("A játékkonfiguráció verziója nem egyezik.", 409);
+    }
+
+    if (history.provablyFairVersion !== ALGORITMHM_VERSION) {
+        throw createServiceError("A provably fair algoritmus verziója nem egyezik.", 409);
+    }
+
+    const revealedSeed = await getRevealedSeed({userId: history.userId, seedId: history.provablyFair.seedId});
+
+    const seedHashMatches = verifyServerSeed({serverSeed: revealedSeed.serverSeed, serverSeedHash: history.provablyFair.serverSeedHash});
+
+    const seedDetailsMatch = revealedSeed.serverSeed === history.provablyFair.serverSeed &&
+    revealedSeed.clientSeed === history.provablyFair.clientSeed &&
+    revealedSeed.algorithmVersion === history.provablyFair.algorithmVersion &&
+    history.provablyFair.nonce < revealedSeed.finalNonce;
+
+    const random = createRandomGenerator({
+        serverSeed: revealedSeed.serverSeed,
+        clientSeed: revealedSeed.clientSeed,
+        nonce: history.provablyFair.nonce,
+        gamedomain: history.provablyFair.gameDomain,
+    });
+
+    const recreatedResult = recreateSlotResult(history, () => randomgenerator.randomfloat());
+
+    const gameresultMatch = isStrictDeepEqual(normalizeResultForComparison(recreatedResult), normalizeResultForComparison(history.result));
+
+    return {
+        verified: seedHashMatches && seedDetailsMatch && gameresultMatch,
+
+        seedHashMatches, seedDetailsMatch, gameresultMatch,
+
+        historyId: history._id,
+        gameType: history.gameType,
+        gamemode: history.gameMode,
+        configVersion: history.configVersion,
+        algorithmVersion: history.provablyFair.algorithmVersion,
+    };
+}
+
+module.exports = { verifySlotGameResult };
+

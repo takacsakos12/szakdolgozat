@@ -17,6 +17,7 @@ function createServiceError(message, statusCode = 400) {
   error.statusCode = statusCode;
   return error;
 }
+exports.createServiceError = createServiceError;
 
 function generateServerSeed() {
   return crypto.randomBytes(32).toString("hex");
@@ -371,46 +372,7 @@ function verifyServerSeed({ serverSeed, serverSeedHash }) {
   return hashServerSeed(serverSeed) === serverSeedHash.toLowerCase();
 }
 
-function normalizeResultForComparison(result) {
-  return JSON.parse(JSON.stringify(result));
-}
 
-function recreateSlotResult(history, random) {
-  switch (history.gameMode) {
-    case "BASE_GAME":
-      return spin({
-        baseBet: history.baseBet,
-        random,
-      });
-
-    case "BONUS_BUY":
-      return buyBookBonus({
-        baseBet: history.baseBet,
-        random,
-      });
-
-    case "FEATURE_SPIN": {
-      const selectedSymbol =
-        history.slotDetails?.expandingSymbol || history.result?.expandingSymbol;
-
-      if (!selectedSymbol) {
-        throw createServiceError(
-          "A Feature Spin kiválasztott szimbóluma hiányzik.",
-          409,
-        );
-      }
-
-      return featureSpin({
-        baseBet: history.baseBet,
-        selectedSymbol,
-        random,
-      });
-    }
-
-    default:
-      throw createServiceError("A játékmód ellenőrzése nem támogatott.", 409);
-  }
-}
 
 async function verifyGameResult({ userId, historyId }) {
   if (!userId) {
