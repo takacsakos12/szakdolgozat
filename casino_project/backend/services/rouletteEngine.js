@@ -28,6 +28,9 @@ const VALID_POSITION_KEYS = Object.fromEntries(
 
 function prepareBet(bet) {
   const betConfig = BET_TYPES[bet?.type];
+  if (!bet || typeof bet !== "object" || !betConfig) {
+    throw createRouletteError("Érvénytelen fogadás.");
+  }
 
   if (
     !Number.isInteger(bet.amount) ||
@@ -63,6 +66,9 @@ function prepareBet(bet) {
 }
 
 function prepareRouletteBets(bets) {
+  if (!Array.isArray(bets) || bets.length === 0) {
+    throw createRouletteError("Legalább egy fogadás szükséges.");
+  }
   const preparedBets = bets.map(prepareBet);
 
   const totalBetAmount = preparedBets.reduce(

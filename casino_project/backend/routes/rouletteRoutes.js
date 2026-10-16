@@ -1,6 +1,6 @@
-const { express } = require("express");
+const express = require("express");
 
-const { settlegameResult } = require("../services/gameSessionService");
+const settlegameResult = require("../services/gameSessionService");
 
 const protectRoute = require("../middleware/authMiddleware");
 
@@ -18,7 +18,7 @@ const {
 } = require("../config/RouletteConfig");
 
 const {
-  playRoulette,
+  playRouletteGame,
   prepareRouletteBets,
 } = require("../services/rouletteEngine");
 
