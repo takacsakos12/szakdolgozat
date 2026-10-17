@@ -156,6 +156,16 @@ const gameHistorySchema = new mongoose.Schema(
       minlength: 8,
       maxlength: 100,
     },
+    requestFingerprint: {
+      type: String,
+      default: null,
+      match: /^[a-f0-9]{64}$/,
+    },
+
+    fingerprintVersion: {
+      type: Number,
+      default: null,
+    },
   },
 
   {

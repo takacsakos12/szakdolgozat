@@ -9,6 +9,7 @@ const connectDatabase = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const slotRoutes = require("./routes/slotRoutes");
 const provablyFairRoutes = require("./routes/provablyFairRoutes");
+const rouletteRoutes = require("./routes/rouletteRoutes");
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/slot", slotRoutes);
 app.use("/api/provably-fair", provablyFairRoutes);
 app.use("/api/game-history", require("./routes/gameHistoryRoutes"));
+app.use("/api/roulette", rouletteRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

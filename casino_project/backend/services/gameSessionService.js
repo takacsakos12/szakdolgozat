@@ -7,6 +7,12 @@ const {
   createRandomGenerator,
 } = require("./provablyFairService");
 
+const {
+  FINGERPRINT_VERSION,
+  createFingerprint,
+  verifyRequestFingerprint,
+} = require("./fingerprintService");
+
 function createRequestError(message, statusCode = 400) {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -31,7 +37,7 @@ function normalizeRequestId(requestId) {
 
 function verifyExistingRequest(
   existingHistory,
-  { gameType, gameMode, baseBet, selectedSymbol = null },
+  { gameType, gameMode, baseBet, selectedSymbol = null, requestFingerprint },
 ) {
   const differentGameType = existingHistory.gameType !== gameType;
 
@@ -43,6 +49,22 @@ function verifyExistingRequest(
     gameMode === "FEATURE_SPIN" &&
     selectedSymbol !== null &&
     existingHistory.result?.expandingSymbol !== selectedSymbol;
+
+  if (existingHistory.requestFingerprint) {
+    if (existingHistory.fingerprintVersion !== FINGERPRINT_VERSION) {
+      throw createRequestError(
+        "A kérés fingerprint-verziója nem támogatott.",
+        409,
+      );
+    }
+
+    verifyRequestFingerprint(
+      existingHistory.requestFingerprint,
+      requestFingerprint,
+    );
+
+    return;
+  }
 
   if (
     differentGameType ||
@@ -81,6 +103,7 @@ async function settleGameResult({
   gameDomain,
   createGameResult,
   selectedSymbol = null,
+  requestData,
 }) {
   if (!userId) {
     throw createRequestError("Az userId hiányzik.");
@@ -103,6 +126,21 @@ async function settleGameResult({
 
   const normalizedRequestId = normalizeRequestId(requestId);
 
+  if (
+    !requestData ||
+    typeof requestData !== "object" ||
+    Array.isArray(requestData)
+  ) {
+    throw createRequestError("A fogadás kérésadatai hiányoznak.", 500);
+  }
+
+  const requestFingerprint = createFingerprint({
+    gameType,
+    gameMode,
+    baseBet,
+    requestData,
+  });
+
   await getOrCreateActiveSeed({ userId });
 
   const session = await mongoose.startSession();
@@ -122,6 +160,7 @@ async function settleGameResult({
           gameMode,
           baseBet,
           selectedSymbol,
+          requestFingerprint,
         });
 
         settlement = toSettlement(existingHistory, true);
@@ -140,7 +179,10 @@ async function settleGameResult({
         gameDomain,
       });
 
-      const gameData = createGameResult(() => randomGenerator.randomFloat());
+      const gameData = createGameResult({
+        randomFloat: () => randomGenerator.randomFloat(),
+        randomInt: (range) => randomGenerator.randomInt(range),
+      });
 
       if (!gameData || typeof gameData !== "object") {
         throw createRequestError("A játékeredmény formátuma érvénytelen.", 500);
@@ -186,6 +228,8 @@ async function settleGameResult({
         [
           {
             requestId: normalizedRequestId,
+            requestFingerprint,
+            fingerprintVersion: FINGERPRINT_VERSION,
             userId,
             gameType,
             gameMode,
@@ -228,6 +272,7 @@ async function settleGameResult({
           gameMode,
           baseBet,
           selectedSymbol,
+          requestFingerprint,
         });
 
         return toSettlement(existingHistory, true);

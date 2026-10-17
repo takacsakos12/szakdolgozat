@@ -136,8 +136,9 @@ router.post("/spin", protectRoute, async (req, res) => {
     baseBet,
     requestId,
     gameDomain: "SLOT:BASE_GAME",
+    requestData: {},
 
-    createGameResult: (random) => {
+    createGameResult: ({ randomFloat: random }) => {
       const result = spin({
         baseBet,
         random,
@@ -180,8 +181,9 @@ router.post("/bonus-buy", protectRoute, async (req, res) => {
     baseBet,
     requestId,
     gameDomain: "SLOT:BONUS_BUY",
+    requestData: {},
 
-    createGameResult: (random) => {
+    createGameResult: ({randomFloat: random}) => {
       const result = buyBookBonus({
         baseBet,
         random,
@@ -237,8 +239,9 @@ router.post("/feature-spin", protectRoute, async (req, res) => {
     requestId,
     gameDomain: "SLOT:FEATURE_SPIN",
     selectedSymbol,
+    requestData: { selectedSymbol },
 
-    createGameResult: (random) => {
+    createGameResult: ({ randomFloat: random }) => {
       const result = featureSpin({
         baseBet,
         selectedSymbol,

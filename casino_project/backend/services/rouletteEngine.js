@@ -3,11 +3,8 @@ const {
   BET_TYPES,
   ROULETTE_POSITIONS,
   MIN_BET_AMOUNT,
-  MAX_BET_PER_POSITION,
   MAX_TOTAL_BET_AMOUNT,
 } = require("../config/RouletteConfig");
-
-const UINT32_RANGE = 0x100000000;
 
 function createRouletteError(message, statusCode = 400) {
   const error = new Error(message);
@@ -27,25 +24,25 @@ const VALID_POSITION_KEYS = Object.fromEntries(
 );
 
 function prepareBet(bet) {
-  const betConfig = BET_TYPES[bet?.type];
-  if (!bet || typeof bet !== "object" || !betConfig) {
+  if (!bet || typeof bet !== "object" || !Object.hasOwn(BET_TYPES, bet.type)) {
     throw createRouletteError("Érvénytelen fogadás.");
   }
 
-  if (
-    !Number.isInteger(bet.amount) ||
-    bet.amount < MIN_BET_AMOUNT ||
-    bet.amount > MAX_BET_PER_POSITION
-  ) {
+  if (!Number.isInteger(bet.amount) || bet.amount < MIN_BET_AMOUNT) {
     throw createRouletteError("Érvénytelen tétösszeg.");
   }
 
+  const betConfig = BET_TYPES[bet.type];
   const validPositions = VALID_POSITION_KEYS[bet.type];
 
   if (validPositions) {
     const numbers = Array.isArray(bet.numbers)
       ? [...bet.numbers].sort((first, second) => first - second)
       : [];
+
+    if (!validPositions.has(positionKey(numbers))) {
+      throw createRouletteError("Érvénytelen fogadási pozíció.");
+    }
 
     return {
       type: bet.type,
@@ -69,6 +66,7 @@ function prepareRouletteBets(bets) {
   if (!Array.isArray(bets) || bets.length === 0) {
     throw createRouletteError("Legalább egy fogadás szükséges.");
   }
+
   const preparedBets = bets.map(prepareBet);
 
   const totalBetAmount = preparedBets.reduce(
@@ -88,20 +86,6 @@ function prepareRouletteBets(bets) {
   };
 }
 
-function getRandomInteger(random, range) {
-  const maxAcceptableValue = UINT32_RANGE - (UINT32_RANGE % range);
-
-  while (true) {
-    const randomValue = random();
-
-    const randomInteger = Math.floor(randomValue * UINT32_RANGE);
-
-    if (randomInteger < maxAcceptableValue) {
-      return randomInteger % range;
-    }
-  }
-}
-
 function evaluateBet(bet, winningNumber) {
   const isWinner = bet.winningNumbers.includes(winningNumber);
 
@@ -115,10 +99,12 @@ function evaluateBet(bet, winningNumber) {
   };
 }
 
-function playRouletteGame({ bets, random = Math.random }) {
-  const { preparedBets, totalBetAmount } = prepareRouletteBets(bets);
+function playRouletteGame({ preparedBets, totalBetAmount, randomInt }) {
+  if (typeof randomInt !== "function") {
+    throw createRouletteError("A véletlenszám-generátor hiányzik.", 500);
+  }
 
-  const winningNumber = getRandomInteger(random, 37);
+  const winningNumber = randomInt(37);
 
   const evaluatedBets = preparedBets.map((bet) =>
     evaluateBet(bet, winningNumber),
