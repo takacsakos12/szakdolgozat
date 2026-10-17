@@ -39,17 +39,6 @@ function verifyExistingRequest(
   existingHistory,
   { gameType, gameMode, baseBet, selectedSymbol = null, requestFingerprint },
 ) {
-  const differentGameType = existingHistory.gameType !== gameType;
-
-  const differentGameMode = existingHistory.gameMode !== gameMode;
-
-  const differentBet = Number(existingHistory.baseBet) !== Number(baseBet);
-
-  const differentFeatureSymbol =
-    gameMode === "FEATURE_SPIN" &&
-    selectedSymbol !== null &&
-    existingHistory.result?.expandingSymbol !== selectedSymbol;
-
   if (existingHistory.requestFingerprint) {
     if (existingHistory.fingerprintVersion !== FINGERPRINT_VERSION) {
       throw createRequestError(
@@ -65,6 +54,24 @@ function verifyExistingRequest(
 
     return;
   }
+
+  if (existingHistory.gameType !== "SLOT" || gameType !== "SLOT") {
+    throw createRequestError(
+      "A korábbi játékkérés fingerprint hiányában nem ellenőrizhető.",
+      409,
+    );
+  }
+
+  const differentGameType = existingHistory.gameType !== gameType;
+
+  const differentGameMode = existingHistory.gameMode !== gameMode;
+
+  const differentBet = Number(existingHistory.baseBet) !== Number(baseBet);
+
+  const differentFeatureSymbol =
+    gameMode === "FEATURE_SPIN" &&
+    selectedSymbol !== null &&
+    existingHistory.result?.expandingSymbol !== selectedSymbol;
 
   if (
     differentGameType ||

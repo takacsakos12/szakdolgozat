@@ -10,6 +10,12 @@ const {
 } = require("../services/provablyFairService");
 
 const { verifySlotGameResult } = require("../services/slotVerificationService");
+const GameHistory = require("../models/GameHistory");
+
+
+const {
+  verifyRouletteGameResult,
+} = require("../services/rouletteVerificationService");
 
 const router = express.Router();
 
@@ -60,9 +66,7 @@ router.get("/revealed/:seedId", protectRoute, async (req, res) => {
 
 router.post("/verify", protectRoute, async (req, res) => {
   const historyId =
-    typeof req.body.historyId === "string"
-      ? req.body.historyId.trim()
-      : "";
+    typeof req.body?.historyId === "string" ? req.body.historyId.trim() : "";
 
   if (!mongoose.isValidObjectId(historyId)) {
     return res.status(400).json({
@@ -70,10 +74,40 @@ router.post("/verify", protectRoute, async (req, res) => {
     });
   }
 
-  const verification = await verifySlotGameResult({
+  const history = await GameHistory.findOne({
+    _id: historyId,
+    userId: req.user._id,
+  })
+    .select("gameType")
+    .lean();
+
+  if (!history) {
+    return res.status(404).json({
+      message: "A játékelőzmény nem található.",
+    });
+  }
+
+  const params = {
     userId: req.user._id,
     historyId,
-  });
+  };
+
+  let verification;
+
+  switch (history.gameType) {
+    case "SLOT":
+      verification = await verifySlotGameResult(params);
+      break;
+
+    case "ROULETTE":
+      verification = await verifyRouletteGameResult(params);
+      break;
+
+    default:
+      return res.status(409).json({
+        message: "A játéktípus ellenőrzése nem támogatott.",
+      });
+  }
 
   return res.status(200).json(verification);
 });

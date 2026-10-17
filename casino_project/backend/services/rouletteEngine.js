@@ -28,7 +28,7 @@ function prepareBet(bet) {
     throw createRouletteError("Érvénytelen fogadás.");
   }
 
-  if (!Number.isInteger(bet.amount) || bet.amount < MIN_BET_AMOUNT) {
+  if (!Number.isSafeInteger(bet.amount) || bet.amount < MIN_BET_AMOUNT) {
     throw createRouletteError("Érvénytelen tétösszeg.");
   }
 
@@ -74,7 +74,10 @@ function prepareRouletteBets(bets) {
     0,
   );
 
-  if (totalBetAmount > MAX_TOTAL_BET_AMOUNT) {
+  if (
+    !Number.isSafeInteger(totalBetAmount) ||
+    totalBetAmount > MAX_TOTAL_BET_AMOUNT
+  ) {
     throw createRouletteError(
       "A teljes tét meghaladja a megengedett maximumot.",
     );
