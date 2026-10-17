@@ -1,4 +1,4 @@
-const { isdeepStrictEqual } = require("node:util");
+const { isDeepStrictEqual } = require("node:util");
 const GameHistory = require("../models/GameHistory");
 
 const {
@@ -8,7 +8,7 @@ const {
   GAME_DOMAIN,
 } = require("../config/rouletteConfig");
 
-const { prepareRouletteBet, playRouletteGame } = require("./rouletteEngine");
+const { prepareRouletteBets, playRouletteGame } = require("./rouletteEngine");
 
 const {
   ALGORITHM_VERSION,
@@ -37,7 +37,7 @@ async function verifyRouletteGameResult({ userId, historyId }) {
     throw createServiceError("A játék típusa vagy módja nem egyezik.", 409);
   }
 
-  if (history.CONFIG_VERSION !== CONFIG_VERSION) {
+  if (history.configVersion !== CONFIG_VERSION) {
     throw createServiceError(
       "A játék konfigurációs verziója nem egyezik.",
       409,
@@ -86,7 +86,7 @@ async function verifyRouletteGameResult({ userId, historyId }) {
     gameDomain: fairData.gameDomain,
   });
 
-  const { preparedBets, totalBetAmount } = prepareRouletteBet(
+  const { preparedBets, totalBetAmount } = prepareRouletteBets(
     history.result?.bets,
   );
 
@@ -96,7 +96,7 @@ async function verifyRouletteGameResult({ userId, historyId }) {
     randomInt: (range) => randomGenerator.randomInt(range),
   });
 
-  const gameResultMatches = isdeepStrictEqual(
+  const gameResultMatches = isDeepStrictEqual(
     JSON.parse(JSON.stringify(recreatedResult)),
     JSON.parse(JSON.stringify(history.result)),
   );
@@ -106,8 +106,7 @@ async function verifyRouletteGameResult({ userId, historyId }) {
     history.cost === recreatedResult.cost &&
     history.winAmount === recreatedResult.totalWin &&
     history.netResult === recreatedResult.netResult &&
-    history.balanceAfter ===
-      recreatedResult.balanceBefore + recreatedResult.netResult;
+    history.balanceAfter === history.balanceBefore + recreatedResult.netResult;
 
   return {
     verified:
