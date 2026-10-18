@@ -36,9 +36,13 @@ function prepareBet(bet) {
   const validPositions = VALID_POSITION_KEYS[bet.type];
 
   if (validPositions) {
-    const numbers = Array.isArray(bet.numbers)
-      ? [...bet.numbers].sort((first, second) => first - second)
-      : [];
+  if (!Array.isArray(bet.numbers) || !bet.numbers.every(Number.isInteger)) {
+    throw createRouletteError("Érvénytelen fogadási számok.");
+  }
+
+  const numbers = [...bet.numbers].sort(
+    (first, second) => first - second
+  );
 
     if (!validPositions.has(positionKey(numbers))) {
       throw createRouletteError("Érvénytelen fogadási pozíció.");

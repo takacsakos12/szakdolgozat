@@ -27,31 +27,6 @@ const {
 
 const router = express.Router();
 
-function createRequestBets(preparedBets) {
-  const mergedBets = new Map();
-
-  for (const bet of preparedBets) {
-    const numbers = [...bet.numbers].sort((first, second) => first - second);
-
-    const key = `${bet.type}:${numbers.join("-")}`;
-    const existingBet = mergedBets.get(key);
-
-    if (existingBet) {
-      existingBet.amount += bet.amount;
-    } else {
-      mergedBets.set(key, {
-        type: bet.type,
-        numbers,
-        amount: bet.amount,
-      });
-    }
-  }
-
-  return [...mergedBets.entries()]
-    .sort(([first], [second]) => (first < second ? -1 : first > second ? 1 : 0))
-    .map(([, bet]) => bet);
-}
-
 router.get("/config", (req, res) => {
   const betTypes = Object.fromEntries(
     Object.entries(BET_TYPES).map(([type, config]) => [
