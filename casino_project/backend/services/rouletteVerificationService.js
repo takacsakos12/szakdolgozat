@@ -11,6 +11,11 @@ const {
 const { prepareRouletteBets, playRouletteGame } = require("./rouletteEngine");
 
 const {
+  FINGERPRINT_VERSION,
+  createFingerprint,
+} = require("./fingerprintService");
+
+const {
   ALGORITHM_VERSION,
   createRandomGenerator,
   getRevealedSeed,
@@ -86,9 +91,22 @@ async function verifyRouletteGameResult({ userId, historyId }) {
     gameDomain: fairData.gameDomain,
   });
 
-  const { preparedBets, totalBetAmount } = prepareRouletteBets(
+  const { preparedBets, totalBetAmount, requestBets } = prepareRouletteBets(
     history.result?.bets,
   );
+
+  const fingerprintMatches =
+    history.fingerprintVersion === FINGERPRINT_VERSION &&
+    typeof history.requestFingerprint === "string" &&
+    history.requestFingerprint ===
+      createFingerprint({
+        gameType: GAME_TYPE,
+        gameMode: GAME_MODE,
+        baseBet: history.baseBet,
+        requestData: {
+          bets: requestBets,
+        },
+      });
 
   const recreatedResult = playRouletteGame({
     preparedBets,
@@ -112,10 +130,13 @@ async function verifyRouletteGameResult({ userId, historyId }) {
     verified:
       seedHashMatches &&
       seedDetailsMatch &&
+      fingerprintMatches &&
       gameResultMatches &&
       settlementMatches,
+
     seedHashMatches,
     seedDetailsMatch,
+    fingerprintMatches,
     gameResultMatches,
     settlementMatches,
 
@@ -127,4 +148,6 @@ async function verifyRouletteGameResult({ userId, historyId }) {
   };
 }
 
-module.exports = { verifyRouletteGameResult };
+module.exports = {
+  verifyRouletteGameResult,
+};
