@@ -19,7 +19,7 @@ function RoulettePage({ user, onUserChange }) {
   const [previousBets, setPreviousBets] = useState([]);
   const isSubmittingRef = useRef(false);
   const controlsDisabled = isLoading || isSpinning || Boolean(pendingRequest);
-  const userId = user?._id;
+  const userId = user?.id;
 
   function handleChipChange(chipValue) {
     if (controlsDisabled || isSubmittingRef.current) {

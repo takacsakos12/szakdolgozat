@@ -11,24 +11,24 @@ const BET_LABELS = {
 };
 
 const COLUMN_BETS = [
-  { type: "COLUMN_1", label: "2:1" },
-  { type: "COLUMN_2", label: "2:1" },
-  { type: "COLUMN_3", label: "2:1" },
+  { type: "FIRST_COLUMN", label: "2:1" },
+  { type: "SECOND_COLUMN", label: "2:1" },
+  { type: "THIRD_COLUMN", label: "2:1" },
 ];
 
 const DOZEN_BETS = [
-  { type: "DOZEN_1", label: "1-12" },
-  { type: "DOZEN_2", label: "13-24" },
-  { type: "DOZEN_3", label: "25-36" },
+  { type: "FIRST_DOZEN", label: "1-12" },
+  { type: "SECOND_DOZEN", label: "13-24" },
+  { type: "THIRD_DOZEN", label: "25-36" },
 ];
 
 const OUTSIDE_BET_LABELS = [
+  { type: "LOW", label: "1–18" },
+  { type: "EVEN", label: "Páros" },
   { type: "RED", label: "Piros" },
   { type: "BLACK", label: "Fekete" },
   { type: "ODD", label: "Páratlan" },
-  { type: "EVEN", label: "Páros" },
-  { type: "LOW", label: "1-18" },
-  { type: "HIGH", label: "19-36" },
+  { type: "HIGH", label: "19–36" },
 ];
 
 function getBetKey(type, numbers = []) {

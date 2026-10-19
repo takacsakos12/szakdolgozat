@@ -133,3 +133,274 @@
   font-size: 13px;
   text-align: center;
 }
+.roulette-page {
+  min-height: calc(100vh - 160px);
+  padding: 28px 20px 48px;
+}
+
+.roulette-page,
+.roulette-page * {
+  box-sizing: border-box;
+}
+
+.roulette-game {
+  width: 66.666%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #11162b;
+  border: 1px solid #252b43;
+  border-radius: 14px;
+}
+
+.roulette-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.roulette-header h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.roulette-header p,
+.roulette-header > span {
+  margin: 0;
+  color: #a7adc2;
+  font-size: 12px;
+}
+
+.roulette-table-area {
+  padding: 14px 10px;
+  background: #13182e;
+  border: 1px solid #242b45;
+  border-radius: 10px;
+}
+
+.roulette-table-scroll {
+  padding: 8px;
+}
+
+.roulette-table-content {
+  min-width: 640px;
+}
+
+.roulette-board {
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  gap: 4px;
+}
+
+.roulette-number-grid,
+.roulette-column-bets {
+  grid-template-rows: repeat(3, 42px);
+}
+
+.roulette-bet {
+  display: grid;
+  place-items: center;
+  margin: 2px;
+  padding: 4px 2px;
+  color: #f2f3fa;
+  background: #202330;
+  border: 1px solid #34384a;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.roulette-table .roulette-red {
+  background: #ee3c4d;
+  border-color: #f04b5a;
+}
+
+.roulette-table .roulette-black {
+  background: #202330;
+  border-color: #34384a;
+}
+
+.roulette-zero {
+  background: #30bd59;
+  border-color: #3bc765;
+}
+
+.roulette-outside-area {
+  margin: 2px 46px 0;
+}
+
+.roulette-outside {
+  min-height: 38px;
+  background: #141a31;
+  border: 1px solid #48517e;
+}
+
+.roulette-column-bets .roulette-outside {
+  min-height: 0;
+  font-size: 11px;
+}
+
+.roulette-bet.is-highlighted,
+.roulette-bet:focus-visible {
+  outline: 2px solid #f5c542;
+  outline-offset: -2px;
+}
+
+.roulette-outside:hover:not(:disabled) {
+  background: #252d4b;
+  border-color: #f5c542;
+}
+
+/* A piros es fekete kulso fogadas rombusza. */
+.roulette-outside.roulette-red,
+.roulette-outside.roulette-black {
+  background: #141a31;
+  border-color: #48517e;
+  font-size: 0;
+}
+
+.roulette-outside.roulette-red::before,
+.roulette-outside.roulette-black::before {
+  content: "";
+  width: 25px;
+  height: 17px;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.roulette-outside.roulette-red::before {
+  background: #ee3c4d;
+}
+
+.roulette-outside.roulette-black::before {
+  background: #4b537f;
+}
+
+/* Az atlatszo vonal- es sarokgombok maradjanak atlatszok. */
+.roulette-bet-zone {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.roulette-bet-zone:hover:not(:disabled),
+.roulette-bet-zone:focus-visible {
+  background: rgba(245, 197, 66, 0.65);
+}
+
+.roulette-chip {
+  min-width: 27px;
+  height: 27px;
+  font-size: 10px;
+}
+
+.roulette-table-hint {
+  min-height: 32px;
+  margin: 12px 0 0;
+  color: #a7adc2;
+  font-size: 12px;
+}
+
+.roulette-controls-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.roulette-controls-area button {
+  padding: 10px 14px;
+  color: #f2f3fa;
+  background: #242b46;
+  border: 1px solid #434d74;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.roulette-controls-area button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.roulette-chip-selector {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.roulette-chip-selector button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px dashed #8892ba;
+  border-radius: 50%;
+  font-size: 10px;
+}
+
+.roulette-chip-selector button[aria-pressed="true"] {
+  color: #171717;
+  background: #f5c542;
+  border-color: #fff0ac;
+}
+
+.roulette-information {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 24px;
+  margin-top: 20px;
+  color: #bec4d8;
+  font-size: 12px;
+}
+
+.roulette-error {
+  margin-bottom: 16px;
+  padding: 12px;
+  color: #ffb4b4;
+  background: #3b202d;
+  border: 1px solid #71374b;
+  border-radius: 7px;
+}
+
+@media (max-width: 1100px) {
+  .roulette-game {
+    width: 100%;
+    max-width: 850px;
+  }
+}
+
+@media (max-width: 600px) {
+  .roulette-page {
+    padding: 16px 10px 32px;
+  }
+
+  .roulette-game {
+    padding: 14px 10px;
+  }
+
+  .roulette-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .roulette-header h1 {
+    font-size: 22px;
+  }
+}
