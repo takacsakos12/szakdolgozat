@@ -1,0 +1,135 @@
+.roulette-table-scroll {
+  overflow-x: auto;
+  padding: 16px 8px;
+}
+
+.roulette-table-content {
+  min-width: 680px;
+}
+
+.roulette-board {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  gap: 4px;
+}
+
+.roulette-number-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: repeat(3, 48px);
+  gap: 0;
+}
+
+.roulette-column-bets {
+  display: grid;
+  grid-template-rows: repeat(3, 48px);
+}
+
+.roulette-bet {
+  position: relative;
+  min-width: 0;
+  margin: 2px;
+  padding: 8px 2px;
+  color: #fff;
+  background: #202530;
+  border: 1px solid #424754;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.roulette-red {
+  background: #bd3545;
+}
+
+.roulette-black {
+  background: #202530;
+}
+
+.roulette-zero {
+  background: #249b57;
+}
+
+.roulette-bet.is-highlighted {
+  outline: 2px solid #f5c542;
+  outline-offset: -2px;
+  filter: brightness(1.25);
+}
+
+.roulette-bet:focus-visible {
+  outline: 2px solid #f5c542;
+  outline-offset: -2px;
+}
+
+.roulette-bet:disabled {
+  cursor: default;
+}
+
+.roulette-bet-zone {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+}
+
+.roulette-bet-zone:hover:not(:disabled),
+.roulette-bet-zone:focus-visible {
+  background: rgba(245, 197, 66, 0.7);
+}
+
+.roulette-outside-area {
+  margin: 16px 52px 0;
+}
+
+.roulette-dozens {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.roulette-outside-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.roulette-outside {
+  min-height: 42px;
+}
+
+.roulette-outside:hover:not(:disabled) {
+  border-color: #f5c542;
+}
+
+.roulette-chip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  min-width: 29px;
+  height: 29px;
+  padding: 0 3px;
+  transform: translate(-50%, -50%);
+  color: #171717;
+  background: #f5c542;
+  border: 2px dashed #fff0ac;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.roulette-table-hint {
+  min-height: 40px;
+  margin: 8px 0;
+  color: #b9bec8;
+  font-size: 13px;
+  text-align: center;
+}

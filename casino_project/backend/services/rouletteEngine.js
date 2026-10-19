@@ -36,13 +36,11 @@ function prepareBet(bet) {
   const validPositions = VALID_POSITION_KEYS[bet.type];
 
   if (validPositions) {
-  if (!Array.isArray(bet.numbers) || !bet.numbers.every(Number.isInteger)) {
-    throw createRouletteError("Érvénytelen fogadási számok.");
-  }
+    if (!Array.isArray(bet.numbers) || !bet.numbers.every(Number.isInteger)) {
+      throw createRouletteError("Érvénytelen fogadási számok.");
+    }
 
-  const numbers = [...bet.numbers].sort(
-    (first, second) => first - second
-  );
+    const numbers = [...bet.numbers].sort((first, second) => first - second);
 
     if (!validPositions.has(positionKey(numbers))) {
       throw createRouletteError("Érvénytelen fogadási pozíció.");
@@ -90,9 +88,7 @@ function prepareRouletteBets(bets) {
   const mergedBets = new Map();
 
   for (const bet of preparedBets) {
-    const numbers = [...bet.numbers].sort(
-      (first, second) => first - second,
-    );
+    const numbers = [...bet.numbers].sort((first, second) => first - second);
 
     const key = `${bet.type}:${numbers.join("-")}`;
     const existingBet = mergedBets.get(key);
@@ -109,9 +105,7 @@ function prepareRouletteBets(bets) {
   }
 
   const requestBets = [...mergedBets.entries()]
-    .sort(([first], [second]) =>
-      first < second ? -1 : first > second ? 1 : 0,
-    )
+    .sort(([first], [second]) => (first < second ? -1 : first > second ? 1 : 0))
     .map(([, bet]) => bet);
 
   return {

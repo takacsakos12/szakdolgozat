@@ -10,6 +10,8 @@ import { getCurrentUser, logoutUser } from "./api/authApi";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import HomePage from "./pages/HomePage";
+import RoulettePage from "./pages/RoulettePage";
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -66,6 +68,10 @@ function App() {
         <Route
           path="/games/slot"
           element={<SlotPage user={user} onUserChange={setUser} />}
+        />
+        <Route
+          path="/games/roulette"
+          element={<RoulettePage user={user} onUserChange={setUser} />}
         />
         <Route
           path="/games/history"
