@@ -1,9 +1,5 @@
 import { useState } from "react";
 
-const CELL_SIZE = 48;
-const ZERO_WIDTH = 60;
-const NUMBER_AREA_WIDTH = 12 * CELL_SIZE;
-const COLUMN_X = ZERO_WIDTH + NUMBER_AREA_WIDTH;
 const BET_LABELS = {
   STRAIGHT: "Egyes szám",
   SPLIT: "Split",
@@ -13,6 +9,19 @@ const BET_LABELS = {
   SIX_LINE: "Six Line",
   FIRST_FOUR: "Első négy",
 };
+
+const COLUMN_BETS = [
+  { type: "COLUMN_1", label: "2:1" },
+  { type: "COLUMN_2", label: "2:1" },
+  { type: "COLUMN_3", label: "2:1" },
+];
+
+const DOZEN_BETS = [
+  { type: "DOZEN_1", label: "1-12" },
+  { type: "DOZEN_2", label: "13-24" },
+  { type: "DOZEN_3", label: "25-36" },
+];
+
 const OUTSIDE_BET_LABELS = [
   { type: "RED", label: "Piros" },
   { type: "BLACK", label: "Fekete" },
@@ -23,7 +32,7 @@ const OUTSIDE_BET_LABELS = [
 ];
 
 function getBetKey(type, numbers = []) {
-  return `${type}:${numbers.sort((a, b) => a - b).join("-")}`;
+  return `${type}:${[...numbers].sort((a, b) => a - b).join("-")}`;
 }
 
 function getPosition(type, numbers) {
@@ -67,7 +76,7 @@ function getPosition(type, numbers) {
 function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
   const [hoveredBet, setHoveredBet] = useState(null);
 
-  const highlightedNumbers = new Set(hoveredBet.numbers ?? []);
+  const highlightedNumbers = new Set(hoveredBet?.numbers ?? []);
   const amounts = new Map();
 
   for (const bet of bets) {
@@ -79,8 +88,11 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
     const coveredNumbers = numbers.length
       ? numbers
       : config.betTypes[type].numbers;
-    const key = getBetKey(type, coveredNumbers);
+
+    const key = getBetKey(type, numbers);
     const amount = amounts.get(key);
+    const betLabel = label || BET_LABELS[type] || type;
+
     return (
       <button
         key={key}
@@ -88,10 +100,20 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
         className={`roulette-bet ${className}`}
         style={style}
         disabled={disabled}
-        aria-label={`${label}: ${coveredNumbers.join(", ")}`}
-        onMouseEnter={() => setHoveredBet({ label, numbers: coveredNumbers })}
+        aria-label={`${betLabel}: ${coveredNumbers.join(", ")}`}
+        onMouseEnter={() =>
+          setHoveredBet({
+            label: betLabel,
+            numbers: coveredNumbers,
+          })
+        }
         onMouseLeave={() => setHoveredBet(null)}
-        onFocus={() => setHoveredBet({ label, numbers: coveredNumbers })}
+        onFocus={() =>
+          setHoveredBet({
+            label: betLabel,
+            numbers: coveredNumbers,
+          })
+        }
         onBlur={() => setHoveredBet(null)}
         onClick={() => onPlaceBet({ type, numbers })}
       >
@@ -101,7 +123,6 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
       </button>
     );
   }
-
   return (
     <div className="roulette-table">
       <div className="roulette-table-scroll">
@@ -151,7 +172,7 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
             </div>
 
             <div className="roulette-column-bets">
-              {COLUMN_BETS.map(([type, label]) =>
+              {COLUMN_BETS.map(({ type, label }) =>
                 renderBet(type, [], label, "roulette-outside"),
               )}
             </div>
@@ -159,13 +180,13 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
 
           <div className="roulette-outside-area">
             <div className="roulette-dozens">
-              {DOZEN_BETS.map(([type, label]) =>
+              {DOZEN_BETS.map(({ type, label }) =>
                 renderBet(type, [], label, "roulette-outside"),
               )}
             </div>
 
             <div className="roulette-outside-grid">
-              {OUTSIDE_BETS.map(([type, label]) =>
+              {OUTSIDE_BET_LABELS.map(({ type, label }) =>
                 renderBet(
                   type,
                   [],
@@ -180,11 +201,10 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
 
       <p className="roulette-table-hint">
         {hoveredBet
-          ? `${hoveredBet.label || "Fogadás"}: ${hoveredBet.numbers.join(", ")}`
+          ? `${hoveredBet.label}: ${hoveredBet.numbers.join(", ")}`
           : "Válassz zsetont, majd kattints egy mezőre, vonalra vagy sarokra."}
       </p>
     </div>
   );
 }
-
 export default RouletteTable;

@@ -124,11 +124,6 @@ function RoulettePage({ user, onUserChange }) {
   }
 
   useEffect(() => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-
     if (!userId) {
       setIsLoading(false);
       return;
@@ -276,7 +271,14 @@ function RoulettePage({ user, onUserChange }) {
           <>
             <div className="roulette-wheel-area"></div>
 
-            <div className="roulette-table-area"></div>
+            <div className="roulette-table-area">
+              <RouletteTable
+                config={rouletteConfig}
+                bets={bets}
+                disabled={controlsDisabled}
+                onPlaceBet={handlePlaceBet}
+              />
+            </div>
 
             <div className="roulette-controls-area">
               <div className="roulette-chip-selector">
@@ -327,7 +329,7 @@ function RoulettePage({ user, onUserChange }) {
                 disabled={controlsDisabled || previousBets.length === 0}
                 onClick={handleReBet}
               >
-                Előző tétek
+                Előző tétek visszaállítása
               </button>
 
               <button
