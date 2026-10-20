@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import { getRouletteConfig, spinRouletteGame } from "../api/rouletteApi";
 import { getCurrentUser } from "../api/authApi";
 import RouletteTable from "../components/roulette/RouletteTable";
+import RouletteWheel from "../components/roulette/RouletteWheel";
 
 import "./RoulettePage.css";
 
@@ -18,7 +19,10 @@ function RoulettePage({ user, onUserChange }) {
   const [pendingRequest, setPendingRequest] = useState(null);
   const [previousBets, setPreviousBets] = useState([]);
   const isSubmittingRef = useRef(false);
-  const controlsDisabled = isLoading || isSpinning || Boolean(pendingRequest);
+  const [isWheelSpinning, setIsWheelSpinning] = useState(false);
+  const controlsDisabled =
+    isLoading || isSpinning || isWheelSpinning || Boolean(pendingRequest);
+  
   const userId = user?.id;
 
   function handleChipChange(chipValue) {
@@ -204,7 +208,7 @@ function RoulettePage({ user, onUserChange }) {
   }
 
   function handleSpin() {
-    if (isLoading || isSubmittingRef.current) {
+    if (isLoading || isSpinning || isWheelSpinning || isSubmittingRef.current) {
       return;
     }
 
@@ -269,7 +273,14 @@ function RoulettePage({ user, onUserChange }) {
           <p role="status">Rulett betöltése...</p>
         ) : rouletteConfig ? (
           <>
-            <div className="roulette-wheel-area"></div>
+            <div className="roulette-wheel-area">
+              <RouletteWheel
+                result={result}
+                wheelOrder={rouletteConfig.wheelOrder}
+                numberColors={rouletteConfig.numberColors}
+                onSpinEnd={() => setIsWheelSpinning(false)}
+              />
+            </div>
 
             <div className="roulette-table-area">
               <RouletteTable
@@ -337,6 +348,7 @@ function RoulettePage({ user, onUserChange }) {
                 disabled={
                   isLoading ||
                   isSpinning ||
+                  isWheelSpinning ||
                   (!pendingRequest && bets.length === 0)
                 }
                 onClick={handleSpin}

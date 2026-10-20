@@ -11,9 +11,9 @@ const BET_LABELS = {
 };
 
 const COLUMN_BETS = [
-  { type: "FIRST_COLUMN", label: "2:1" },
-  { type: "SECOND_COLUMN", label: "2:1" },
   { type: "THIRD_COLUMN", label: "2:1" },
+  { type: "SECOND_COLUMN", label: "2:1" },
+  { type: "FIRST_COLUMN", label: "2:1" },
 ];
 
 const DOZEN_BETS = [

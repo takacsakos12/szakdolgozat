@@ -1,15 +1,15 @@
 .roulette-table-scroll {
   overflow-x: auto;
-  padding: 16px 8px;
+  padding: 8px;
 }
 
 .roulette-table-content {
-  min-width: 680px;
+  min-width: 640px;
 }
 
 .roulette-board {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
   gap: 4px;
 }
 
@@ -17,28 +17,33 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: repeat(3, 48px);
+  grid-template-rows: repeat(3, 42px);
   gap: 0;
 }
 
 .roulette-column-bets {
   display: grid;
-  grid-template-rows: repeat(3, 48px);
+  grid-template-rows: repeat(3, 42px);
 }
 
 .roulette-bet {
   position: relative;
   min-width: 0;
+  display: grid;
+  place-items: center;
   margin: 2px;
-  padding: 8px 2px;
-  color: #fff;
-  background: #202530;
-  border: 1px solid #424754;
-  border-radius: 4px;
+  padding: 4px 2px;
+  color: #f2f3fa;
+  background: #202330;
+  border: 1px solid #34384a;
+  border-radius: 5px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
 }
 
 .roulette-red {
@@ -49,19 +54,14 @@
   background: #202530;
 }
 
-.roulette-zero {
-  background: #249b57;
-}
-
-.roulette-bet.is-highlighted {
-  outline: 2px solid #f5c542;
-  outline-offset: -2px;
-  filter: brightness(1.25);
-}
-
+.roulette-bet.is-highlighted,
 .roulette-bet:focus-visible {
   outline: 2px solid #f5c542;
   outline-offset: -2px;
+}
+
+.roulette-bet.is-highlighted {
+  filter: brightness(1.25);
 }
 
 .roulette-bet:disabled {
@@ -82,11 +82,11 @@
 
 .roulette-bet-zone:hover:not(:disabled),
 .roulette-bet-zone:focus-visible {
-  background: rgba(245, 197, 66, 0.7);
+  background: rgba(245, 197, 66, 0.65);
 }
 
 .roulette-outside-area {
-  margin: 16px 52px 0;
+  margin: 2px 46px 0;
 }
 
 .roulette-dozens {
@@ -100,10 +100,13 @@
 }
 
 .roulette-outside {
-  min-height: 42px;
+  min-height: 38px;
+  background: #141a31;
+  border: 1px solid #48517e;
 }
 
 .roulette-outside:hover:not(:disabled) {
+  background: #252d4b;
   border-color: #f5c542;
 }
 
@@ -113,8 +116,8 @@
   top: 50%;
   display: grid;
   place-items: center;
-  min-width: 29px;
-  height: 29px;
+  min-width: 27px;
+  height: 27px;
   padding: 0 3px;
   transform: translate(-50%, -50%);
   color: #171717;
@@ -127,10 +130,10 @@
 }
 
 .roulette-table-hint {
-  min-height: 40px;
-  margin: 8px 0;
-  color: #b9bec8;
-  font-size: 13px;
+  min-height: 32px;
+  margin: 12px 0 0;
+  color: #a7adc2;
+  font-size: 12px;
   text-align: center;
 }
 .roulette-page {
@@ -182,40 +185,6 @@
   border-radius: 10px;
 }
 
-.roulette-table-scroll {
-  padding: 8px;
-}
-
-.roulette-table-content {
-  min-width: 640px;
-}
-
-.roulette-board {
-  grid-template-columns: 42px minmax(0, 1fr) 42px;
-  gap: 4px;
-}
-
-.roulette-number-grid,
-.roulette-column-bets {
-  grid-template-rows: repeat(3, 42px);
-}
-
-.roulette-bet {
-  display: grid;
-  place-items: center;
-  margin: 2px;
-  padding: 4px 2px;
-  color: #f2f3fa;
-  background: #202330;
-  border: 1px solid #34384a;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 700;
-  transition:
-    background-color 120ms ease,
-    border-color 120ms ease;
-}
-
 .roulette-table .roulette-red {
   background: #ee3c4d;
   border-color: #f04b5a;
@@ -231,30 +200,9 @@
   border-color: #3bc765;
 }
 
-.roulette-outside-area {
-  margin: 2px 46px 0;
-}
-
-.roulette-outside {
-  min-height: 38px;
-  background: #141a31;
-  border: 1px solid #48517e;
-}
-
 .roulette-column-bets .roulette-outside {
   min-height: 0;
   font-size: 11px;
-}
-
-.roulette-bet.is-highlighted,
-.roulette-bet:focus-visible {
-  outline: 2px solid #f5c542;
-  outline-offset: -2px;
-}
-
-.roulette-outside:hover:not(:disabled) {
-  background: #252d4b;
-  border-color: #f5c542;
 }
 
 /* A piros es fekete kulso fogadas rombusza. */
@@ -279,35 +227,6 @@
 
 .roulette-outside.roulette-black::before {
   background: #4b537f;
-}
-
-/* Az atlatszo vonal- es sarokgombok maradjanak atlatszok. */
-.roulette-bet-zone {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  border: 0;
-}
-
-.roulette-bet-zone:hover:not(:disabled),
-.roulette-bet-zone:focus-visible {
-  background: rgba(245, 197, 66, 0.65);
-}
-
-.roulette-chip {
-  min-width: 27px;
-  height: 27px;
-  font-size: 10px;
-}
-
-.roulette-table-hint {
-  min-height: 32px;
-  margin: 12px 0 0;
-  color: #a7adc2;
-  font-size: 12px;
 }
 
 .roulette-controls-area {
@@ -402,5 +321,145 @@
 
   .roulette-header h1 {
     font-size: 22px;
+  }
+}
+
+.roulette-wheel-container {
+  width: min(100%, 340px);
+  margin: 20px auto;
+}
+
+.roulette-wheel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  background: #17191e;
+  border: 12px solid #a8792e;
+  border-radius: 50%;
+
+  transform: perspective(800px) rotateX(28deg);
+
+  box-shadow:
+    0 2px 0 #e4c079,
+    0 7px 0 #795020,
+    0 13px 0 #523415,
+    0 19px 0 #30200f,
+    0 30px 35px rgba(0, 0, 0, 0.6),
+    inset 0 0 12px rgba(0, 0, 0, 0.7);
+}
+
+.roulette-wheel-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transition: transform 6s cubic-bezier(0.15, 0.35, 0.3, 1);
+}
+
+.roulette-wheel-number {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+}
+
+.roulette-wheel-number span {
+  display: inline-block;
+  margin-top: 9px;
+  color: #fff;
+  font-size: clamp(10px, 2vw, 13px);
+  font-weight: 800;
+}
+
+.roulette-wheel-center {
+  position: absolute;
+  inset: 22%;
+  display: grid;
+  place-items: center;
+  color: #e4c576;
+  background: radial-gradient(circle, #34302a, #17191e);
+  border: 5px solid #b99139;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.roulette-ball-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 6s cubic-bezier(0.12, 0.65, 0.18, 1);
+}
+
+.roulette-ball {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 30% 25%, #fff, #d0d0d0);
+  border-radius: 50%;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.65);
+  transform: translate(-50%, -50%);
+}
+
+.roulette-wheel-animating .roulette-ball {
+  animation: roulette-ball-drop 6s linear forwards;
+}
+
+.roulette-wheel-result {
+  margin: 18px 0 0;
+  color: var(--text);
+  text-align: center;
+  font-weight: 700;
+}
+
+@keyframes roulette-ball-drop {
+  0%,
+  55% {
+    top: 5%;
+  }
+
+  80% {
+    top: 10%;
+  }
+
+  92% {
+    top: 16%;
+  }
+
+  100% {
+    top: 15%;
+  }
+}
+
+.roulette-wheel-rotor {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: roulette-idle-rotation 60s linear infinite;
+}
+
+/* Fény a peremen és árnyék a kerék belső szélén. */
+.roulette-wheel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 3px 5px rgba(255, 255, 255, 0.25),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes roulette-idle-rotation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
