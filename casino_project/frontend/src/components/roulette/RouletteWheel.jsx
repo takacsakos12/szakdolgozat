@@ -43,7 +43,7 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
     const index = wheelOrder.indexOf(result.winningNumber);
     const current = rotationRef.current;
 
-    const wheel = current.wheel + 180;
+    const wheel = current.wheel + 360 * 4 + 180;
 
     const targetAngle = normalizeAngle(wheel + index * sectorAngle);
 

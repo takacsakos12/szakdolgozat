@@ -73,7 +73,14 @@ function getPosition(type, numbers) {
   };
 }
 
-function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
+function RouletteTable({
+  config,
+  bets,
+  disabled = false,
+  onPlaceBet,
+  onUndoBet,
+  onClearBets,
+}) {
   const [hoveredBet, setHoveredBet] = useState(null);
 
   const highlightedNumbers = new Set(hoveredBet?.numbers ?? []);
@@ -178,23 +185,47 @@ function RouletteTable({ config, bets, disabled = false, onPlaceBet }) {
             </div>
           </div>
 
-          <div className="roulette-outside-area">
-            <div className="roulette-dozens">
-              {DOZEN_BETS.map(({ type, label }) =>
-                renderBet(type, [], label, "roulette-outside"),
-              )}
+          <div className="roulette-table-bottom">
+            <button
+              className="roulette-table-action"
+              type="button"
+              disabled={disabled || bets.length === 0}
+              onClick={onUndoBet}
+              aria-label="Utolsó zseton visszavonása"
+              title="Visszavonás"
+            >
+              <span aria-hidden="true">↶</span>
+            </button>
+
+            <div className="roulette-outside-area">
+              <div className="roulette-dozens">
+                {DOZEN_BETS.map(({ type, label }) =>
+                  renderBet(type, [], label, "roulette-outside"),
+                )}
+              </div>
+
+              <div className="roulette-outside-grid">
+                {OUTSIDE_BET_LABELS.map(({ type, label }) =>
+                  renderBet(
+                    type,
+                    [],
+                    label,
+                    `roulette-outside roulette-${type.toLowerCase()}`,
+                  ),
+                )}
+              </div>
             </div>
 
-            <div className="roulette-outside-grid">
-              {OUTSIDE_BET_LABELS.map(({ type, label }) =>
-                renderBet(
-                  type,
-                  [],
-                  label,
-                  `roulette-outside roulette-${type.toLowerCase()}`,
-                ),
-              )}
-            </div>
+            <button
+              className="roulette-table-action"
+              type="button"
+              disabled={disabled || bets.length === 0}
+              onClick={onClearBets}
+              aria-label="Összes fogadás törlése"
+              title="Törlés"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
           </div>
         </div>
       </div>

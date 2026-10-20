@@ -84,11 +84,6 @@
 .roulette-bet-zone:focus-visible {
   background: rgba(245, 197, 66, 0.65);
 }
-
-.roulette-outside-area {
-  margin: 2px 46px 0;
-}
-
 .roulette-dozens {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -462,4 +457,50 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.roulette-table-bottom {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.roulette-outside-area {
+  min-width: 0;
+  margin: 0;
+}
+
+.roulette-table-action {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin: 2px;
+  padding: 0;
+  color: #bec4d8;
+  background: #20283f;
+  border: 1px solid #434d74;
+  border-radius: 50%;
+  font: inherit;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.roulette-table-action:hover:not(:disabled) {
+  color: #f5c542;
+  background: #2b3552;
+  border-color: #f5c542;
+}
+
+.roulette-table-action:focus-visible {
+  outline: 2px solid #f5c542;
+  outline-offset: 2px;
+}
+
+.roulette-table-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }

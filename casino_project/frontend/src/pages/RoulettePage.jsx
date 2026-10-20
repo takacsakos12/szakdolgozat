@@ -22,7 +22,7 @@ function RoulettePage({ user, onUserChange }) {
   const [isWheelSpinning, setIsWheelSpinning] = useState(false);
   const controlsDisabled =
     isLoading || isSpinning || isWheelSpinning || Boolean(pendingRequest);
-  
+
   const userId = user?.id;
 
   function handleChipChange(chipValue) {
@@ -182,7 +182,7 @@ function RoulettePage({ user, onUserChange }) {
 
     try {
       const response = await spinRouletteGame(request.bets, request.requestId);
-
+      setIsWheelSpinning(true);
       setResult(response.result);
       setPreviousBets(request.bets);
       setBets([]);
@@ -288,6 +288,8 @@ function RoulettePage({ user, onUserChange }) {
                 bets={bets}
                 disabled={controlsDisabled}
                 onPlaceBet={handlePlaceBet}
+                onUndoBet={handleUndoBet}
+                onClearBets={handleClearBets}
               />
             </div>
 
@@ -305,43 +307,6 @@ function RoulettePage({ user, onUserChange }) {
                   </button>
                 ))}
               </div>
-
-              <button
-                type="button"
-                disabled={controlsDisabled}
-                onClick={() =>
-                  handlePlaceBet({
-                    type: "RED",
-                    numbers: [],
-                  })
-                }
-              >
-                Pirosra: {selectedChip} CR
-              </button>
-
-              <button
-                type="button"
-                disabled={controlsDisabled || bets.length === 0}
-                onClick={handleUndoBet}
-              >
-                Visszavonás
-              </button>
-
-              <button
-                type="button"
-                disabled={controlsDisabled || bets.length === 0}
-                onClick={handleClearBets}
-              >
-                Törlés
-              </button>
-
-              <button
-                type="button"
-                disabled={controlsDisabled || previousBets.length === 0}
-                onClick={handleReBet}
-              >
-                Előző tétek visszaállítása
-              </button>
 
               <button
                 type="button"
