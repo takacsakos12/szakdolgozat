@@ -77,15 +77,6 @@ function RoulettePage({ user, onUserChange }) {
     setErrorMessage("");
   }
 
-  function handleClearBets() {
-    if (controlsDisabled || isSubmittingRef.current) {
-      return;
-    }
-
-    setBets([]);
-    setErrorMessage("");
-  }
-
   async function updateDisplayedBalance(response) {
     if (!response.replayed) {
       onUserChange((currentUser) =>
@@ -288,8 +279,9 @@ function RoulettePage({ user, onUserChange }) {
                 bets={bets}
                 disabled={controlsDisabled}
                 onPlaceBet={handlePlaceBet}
+                onReBet={handleReBet}
+                canReBet={previousBets.length > 0}
                 onUndoBet={handleUndoBet}
-                onClearBets={handleClearBets}
               />
             </div>
 

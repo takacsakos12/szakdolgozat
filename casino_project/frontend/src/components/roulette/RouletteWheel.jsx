@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function normalizeAngle(angle) {
   return ((angle % 360) + 360) % 360;
@@ -14,8 +14,26 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
 
   const rotationRef = useRef({ wheel: 0, ball: 0 });
   const animationActiveRef = useRef(false);
+  const animationTimeoutRef = useRef(null);
+  const onSpinEndRef = useRef(onSpinEnd);
 
   const sectorAngle = 360 / wheelOrder.length;
+
+  useEffect(() => {
+    onSpinEndRef.current = onSpinEnd;
+  }, [onSpinEnd]);
+
+  const finishSpin = useCallback(() => {
+    if (!animationActiveRef.current) {
+      return;
+    }
+
+    animationActiveRef.current = false;
+    window.clearTimeout(animationTimeoutRef.current);
+
+    setIsAnimating(false);
+    onSpinEndRef.current();
+  }, []);
 
   const background = `conic-gradient(
     from ${-sectorAngle / 2}deg,
@@ -45,9 +63,13 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
 
     const wheel = current.wheel + 360 * 4 + 180;
 
-    const targetAngle = normalizeAngle(wheel + index * sectorAngle);
+    const targetAngle = normalizeAngle(
+      wheel + index * sectorAngle,
+    );
 
-    const remainingAngle = normalizeAngle(current.ball - targetAngle);
+    const remainingAngle = normalizeAngle(
+      current.ball - targetAngle,
+    );
 
     const ball = current.ball - 360 * 5 - remainingAngle;
     const nextRotation = { wheel, ball };
@@ -57,20 +79,26 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
 
     setIsAnimating(true);
     setRotation(nextRotation);
-  }, [result, wheelOrder, sectorAngle]);
+
+    animationTimeoutRef.current = window.setTimeout(
+      finishSpin,
+      6500,
+    );
+
+    return () => {
+      window.clearTimeout(animationTimeoutRef.current);
+    };
+  }, [result, wheelOrder, sectorAngle, finishSpin]);
 
   function handleBallStop(event) {
     if (
       event.target !== event.currentTarget ||
-      event.propertyName !== "transform" ||
-      !animationActiveRef.current
+      event.propertyName !== "transform"
     ) {
       return;
     }
 
-    animationActiveRef.current = false;
-    setIsAnimating(false);
-    onSpinEnd();
+    finishSpin();
   }
 
   return (
@@ -101,7 +129,9 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
               </div>
             ))}
 
-            <div className="roulette-wheel-center">ROULETTE</div>
+            <div className="roulette-wheel-center">
+              ROULETTE
+            </div>
           </div>
 
           <div

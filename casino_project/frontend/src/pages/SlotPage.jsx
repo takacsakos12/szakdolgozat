@@ -170,16 +170,15 @@ function SlotPage({ user, onUserChange }) {
   }
 
   async function executeGame(mode, request) {
+    setIsSpinning(true);
+    setIsGridSpinning(true);
+    setErrorMessage("");
+    setBonusPlayback(null);
+    setGameResult(null);
+    setGameMode(mode);
+
+    let response;
     try {
-      setIsSpinning(true);
-      setIsGridSpinning(true);
-      setErrorMessage("");
-      setBonusPlayback(null);
-      setGameResult(null);
-      setGameMode(mode);
-
-      let response;
-
       if (mode === "BONUS_BUY") {
         response = await buyBonus(request);
       } else if (mode === "FEATURE_SPIN") {
@@ -187,9 +186,27 @@ function SlotPage({ user, onUserChange }) {
       } else {
         response = await spinSlot(request);
       }
+    } catch (error) {
+      const requestWasRejected = [400, 401, 403, 404, 409, 422].includes(
+        error.statusCode,
+      );
+
+      if (requestWasRejected) {
+        setPendingRequest(null);
+        setErrorMessage(error.message);
+      } else {
+        setPendingRequest({ mode, request });
+        setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
+      }
 
       setIsGridSpinning(false);
+      setIsSpinning(false);
+      return;
+    }
+    setPendingRequest(null);
+    setIsGridSpinning(false);
 
+    try {
       const freeSpins = response.result.bonus?.freeSpinResults || [];
 
       if (response.result.grid) {
@@ -203,22 +220,13 @@ function SlotPage({ user, onUserChange }) {
 
         await playBonusSpins(response.result);
       }
-
+    } catch {
+      setErrorMessage(
+        "A kör elszámolása megtörtént, de a bónusz megjelenítése megszakadt.",
+      );
+    } finally {
       setGameResult(response.result);
       updateDisplayedBalance(response);
-      setPendingRequest(null);
-    } catch (error) {
-      setErrorMessage(error.message);
-
-      if (error.code === "NETWORK_ERROR") {
-        setPendingRequest({
-          mode,
-          request,
-        });
-      } else {
-        setPendingRequest(null);
-      }
-    } finally {
       setIsGridSpinning(false);
       setIsSpinning(false);
     }

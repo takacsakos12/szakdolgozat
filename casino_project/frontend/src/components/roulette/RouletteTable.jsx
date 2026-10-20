@@ -78,8 +78,9 @@ function RouletteTable({
   bets,
   disabled = false,
   onPlaceBet,
+  onReBet,
+  canReBet,
   onUndoBet,
-  onClearBets,
 }) {
   const [hoveredBet, setHoveredBet] = useState(null);
 
@@ -219,12 +220,12 @@ function RouletteTable({
             <button
               className="roulette-table-action"
               type="button"
-              disabled={disabled || bets.length === 0}
-              onClick={onClearBets}
-              aria-label="Összes fogadás törlése"
-              title="Törlés"
+              disabled={disabled || !canReBet}
+              onClick={onReBet}
+              aria-label="Előző kör fogadásainak visszaállítása"
+              title="Rebet"
             >
-              <span aria-hidden="true">×</span>
+              <span aria-hidden="true">↻</span>
             </button>
           </div>
         </div>

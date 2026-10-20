@@ -53,6 +53,7 @@ function GameHistoryPage({ user }) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [retryAttempt, setRetryAttempt] = useState(0);
   const lastSuccessfulPage = useRef(1);
   const userId = user?.id;
 
@@ -81,7 +82,7 @@ function GameHistoryPage({ user }) {
       } catch (error) {
         if (componentIsActive) {
           setErrorMessage(
-            `${error.message} Az előzőleg betöltött oldal adatai maradtak láthatók.`,
+            error.message || "Nem sikerült betölteni a játéktörténetet.",
           );
 
           setPage(lastSuccessfulPage.current);
@@ -98,7 +99,7 @@ function GameHistoryPage({ user }) {
     return () => {
       componentIsActive = false;
     };
-  }, [page, userId]);
+  }, [page, userId, retryAttempt]);
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -136,13 +137,21 @@ function GameHistoryPage({ user }) {
 
         {errorMessage && (
           <div className="history-message history-error" role="alert">
-            {errorMessage}
+            <p>{errorMessage}</p>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setRetryAttempt((current) => current + 1)}
+            >
+              Újrapróbálás
+            </button>
           </div>
         )}
 
         {loading ? (
           <div className="history-message">Játéktörténet betöltése...</div>
-        ) : games.length === 0 ? (
+        ) : errorMessage && games.length === 0 ? null : games.length === 0 ? (
           <div className="history-empty">
             <h2>Még nincs játéktörténeted</h2>
             <p>
