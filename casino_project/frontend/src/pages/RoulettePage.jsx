@@ -109,6 +109,26 @@ function RoulettePage({ user, onUserChange }) {
     ) {
       return;
     }
+
+    const previousTotal = previousBets.reduce(
+      (total, bet) => total + bet.amount,
+      0,
+    );
+
+    if (previousTotal > rouletteConfig.maxTotalBetAmount) {
+      setErrorMessage(
+        `A maximális össztét ${rouletteConfig.maxTotalBetAmount} CR.`,
+      );
+      return;
+    }
+
+    if (previousTotal > user.balance) {
+      setErrorMessage(
+        "Nincs elegendő egyenleg az előző fogadások visszaállításához.",
+      );
+      return;
+    }
+
     setBets(
       previousBets.map((bet) => ({
         ...bet,
@@ -174,7 +194,10 @@ function RoulettePage({ user, onUserChange }) {
     try {
       const response = await spinRouletteGame(request.bets, request.requestId);
       setIsWheelSpinning(true);
-      setResult(response.result);
+      setResult({
+        ...response.result,
+        historyId: response.historyId,
+      });
       setPreviousBets(request.bets);
       setBets([]);
       setPendingRequest(null);

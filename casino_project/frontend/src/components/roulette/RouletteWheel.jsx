@@ -16,6 +16,7 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
   const animationActiveRef = useRef(false);
   const animationTimeoutRef = useRef(null);
   const onSpinEndRef = useRef(onSpinEnd);
+  const lastAnimatedHistoryIdRef = useRef(null);
 
   const sectorAngle = 360 / wheelOrder.length;
 
@@ -54,22 +55,22 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
   )`;
 
   useEffect(() => {
-    if (!result) {
+    if (!result || result.historyId === lastAnimatedHistoryIdRef.current) {
       return;
     }
+
+    lastAnimatedHistoryIdRef.current = result.historyId;
+
+    window.clearTimeout(animationTimeoutRef.current);
 
     const index = wheelOrder.indexOf(result.winningNumber);
     const current = rotationRef.current;
 
     const wheel = current.wheel + 360 * 4 + 180;
 
-    const targetAngle = normalizeAngle(
-      wheel + index * sectorAngle,
-    );
+    const targetAngle = normalizeAngle(wheel + index * sectorAngle);
 
-    const remainingAngle = normalizeAngle(
-      current.ball - targetAngle,
-    );
+    const remainingAngle = normalizeAngle(current.ball - targetAngle);
 
     const ball = current.ball - 360 * 5 - remainingAngle;
     const nextRotation = { wheel, ball };
@@ -80,15 +81,14 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
     setIsAnimating(true);
     setRotation(nextRotation);
 
-    animationTimeoutRef.current = window.setTimeout(
-      finishSpin,
-      6500,
-    );
+    animationTimeoutRef.current = window.setTimeout(finishSpin, 6500);
+  }, [result, wheelOrder, sectorAngle, finishSpin]);
 
+  useEffect(() => {
     return () => {
       window.clearTimeout(animationTimeoutRef.current);
     };
-  }, [result, wheelOrder, sectorAngle, finishSpin]);
+  }, []);
 
   function handleBallStop(event) {
     if (
@@ -129,9 +129,7 @@ function RouletteWheel({ wheelOrder, numberColors, result, onSpinEnd }) {
               </div>
             ))}
 
-            <div className="roulette-wheel-center">
-              ROULETTE
-            </div>
+            <div className="roulette-wheel-center">ROULETTE</div>
           </div>
 
           <div
