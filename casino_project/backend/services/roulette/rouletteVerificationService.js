@@ -1,26 +1,26 @@
 const { isDeepStrictEqual } = require("node:util");
-const GameHistory = require("../models/GameHistory");
+const GameHistory = require("../../models/GameHistory");
 
 const {
   CONFIG_VERSION,
   GAME_TYPE,
   GAME_MODE,
   GAME_DOMAIN,
-} = require("../config/rouletteConfig");
+} = require("../../config/rouletteConfig");
 
-const { prepareRouletteBets, playRouletteGame } = require("./rouletteEngine");
+const { prepareRouletteBets, playRouletteGame } = require("../rouletteEngine");
 
 const {
   FINGERPRINT_VERSION,
   createFingerprint,
-} = require("./fingerprintService");
+} = require("../fingerprintService");
 
 const {
   ALGORITHM_VERSION,
   createRandomGenerator,
   getRevealedSeed,
   verifyServerSeed,
-} = require("./provablyFairService");
+} = require("../provablyFairService");
 
 function createServiceError(message, statusCode = 400) {
   const error = new Error(message);

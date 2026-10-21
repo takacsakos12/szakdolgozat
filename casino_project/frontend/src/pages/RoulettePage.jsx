@@ -20,6 +20,8 @@ function RoulettePage({ user, onUserChange }) {
   const [previousBets, setPreviousBets] = useState([]);
   const isSubmittingRef = useRef(false);
   const [isWheelSpinning, setIsWheelSpinning] = useState(false);
+  const [displayedBalance, setDisplayedBalance] = useState(user?.balance ?? 0);
+  const [displayedWin, setDisplayedWin] = useState(0);
   const controlsDisabled =
     isLoading || isSpinning || isWheelSpinning || Boolean(pendingRequest);
 
@@ -139,6 +141,12 @@ function RoulettePage({ user, onUserChange }) {
   }
 
   useEffect(() => {
+    if (!isWheelSpinning) {
+      setDisplayedBalance(user?.balance ?? 0);
+    }
+  }, [user?.balance, isWheelSpinning]);
+
+  useEffect(() => {
     if (!userId) {
       setIsLoading(false);
       return;
@@ -199,7 +207,6 @@ function RoulettePage({ user, onUserChange }) {
         historyId: response.historyId,
       });
       setPreviousBets(request.bets);
-      setBets([]);
       setPendingRequest(null);
 
       await updateDisplayedBalance(response);
@@ -255,6 +262,12 @@ function RoulettePage({ user, onUserChange }) {
     executeSpin(request);
   }
 
+  function handleWheelSpinEnd() {
+    setDisplayedWin(result?.totalWin ?? 0);
+    setBets([]);
+    setIsWheelSpinning(false);
+  }
+
   const totalBet = bets.reduce((total, bet) => total + bet.amount, 0);
 
   return (
@@ -292,7 +305,7 @@ function RoulettePage({ user, onUserChange }) {
                 result={result}
                 wheelOrder={rouletteConfig.wheelOrder}
                 numberColors={rouletteConfig.numberColors}
-                onSpinEnd={() => setIsWheelSpinning(false)}
+                onSpinEnd={handleWheelSpinEnd}
               />
             </div>
 
@@ -342,10 +355,10 @@ function RoulettePage({ user, onUserChange }) {
             </div>
 
             <div className="roulette-information">
-              <span>Egyenleg: {user.balance} CR</span>
+              <span>Egyenleg: {displayedBalance} CR</span>
               <span>Kiválasztott zseton: {selectedChip} CR</span>
               <span>Össztét: {totalBet} CR</span>
-              <span>Utolsó nyeremény: {result?.totalWin ?? 0} CR</span>
+              <span>Utolsó nyeremény: {displayedWin} CR</span>
             </div>
           </>
         ) : null}

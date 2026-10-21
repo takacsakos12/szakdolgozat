@@ -1,11 +1,11 @@
 const { isDeepStrictEqual } = require("node:util");
 
-const GameHistory = require("../models/GameHistory");
-const { CONFIG_VERSION } = require("../config/slotConfig");
+const GameHistory = require("../../models/GameHistory");
+const { CONFIG_VERSION } = require("../../config/slotConfig");
 
-const { spin, featureSpin, buyBookBonus } = require("./slotEngine");
+const { spin, featureSpin, buyBookBonus } = require("../slotEngine");
 
-const { ALGORITHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed} = require("./provablyFairService");
+const { ALGORITHM_VERSION, createRandomGenerator, getRevealedSeed, verifyServerSeed} = require("../provablyFairService");
 
 function createServiceError(message, statusCode = 400) {
   const error = new Error(message);
