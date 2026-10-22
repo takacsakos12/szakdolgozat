@@ -23,7 +23,7 @@ const {
 const {
   playRouletteGame,
   prepareRouletteBets,
-} = require("../services/rouletteEngine");
+} = require("../services/roulette/rouletteEngine");
 
 const router = express.Router();
 

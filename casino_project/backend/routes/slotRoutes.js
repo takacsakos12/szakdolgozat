@@ -18,7 +18,7 @@ const {
   PAYLINES,
 } = require("../config/slotConfig");
 
-const { spin, featureSpin, buyBookBonus } = require("../services/slotEngine");
+const { spin, featureSpin, buyBookBonus } = require("../services/slot/slotEngine");
 
 const router = express.Router();
 

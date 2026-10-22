@@ -288,11 +288,12 @@ function finishBlackjackRound(round) {
   };
 }
 
-function advancedHand(round) {
+function advanceHand(round) {
   const nextIndex = round.hands.findIndex(
     (hand, index) => hand.status === "ACTIVE" && index >= round.activeHandIndex,
   );
-  if (nextIndex !== -1) {
+
+  if (nextIndex === -1) {
     finishBlackjackRound(round);
   } else {
     round.activeHandIndex = nextIndex;
@@ -300,12 +301,14 @@ function advancedHand(round) {
 }
 
 function resolveOpening(round) {
-  round.phase = "OPENING";
   const playerBlackjack = isNaturalBlackjack(round.hands[0].cards);
+
   const dealerBlackjack = isNaturalBlackjack(round.dealerHand);
 
-  if (playerBlackjack || (RULES.dealerBlackjack && dealerBlackjack)) {
+  if (playerBlackjack || (RULES.dealerChecksBlackjack && dealerBlackjack)) {
     finishBlackjackRound(round);
+  } else {
+    round.phase = "PLAYER_TURN";
   }
 }
 
@@ -347,15 +350,20 @@ function startBlackjackRound({
 }
 
 function getAvailableActions(round) {
-  if (round.phase === "FINISHED") {
-    return [];
-  }
-
   if (round.phase === "INSURANCE") {
     return ["INSURANCE", "DECLINE_INSURANCE"];
   }
 
+  if (round.phase !== "PLAYER_TURN") {
+    return [];
+  }
+
   const hand = round.hands[round.activeHandIndex];
+
+  if (!hand || hand.status !== "ACTIVE") {
+    return [];
+  }
+
   const actions = ["HIT", "STAND"];
   const twoCardHand = hand.cards.length === 2;
 
@@ -435,7 +443,7 @@ function applyBlackjackAction(round, action, insuranceAmount) {
   } else if (action === "STAND") {
     hand.status = "STAND";
     advanceHand(next);
-  } else if (action === "DOUBLE") {
+  } else if (action === "DOUBLE_DOWN") {
     next.cost += hand.bet;
     hand.bet *= 2;
 

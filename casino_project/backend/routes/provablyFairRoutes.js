@@ -9,13 +9,13 @@ const {
   getRevealedSeed,
 } = require("../services/provablyFairService");
 
-const { verifySlotGameResult } = require("../services/slotVerificationService");
+const { verifySlotGameResult } = require("../services/slot/slotVerificationService");
 const GameHistory = require("../models/GameHistory");
 
 
 const {
   verifyRouletteGameResult,
-} = require("../services/rouletteVerificationService");
+} = require("../services/roulette/rouletteVerificationService");
 
 const router = express.Router();
 

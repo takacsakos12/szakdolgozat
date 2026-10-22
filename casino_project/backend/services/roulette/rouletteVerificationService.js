@@ -8,7 +8,7 @@ const {
   GAME_DOMAIN,
 } = require("../../config/rouletteConfig");
 
-const { prepareRouletteBets, playRouletteGame } = require("../rouletteEngine");
+const { prepareRouletteBets, playRouletteGame } = require("../roulette/rouletteEngine");
 
 const {
   FINGERPRINT_VERSION,
