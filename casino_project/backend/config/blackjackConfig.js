@@ -1,4 +1,4 @@
-const CONFIG_VERSION = "BjackjackConfig_v1.0.0";
+const CONFIG_VERSION = "BlackjackConfig_v1.0.0";
 
 const GAME_TYPE = "BLACKJACK";
 const GAME_MODE = "STANDARD";
@@ -49,12 +49,10 @@ const RULES = {
   doubleAfterSplitAllowed: true,
   splitEnabled: true,
   splitByValue: true,
+  maxHands: 2,
   splitAcesOnlyOneCard: true,
   insuranceAllowed: true,
   maxInsuranceBetRatio: 0.5,
-  maxHands: 2,
-  blackjackAfterSplit: false,
-  shuffleEveryRound: true,
 };
 
 const PAYOUTS = {
