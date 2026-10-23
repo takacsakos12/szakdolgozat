@@ -12,7 +12,7 @@ const {
   REEL_STRIPS,
   BONUS_REEL_STRIPS_BY_SYMBOL,
   FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL,
-} = require("../config/slotConfig");
+} = require("../../config/slotConfig");
 
 function generateGrid(random = Math.random, reelStrips = REEL_STRIPS) {
   const grid = Array.from({ length: ROW_COUNT }, () =>

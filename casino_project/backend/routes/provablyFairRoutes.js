@@ -9,13 +9,18 @@ const {
   getRevealedSeed,
 } = require("../services/provablyFairService");
 
-const { verifySlotGameResult } = require("../services/slot/slotVerificationService");
+const {
+  verifySlotGameResult,
+} = require("../services/slot/slotVerificationService");
 const GameHistory = require("../models/GameHistory");
-
 
 const {
   verifyRouletteGameResult,
 } = require("../services/roulette/rouletteVerificationService");
+
+const {
+  verifyBlackjackGameResult,
+} = require("../services/blackjack/blackjackVerifiactionService");
 
 const router = express.Router();
 
@@ -102,6 +107,10 @@ router.post("/verify", protectRoute, async (req, res) => {
     case "ROULETTE":
       verification = await verifyRouletteGameResult(params);
       break;
+    case "BLACKJACK":
+      verification = await verifyBlackjackGameResult(params);
+      break;
+
 
     default:
       return res.status(409).json({

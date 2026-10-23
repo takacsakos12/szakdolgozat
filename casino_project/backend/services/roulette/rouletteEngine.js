@@ -4,7 +4,7 @@ const {
   ROULETTE_POSITIONS,
   MIN_BET_AMOUNT,
   MAX_TOTAL_BET_AMOUNT,
-} = require("../config/rouletteConfig");
+} = require("../../config/rouletteConfig");
 
 function createRouletteError(message, statusCode = 400) {
   const error = new Error(message);

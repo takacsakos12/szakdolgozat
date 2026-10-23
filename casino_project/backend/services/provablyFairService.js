@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 
 const ProvablyFairSeed = require("../models/ProvablyFairSeed");
+const BlackjackSession = require("../models/BlackjackSession");
 
 const UINT32_RANGE = 0x100000000;
 const ALGORITHM_VERSION = "HMAC_SHA512_V1";
@@ -287,6 +288,18 @@ async function rotateSeed({ userId, clientSeed }) {
       if (!oldSeed) {
         throw createServiceError(
           "Nem található lecserélhető aktív seedpár.",
+          409,
+        );
+      }
+      const activeBlackjack = await BlackjackSession.exists({
+        userId,
+        status: "ACTIVE",
+        "provablyFair.seedId": oldSeed._id,
+      }).session(session);
+
+      if (activeBlackjack) {
+        throw createServiceError(
+          "A seed cseréje előtt fejezd be a folyamatban lévő blackjackkört.",
           409,
         );
       }
