@@ -6,6 +6,8 @@ const {
   SIDE_BETS,
   RULES,
   PAYOUTS,
+  MIN_BET,
+  MAX_BET,
 } = require("../../config/blackjackConfig");
 
 function createShoe() {
@@ -318,6 +320,29 @@ function startBlackjackRound({
   perfectPairsBet = 0,
   twentyOnePlusThreeBet = 0,
 }) {
+
+  if (
+    !Number.isSafeInteger(baseBet) ||
+    baseBet < MIN_BET ||
+    baseBet > MAX_BET
+  ) {
+    const error = new Error("Érvénytelen alaptét.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (
+    ![perfectPairsBet, twentyOnePlusThreeBet].every(
+      (amount) =>
+        Number.isSafeInteger(amount) &&
+        amount >= 0,
+    )
+  ) {
+    const error = new Error("Érvénytelen mellékfogadás.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const shoe = shuffleShoe(createShoe(), randomInt);
   const opening = dealInitialHands(shoe);
   const sideBets = evaluateSideBets({

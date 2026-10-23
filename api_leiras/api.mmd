@@ -1,0 +1,28 @@
+flowchart LR
+    subgraph Kliens["React kliens"]
+        direction TB
+        SLOT["SlotPage.jsx"]
+        RULETT["RoulettePage.jsx"]
+        SLOTAPI["slotApi.js"]
+        RULETTAPI["rouletteApi.js"]
+        CLIENT["apiClient.js"]
+
+        SLOT --> SLOTAPI
+        RULETT --> RULETTAPI
+        SLOTAPI --> CLIENT
+        RULETTAPI --> CLIENT
+    end
+
+    subgraph Szerver["Express szerver"]
+        direction TB
+        SLOTROUTE["slotRoutes.js"]
+        RULETTROUTE["rouletteRoutes.js"]
+    end
+
+    CLIENT -->|"GET /api/slot/config"| SLOTROUTE
+    CLIENT -->|"POST /api/slot/spin"| SLOTROUTE
+    CLIENT -->|"POST /api/slot/bonus-buy"| SLOTROUTE
+    CLIENT -->|"POST /api/slot/feature-spin"| SLOTROUTE
+
+    CLIENT -->|"GET /api/roulette/config"| RULETTROUTE
+    CLIENT -->|"POST /api/roulette/spin"| RULETTROUTE
