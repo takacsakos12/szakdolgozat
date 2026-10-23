@@ -1,0 +1,35 @@
+erDiagram
+    User ||--o{ GameHistory : "játékelőzmények"
+    User ||--o{ ProvablyFairSeed : "seedek"
+   
+
+    ProvablyFairSeed o|--o{ GameHistory : "sorsoláshoz használt seed"
+
+    User {
+        ObjectId _id PK
+        String username
+        Number balance
+    }
+
+    GameHistory {
+        ObjectId _id PK
+        ObjectId userId
+        String gameType
+        Number cost
+        Number winAmount
+        Number netResult
+        Mixed result
+        Object provablyFair "Tartalmazza a seedId hivatkozást"
+    }
+
+    ProvablyFairSeed {
+        ObjectId _id PK
+        ObjectId userId
+        String serverSeed
+        String serverSeedHash
+        String clientSeed
+        Number nonce
+        String status
+    }
+
+    
