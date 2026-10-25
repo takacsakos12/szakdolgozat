@@ -11,6 +11,7 @@ import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import HomePage from "./pages/HomePage";
 import RoulettePage from "./pages/RoulettePage";
+import BlackjackPage from "./pages/BlackjackPage";
 
 
 function App() {
@@ -76,6 +77,10 @@ function App() {
         <Route
           path="/games/history"
           element={<GameHistoryPage user={user} />}
+        />
+        <Route
+          path="/games/blackjack"
+          element={<BlackjackPage user={user} onUserChange={setUser} />}
         />
       </Routes>
 
