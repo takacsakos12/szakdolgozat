@@ -101,10 +101,6 @@ const blackjackSessionSchema = new mongoose.Schema(
         type: Number,
         required: true,
       },
-      balanceBefore: {
-        type: Number,
-        required: true,
-      },
       perfectPairsBet: {
         type: Number,
         default: 0,
@@ -113,6 +109,11 @@ const blackjackSessionSchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+    },
+    
+    balanceBefore: {
+      type: Number,
+      required: true,
     },
 
     round: {

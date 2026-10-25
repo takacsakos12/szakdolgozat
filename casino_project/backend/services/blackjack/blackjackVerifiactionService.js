@@ -183,7 +183,8 @@ async function verifyBlackjackGameResult({ userId, historyId }) {
     history.baseBet === baseBet &&
     history.cost === recreatedResult.cost &&
     history.winAmount === recreatedResult.totalWin &&
-    history.netResult === recreatedResult.netResult;
+    history.netResult === recreatedResult.netResult &&
+    history.balanceBefore + history.netResult === history.balanceAfter;
 
   return {
     verified:
