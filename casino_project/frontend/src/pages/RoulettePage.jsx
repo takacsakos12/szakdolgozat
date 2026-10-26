@@ -8,6 +8,16 @@ import RouletteWheel from "../components/roulette/RouletteWheel";
 
 import "./RoulettePage.css";
 
+const CHIP_COLORS = {
+  1: "#dce1e8",
+  2: "#778395",
+  5: "#b9404d",
+  10: "#3578bc",
+  25: "#32875d",
+  50: "#8957b2",
+  100: "#292d38",
+};
+
 function RoulettePage({ user, onUserChange }) {
   const [bets, setBets] = useState([]);
   const [selectedChip, setSelectedChip] = useState(null);
@@ -274,20 +284,8 @@ function RoulettePage({ user, onUserChange }) {
     <main className="roulette-page">
       <section className="roulette-game">
         <header className="roulette-header">
-          <div>
-            <h1>Európai rulett</h1>
-            <p>37 szám · Egyetlen nulla</p>
-          </div>
-
-          {rouletteConfig && (
-            <span>
-              RTP:{" "}
-              {(rouletteConfig.theoreticalRtp * 100).toLocaleString("hu-HU", {
-                maximumFractionDigits: 2,
-              })}
-              %
-            </span>
-          )}
+          <h1>Roulett</h1>
+          <span>Egyenleg: {displayedBalance} CR</span>
         </header>
 
         {errorMessage && (
@@ -300,25 +298,27 @@ function RoulettePage({ user, onUserChange }) {
           <p role="status">Rulett betöltése...</p>
         ) : rouletteConfig ? (
           <>
-            <div className="roulette-wheel-area">
-              <RouletteWheel
-                result={result}
-                wheelOrder={rouletteConfig.wheelOrder}
-                numberColors={rouletteConfig.numberColors}
-                onSpinEnd={handleWheelSpinEnd}
-              />
-            </div>
+            <div className="roulette-play-area">
+              <div className="roulette-wheel-area">
+                <RouletteWheel
+                  result={result}
+                  wheelOrder={rouletteConfig.wheelOrder}
+                  numberColors={rouletteConfig.numberColors}
+                  onSpinEnd={handleWheelSpinEnd}
+                />
+              </div>
 
-            <div className="roulette-table-area">
-              <RouletteTable
-                config={rouletteConfig}
-                bets={bets}
-                disabled={controlsDisabled}
-                onPlaceBet={handlePlaceBet}
-                onReBet={handleReBet}
-                canReBet={previousBets.length > 0}
-                onUndoBet={handleUndoBet}
-              />
+              <div className="roulette-table-area">
+                <RouletteTable
+                  config={rouletteConfig}
+                  bets={bets}
+                  disabled={controlsDisabled}
+                  onPlaceBet={handlePlaceBet}
+                  onReBet={handleReBet}
+                  canReBet={previousBets.length > 0}
+                  onUndoBet={handleUndoBet}
+                />
+              </div>
             </div>
 
             <div className="roulette-controls-area">
@@ -327,11 +327,18 @@ function RoulettePage({ user, onUserChange }) {
                   <button
                     key={chipValue}
                     type="button"
+                    className="roulette-select-chip"
+                    style={{
+                      "--chip-color": CHIP_COLORS[chipValue] ?? "#3578bc",
+                      "--chip-text": chipValue === 1 ? "#252a34" : "#ffffff",
+                      "--chip-stripe": chipValue === 1 ? "#657084" : "#f3f0e7",
+                    }}
                     disabled={controlsDisabled}
+                    aria-label={`${chipValue} CR zseton`}
                     aria-pressed={selectedChip === chipValue}
                     onClick={() => handleChipChange(chipValue)}
                   >
-                    {chipValue} CR
+                    <span>{chipValue}</span>
                   </button>
                 ))}
               </div>
@@ -355,8 +362,6 @@ function RoulettePage({ user, onUserChange }) {
             </div>
 
             <div className="roulette-information">
-              <span>Egyenleg: {displayedBalance} CR</span>
-              <span>Kiválasztott zseton: {selectedChip} CR</span>
               <span>Össztét: {totalBet} CR</span>
               <span>Utolsó nyeremény: {displayedWin} CR</span>
             </div>

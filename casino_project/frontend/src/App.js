@@ -6,13 +6,11 @@ import AuthPage from "./AuthPage";
 import GameHistoryPage from "./pages/GameHistoryPage";
 import { getCurrentUser, logoutUser } from "./api/authApi";
 
-
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import HomePage from "./pages/HomePage";
 import RoulettePage from "./pages/RoulettePage";
 import BlackjackPage from "./pages/BlackjackPage";
-
 
 function App() {
   const [user, setUser] = useState(null);
@@ -22,7 +20,7 @@ function App() {
     async function checkCurrentUser() {
       try {
         const response = await getCurrentUser();
-          setUser(response.user);
+        setUser(response.user);
       } catch {
         setUser(null);
       } finally {

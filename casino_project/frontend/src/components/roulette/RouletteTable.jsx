@@ -10,6 +10,16 @@ const BET_LABELS = {
   FIRST_FOUR: "Első négy",
 };
 
+const CHIP_COLORS = {
+  1: "#dce1e8",
+  2: "#778395",
+  5: "#b9404d",
+  10: "#3578bc",
+  25: "#32875d",
+  50: "#8957b2",
+  100: "#292d38",
+};
+
 const COLUMN_BETS = [
   { type: "THIRD_COLUMN", label: "2:1" },
   { type: "SECOND_COLUMN", label: "2:1" },
@@ -92,6 +102,52 @@ function RouletteTable({
     amounts.set(key, (amounts.get(key) ?? 0) + bet.amount);
   }
 
+  function getBetChips(amount) {
+    const chipValues = [...config.allowedChipValues].sort(
+      (first, second) => second - first,
+    );
+
+    const chips = [];
+
+    for (const chipValue of chipValues) {
+      const count = Math.floor(amount / chipValue);
+
+      for (let index = 0; index < count; index++) {
+        chips.push(chipValue);
+      }
+
+      amount -= count * chipValue;
+    }
+
+    return chips;
+  }
+
+  function renderBetChips(amount) {
+    const chips = getBetChips(amount);
+
+    return (
+      <span className="roulette-bet-chips" aria-hidden="true">
+        {chips.slice(-6).map((value, index) => (
+          <span
+            key={index}
+            className="roulette-bet-chip"
+            style={{
+              "--chip-color": CHIP_COLORS[value] ?? "#3578bc",
+              "--chip-text": value === 1 ? "#252a34" : "#ffffff",
+              "--chip-stripe": value === 1 ? "#657084" : "#f3f0e7",
+            }}
+          >
+            <span>{value}</span>
+          </span>
+        ))}
+
+        {chips.length > 6 && (
+          <span className="roulette-bet-chip-count">×{chips.length}</span>
+        )}
+      </span>
+    );
+  }
+
   function renderBet(type, numbers, label, className, style) {
     const coveredNumbers = numbers.length
       ? numbers
@@ -108,7 +164,7 @@ function RouletteTable({
         className={`roulette-bet ${className}`}
         style={style}
         disabled={disabled}
-        aria-label={`${betLabel}: ${coveredNumbers.join(", ")}`}
+        aria-label={`${betLabel}: ${coveredNumbers.join(", ")}. Tét: ${amount ?? 0} CR`}
         onMouseEnter={() =>
           setHoveredBet({
             label: betLabel,
@@ -127,7 +183,7 @@ function RouletteTable({
       >
         {label}
 
-        {amount > 0 && <span className="roulette-chip">{amount}</span>}
+        {amount > 0 && renderBetChips(amount)}
       </button>
     );
   }

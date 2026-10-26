@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Link,
-  Navigate,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { loginUser, registerUser } from "./api/authApi";
 
 import "./AuthPage.css";
@@ -38,7 +33,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [serverMessage, setServerMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState(
-    location.state?.message || ""
+    location.state?.message || "",
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,11 +80,9 @@ function AuthPage({ mode, user, onAuthenticated }) {
     if (!username) {
       errors.username = "Add meg a felhasználóneved.";
     } else if (username.length < 3) {
-      errors.username =
-        "A felhasználónév legalább 3 karakter legyen.";
+      errors.username = "A felhasználónév legalább 3 karakter legyen.";
     } else if (username.length > 30) {
-      errors.username =
-        "A felhasználónév legfeljebb 30 karakter lehet.";
+      errors.username = "A felhasználónév legfeljebb 30 karakter lehet.";
     }
 
     if (!isLogin) {
@@ -104,10 +97,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
 
     if (!formData.password) {
       errors.password = "Add meg a jelszavad.";
-    } else if (
-      !isLogin &&
-      !validatePassword(formData.password)
-    ) {
+    } else if (!isLogin && !validatePassword(formData.password)) {
       errors.password =
         "Legalább 8 karakter, kisbetű, nagybetű és szám szükséges.";
     }
@@ -115,9 +105,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
     if (!isLogin) {
       if (!formData.confirmPassword) {
         errors.confirmPassword = "Írd be újra a jelszavad.";
-      } else if (
-        formData.password !== formData.confirmPassword
-      ) {
+      } else if (formData.password !== formData.confirmPassword) {
         errors.confirmPassword = "A két jelszó nem egyezik.";
       }
     }
@@ -150,7 +138,9 @@ function AuthPage({ mode, user, onAuthenticated }) {
 
     try {
       setIsSubmitting(true);
-      const data = isLogin ? await loginUser(requestBody) : await registerUser(requestBody);
+      const data = isLogin
+        ? await loginUser(requestBody)
+        : await registerUser(requestBody);
 
       if (isLogin) {
         onAuthenticated(data.user);
@@ -161,13 +151,12 @@ function AuthPage({ mode, user, onAuthenticated }) {
       navigate("/login", {
         replace: true,
         state: {
-          message:
-            "Sikeres regisztráció. Most már bejelentkezhetsz.",
+          message: "Sikeres regisztráció. Most már bejelentkezhetsz.",
         },
       });
     } catch (error) {
       setServerMessage(error.message);
-    } finally { 
+    } finally {
       setIsSubmitting(false);
     }
   }
@@ -208,8 +197,8 @@ function AuthPage({ mode, user, onAuthenticated }) {
           <strong>Biztonságos adatkezelés</strong>
 
           <p>
-            A jelszavakat az alkalmazás nem olvasható formában,
-            hanem biztonságos hashként tárolja.
+            A jelszavakat az alkalmazás nem olvasható formában, hanem
+            biztonságos hashként tárolja.
           </p>
         </div>
       </section>
@@ -220,9 +209,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
             {isLogin ? "Belépés" : "Regisztráció"}
           </span>
 
-          <h2>
-            {isLogin ? "Bejelentkezés" : "Fiók létrehozása"}
-          </h2>
+          <h2>{isLogin ? "Bejelentkezés" : "Fiók létrehozása"}</h2>
 
           <p>
             {isLogin
@@ -238,23 +225,15 @@ function AuthPage({ mode, user, onAuthenticated }) {
         )}
 
         {serverMessage && (
-          <div className="auth-message auth-message-error">
-            {serverMessage}
-          </div>
+          <div className="auth-message auth-message-error">{serverMessage}</div>
         )}
 
-        <form
-          className="auth-page-form"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+        <form className="auth-page-form" onSubmit={handleSubmit} noValidate>
           <div className="form-field">
             <label htmlFor="username">Felhasználónév</label>
 
             <input
-              className={
-                fieldErrors.username ? "input-error" : ""
-              }
+              className={fieldErrors.username ? "input-error" : ""}
               id="username"
               name="username"
               type="text"
@@ -262,16 +241,12 @@ function AuthPage({ mode, user, onAuthenticated }) {
               onChange={handleInputChange}
               autoComplete="username"
               placeholder={
-                isLogin
-                  ? "Add meg a felhasználóneved"
-                  : "Legalább 3 karakter"
+                isLogin ? "Add meg a felhasználóneved" : "Legalább 3 karakter"
               }
             />
 
             {fieldErrors.username && (
-              <span className="field-error">
-                {fieldErrors.username}
-              </span>
+              <span className="field-error">{fieldErrors.username}</span>
             )}
           </div>
 
@@ -280,9 +255,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
               <label htmlFor="email">E-mail-cím</label>
 
               <input
-                className={
-                  fieldErrors.email ? "input-error" : ""
-                }
+                className={fieldErrors.email ? "input-error" : ""}
                 id="email"
                 name="email"
                 type="email"
@@ -293,9 +266,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
               />
 
               {fieldErrors.email && (
-                <span className="field-error">
-                  {fieldErrors.email}
-                </span>
+                <span className="field-error">{fieldErrors.email}</span>
               )}
             </div>
           )}
@@ -304,39 +275,27 @@ function AuthPage({ mode, user, onAuthenticated }) {
             <label htmlFor="password">Jelszó</label>
 
             <input
-              className={
-                fieldErrors.password ? "input-error" : ""
-              }
+              className={fieldErrors.password ? "input-error" : ""}
               id="password"
               name="password"
               type="password"
               value={formData.password}
               onChange={handleInputChange}
-              autoComplete={
-                isLogin ? "current-password" : "new-password"
-              }
+              autoComplete={isLogin ? "current-password" : "new-password"}
               placeholder="Add meg a jelszavad"
             />
 
             {fieldErrors.password && (
-              <span className="field-error">
-                {fieldErrors.password}
-              </span>
+              <span className="field-error">{fieldErrors.password}</span>
             )}
           </div>
 
           {!isLogin && (
             <div className="form-field">
-              <label htmlFor="confirmPassword">
-                Jelszó megerősítése
-              </label>
+              <label htmlFor="confirmPassword">Jelszó megerősítése</label>
 
               <input
-                className={
-                  fieldErrors.confirmPassword
-                    ? "input-error"
-                    : ""
-                }
+                className={fieldErrors.confirmPassword ? "input-error" : ""}
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
@@ -368,9 +327,7 @@ function AuthPage({ mode, user, onAuthenticated }) {
         </form>
 
         <div className="auth-alternative">
-          <span>
-            {isLogin ? "Még nincs fiókod?" : "Már van fiókod?"}
-          </span>
+          <span>{isLogin ? "Még nincs fiókod?" : "Már van fiókod?"}</span>
 
           <Link to={isLogin ? "/register" : "/login"}>
             {isLogin ? "Regisztráció" : "Bejelentkezés"}

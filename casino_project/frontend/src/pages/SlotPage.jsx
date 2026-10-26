@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Navigate } from "react-router-dom";
 
 import { getCurrentUser } from "../api/authApi";
@@ -40,8 +40,14 @@ function SlotPage({ user, onUserChange }) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [isGridSpinning, setIsGridSpinning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
   const [pendingRequest, setPendingRequest] = useState(null);
   const [bonusPlayback, setBonusPlayback] = useState(null);
+  const [displayedExpandingSymbol, setDisplayedExpandingSymbol] =
+    useState(null);
+
+  const slotGridRef = useRef(null);
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     setBalance(user?.balance ?? 0);
@@ -93,12 +99,8 @@ function SlotPage({ user, onUserChange }) {
     };
   }, []);
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   function handleBetChange(newBet) {
-    if (pendingRequest || isSpinning) {
+    if (pendingRequest || isSpinning || isSubmittingRef.current) {
       return;
     }
 
@@ -106,28 +108,50 @@ function SlotPage({ user, onUserChange }) {
     setErrorMessage("");
   }
 
-  function updateDisplayedBalance(response) {
+  async function updateDisplayedBalance(response) {
     if (!response.replayed) {
       setBalance(response.balanceAfter);
 
-      onUserChange?.((currentUser) => ({
-        ...currentUser,
-        balance: response.balanceAfter,
-      }));
+      onUserChange?.((currentUser) =>
+        currentUser
+          ? {
+              ...currentUser,
+              balance: response.balanceAfter,
+            }
+          : currentUser,
+      );
 
       return;
     }
 
-    getCurrentUser()
-      .then((currentUserResponse) => {
-        const currentUser = currentUserResponse.user;
+    try {
+      const currentUserResponse = await getCurrentUser();
+      const currentUser = currentUserResponse.user;
 
-        setBalance(currentUser.balance);
-        onUserChange?.(currentUser);
-      })
-      .catch(() => {
-        setErrorMessage("Az aktuális egyenleget nem sikerült frissíteni.");
-      });
+      setBalance(currentUser.balance);
+      onUserChange?.(currentUser);
+    } catch {
+      setErrorMessage("Az aktuális egyenleget nem sikerült frissíteni.");
+    }
+  }
+
+  async function animateSpinResult(result, expandingSymbol = null) {
+    const originalGrid = result.originalGrid ?? result.grid;
+
+    setDisplayedExpandingSymbol(expandingSymbol);
+
+    await slotGridRef.current.stopSpin(originalGrid);
+
+    setDisplayedGrid(originalGrid);
+    setIsGridSpinning(false);
+
+    if (result.expandedReels?.length > 0) {
+      await wait(650);
+
+      setDisplayedGrid(result.grid);
+
+      await wait(500);
+    }
   }
 
   async function playBonusSpins(result) {
@@ -143,9 +167,25 @@ function SlotPage({ user, onUserChange }) {
     for (let index = 0; index < freeSpins.length; index += 1) {
       const freeSpin = freeSpins[index];
 
-      accumulatedWin += Number(freeSpin.totalWin);
+      setBonusPlayback({
+        currentSpin: index + 1,
+        totalSpins: freeSpins.length,
+        spinWin: 0,
+        accumulatedWin,
+        expandingSymbol: bonus.expandingSymbol,
+        finished: false,
+      });
 
-      setDisplayedGrid(freeSpin.grid);
+      setDisplayedExpandingSymbol(null);
+      setIsGridSpinning(true);
+
+      slotGridRef.current.startSpin();
+
+      await wait(500);
+
+      await animateSpinResult(freeSpin, bonus.expandingSymbol);
+
+      accumulatedWin += freeSpin.totalWin;
 
       setBonusPlayback({
         currentSpin: index + 1,
@@ -162,7 +202,7 @@ function SlotPage({ user, onUserChange }) {
     setBonusPlayback({
       currentSpin: freeSpins.length,
       totalSpins: freeSpins.length,
-      spinWin: freeSpins[freeSpins.length - 1]?.totalWin,
+      spinWin: freeSpins[freeSpins.length - 1].totalWin,
       accumulatedWin: bonus.totalWin,
       expandingSymbol: bonus.expandingSymbol,
       finished: true,
@@ -170,70 +210,96 @@ function SlotPage({ user, onUserChange }) {
   }
 
   async function executeGame(mode, request) {
+    if (isSubmittingRef.current || !slotGridRef.current) {
+      return;
+    }
+
+    isSubmittingRef.current = true;
+
     setIsSpinning(true);
     setIsGridSpinning(true);
     setErrorMessage("");
     setBonusPlayback(null);
     setGameResult(null);
+    setDisplayedExpandingSymbol(null);
     setGameMode(mode);
 
-    let response;
     try {
-      if (mode === "BONUS_BUY") {
-        response = await buyBonus(request);
-      } else if (mode === "FEATURE_SPIN") {
-        response = await featureSpin(request);
-      } else {
-        response = await spinSlot(request);
-      }
-    } catch (error) {
-      const requestWasRejected = [400, 401, 403, 404, 409, 422].includes(
-        error.statusCode,
-      );
+      slotGridRef.current.startSpin();
 
-      if (requestWasRejected) {
-        setPendingRequest(null);
-        setErrorMessage(error.message);
-      } else {
-        setPendingRequest({ mode, request });
-        setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
-      }
+      let response;
 
-      setIsGridSpinning(false);
-      setIsSpinning(false);
-      return;
-    }
-    setPendingRequest(null);
-    setIsGridSpinning(false);
+      try {
+        if (mode === "BONUS_BUY") {
+          response = await buyBonus(request);
+        } else if (mode === "FEATURE_SPIN") {
+          response = await featureSpin(request);
+        } else {
+          response = await spinSlot(request);
+        }
+      } catch (error) {
+        const uncertainOutcome =
+          error.code === "NETWORK_ERROR" || error.statusCode >= 500;
 
-    try {
-      const freeSpins = response.result.bonus?.freeSpinResults || [];
+        if (uncertainOutcome) {
+          setPendingRequest({ mode, request });
 
-      if (response.result.grid) {
-        setDisplayedGrid(response.result.grid);
-      }
-
-      if (freeSpins.length > 0) {
-        if (response.result.grid) {
-          await wait(BONUS_SPIN_DURATION);
+          setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
+        } else {
+          setPendingRequest(null);
+          setErrorMessage(error.message);
         }
 
-        await playBonusSpins(response.result);
+        const fallbackGrid =
+          displayedGrid ??
+          Array.from({ length: rowCount }, () => Array(reelCount).fill(null));
+
+        await slotGridRef.current.stopSpin(fallbackGrid);
+
+        return;
       }
-    } catch {
-      setErrorMessage(
-        "A kör elszámolása megtörtént, de a bónusz megjelenítése megszakadt.",
-      );
+
+      setPendingRequest(null);
+
+      try {
+        if (response.result.grid) {
+          await animateSpinResult(
+            response.result,
+            response.result.expandingSymbol,
+          );
+        }
+
+        const freeSpins = response.result.bonus?.freeSpinResults ?? [];
+
+        if (freeSpins.length > 0) {
+          if (response.result.grid) {
+            await wait(700);
+          }
+
+          await playBonusSpins(response.result);
+        }
+      } catch {
+        setErrorMessage(
+          "A kör elszámolása megtörtént, de az animáció megszakadt.",
+        );
+      } finally {
+        setGameResult(response.result);
+        await updateDisplayedBalance(response);
+      }
     } finally {
-      setGameResult(response.result);
-      updateDisplayedBalance(response);
+      isSubmittingRef.current = false;
       setIsGridSpinning(false);
       setIsSpinning(false);
     }
   }
 
   function handleSpin() {
-    if (selectedBet === null || isSpinning || isLoadingConfig) {
+    if (
+      selectedBet === null ||
+      isSpinning ||
+      isLoadingConfig ||
+      isSubmittingRef.current
+    ) {
       return;
     }
 
@@ -260,7 +326,13 @@ function SlotPage({ user, onUserChange }) {
   }
 
   function handleBonusBuy() {
-    if (selectedBet === null || isSpinning || pendingRequest) {
+    if (
+      selectedBet === null ||
+      isSpinning ||
+      isLoadingConfig ||
+      pendingRequest ||
+      isSubmittingRef.current
+    ) {
       return;
     }
 
@@ -281,7 +353,7 @@ function SlotPage({ user, onUserChange }) {
   }
 
   function handleFeatureToggle() {
-    if (isSpinning || pendingRequest) {
+    if (isSpinning || pendingRequest || isSubmittingRef.current) {
       return;
     }
 
@@ -295,6 +367,10 @@ function SlotPage({ user, onUserChange }) {
   }
 
   function handleFeatureConfirm() {
+    if (isSpinning || isSubmittingRef.current) {
+      return;
+    }
+
     setFeatureEnabled(true);
     setIsFeatureSelectorOpen(false);
     setErrorMessage("");
@@ -313,7 +389,11 @@ function SlotPage({ user, onUserChange }) {
   const lastWin = gameResult?.totalWin ?? 0;
 
   const controlsDisabled =
-    isSpinning || isLoadingConfig || Boolean(pendingRequest);
+    isSpinning || isLoadingConfig || !slotConfig || Boolean(pendingRequest);
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <main className="slot-page">
@@ -341,20 +421,16 @@ function SlotPage({ user, onUserChange }) {
             <div className="game-stage-content">
               {isLoadingConfig ? (
                 <p>Játék betöltése...</p>
-              ) : (
+              ) : slotConfig ? (
                 <SlotGrid
+                  ref={slotGridRef}
                   grid={displayedGrid}
                   rowCount={rowCount}
                   reelCount={reelCount}
                   isSpinning={isGridSpinning}
-                  expandingSymbol={
-                    bonusPlayback?.expandingSymbol ??
-                    (gameMode === "FEATURE_SPIN"
-                      ? (gameResult?.expandingSymbol ?? null)
-                      : null)
-                  }
+                  expandingSymbol={displayedExpandingSymbol}
                 />
-              )}
+              ) : null}
 
               {bonusPlayback && (
                 <div className="bonus-playback">
@@ -396,7 +472,7 @@ function SlotPage({ user, onUserChange }) {
           balance={balance}
           lastWin={lastWin}
           isPlaying={isSpinning}
-          isLoading={isLoadingConfig}
+          isLoading={isLoadingConfig || !slotConfig}
           hasPendingRequest={Boolean(pendingRequest)}
           onBetChange={handleBetChange}
           onSpin={handleSpin}

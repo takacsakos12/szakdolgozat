@@ -53,7 +53,7 @@ function HomePage() {
               className="button button-secondary button-large"
               href="#statistics"
             >
-              Elemzések megtekintése 
+              Elemzések megtekintése
             </a>
           </div>
 
