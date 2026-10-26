@@ -9,6 +9,7 @@ const {
   GAME_TYPE,
   GAME_MODE,
   GAME_DOMAIN,
+  RULES,
 } = require("../../config/blackjackConfig");
 
 const {
@@ -72,7 +73,10 @@ function toPublicSession(game, balance, replayed = false) {
     }
 
     if (action === "INSURANCE") {
-      return balance >= 0.5;
+      const insuranceAmount =
+        game.initialBets.baseBet * RULES.maxInsuranceBetRatio;
+
+      return balance >= insuranceAmount;
     }
 
     return true;

@@ -152,7 +152,7 @@ function BlackjackPage({ user, onUserChange }) {
 
   function renderBetChips(type) {
     const chips = getBetChips(type);
-    const visibleChips = chips.slice(-6);
+    const visibleChips = chips.slice(0, 6);
 
     if (chips.length === 0) {
       return <span className="blackjack-empty-bet">+</span>;
@@ -462,7 +462,7 @@ function BlackjackPage({ user, onUserChange }) {
           <p role="status">Blackjack betöltése...</p>
         ) : blackjackConfig ? (
           <>
-            <BlackjackTable game={game} />
+            <BlackjackTable game={showRound ? game : null} />
             <div className="blackjack-console">
               <div className="blackjack-side-bet">
                 {blackjackConfig.sideBets.PERFECT_PAIRS.enabled && (
@@ -503,7 +503,8 @@ function BlackjackPage({ user, onUserChange }) {
                     disabled={
                       isLoading ||
                       isSubmitting ||
-                      (!pendingAction && hasActiveGame)
+                      (!pendingAction &&
+                        (hasActiveGame || baseBet < blackjackConfig.minBet))
                     }
                     onClick={pendingAction ? handleRetry : handleStartGame}
                   >
