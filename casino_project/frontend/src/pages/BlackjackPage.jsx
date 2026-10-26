@@ -9,7 +9,6 @@ import {
 } from "../api/blackjackApi";
 import { getCurrentUser } from "../api/authApi";
 import BlackjackTable from "../components/blackjack/BlackjackTable";
-import PlayingCard from "../components/blackjack/PlayingCard";
 
 import "./BlackjackPage.css";
 
@@ -135,7 +134,7 @@ function BlackjackPage({ user, onUserChange }) {
 
     isSubmittingRef.current = true;
     setIsSubmitting(true);
-    setPendingAction(request.action);
+    setPendingAction(request);
     setErrorMessage("");
 
     try {
@@ -180,6 +179,22 @@ function BlackjackPage({ user, onUserChange }) {
       );
       return;
     }
+
+    if (
+      ![perfectPairsBet, twentyOnePlusThreeBet].every(
+        (amount) => Number.isSafeInteger(amount) && amount >= 0,
+      ) ||
+      !Number.isSafeInteger(totalBetAmount)
+    ) {
+      setErrorMessage("A mellékfogadások nemnegatív egész összegek legyenek.");
+      return;
+    }
+
+    if (totalBetAmount > user.balance) {
+      setErrorMessage("Nincs elegendő egyenleg.");
+      return;
+    }
+
     const request = {
       type: "START",
       requestId: window.crypto.randomUUID(),
@@ -253,7 +268,7 @@ function BlackjackPage({ user, onUserChange }) {
                   step="1"
                   value={baseBet}
                   disabled={betsDisabled}
-                  onchange={(event) =>
+                  onChange={(event) =>
                     handleBetChange("baseBet", Number(event.target.value))
                   }
                 />
@@ -268,7 +283,7 @@ function BlackjackPage({ user, onUserChange }) {
                     step="1"
                     value={perfectPairsBet}
                     disabled={betsDisabled}
-                    onchange={(event) =>
+                    onChange={(event) =>
                       handleBetChange(
                         "perfectPairsBet",
                         Number(event.target.value),
@@ -287,7 +302,7 @@ function BlackjackPage({ user, onUserChange }) {
                     step="1"
                     value={twentyOnePlusThreeBet}
                     disabled={betsDisabled}
-                    onchange={(event) =>
+                    onChange={(event) =>
                       handleBetChange(
                         "twentyOnePlusThreeBet",
                         Number(event.target.value),
@@ -330,18 +345,16 @@ function BlackjackPage({ user, onUserChange }) {
             </div>
             {game?.phase === "INSURANCE" && (
               <p className="blackjack-insurance">
-                Biztosítás összege: {""}
-                {game.cost !== undefined &&
-                  game.hand[0].bet *
-                    blackjackConfig.rules.InsuranceBetRatio}{" "}
+                Biztosítás összege:{" "}
+                {game.hands[0].bet * blackjackConfig.rules.maxInsuranceBetRatio}{" "}
                 CR
               </p>
             )}
             <div className="blackjack-information">
               <span>
                 {hasActiveGame
-                  ? `A kör eddigi költsége: ${game.cost}`
-                  : "Új kör kezdőtétei: ${totalBetAmount} CR"}
+                  ? `A kör eddigi költsége: ${game.cost} CR`
+                  : `Új kör kezdőtétei: ${totalBetAmount} CR`}
               </span>
               {game?.phase === "FINISHED" && (
                 <>

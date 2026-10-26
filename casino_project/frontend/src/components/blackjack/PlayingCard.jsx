@@ -1,6 +1,4 @@
-import "../pages/BlackjackPage.css";
-
-const SUITS = {
+const SUIT_SYMBOLS = {
   HEARTS: "♥",
   DIAMONDS: "♦",
   CLUBS: "♣",
@@ -14,7 +12,7 @@ const RANK_LABELS = {
   ACE: "A",
 };
 
-function PlayingCard(rank, suit) {
+function PlayingCard({ card }) {
   if (card.hidden) {
     return (
       <div
@@ -26,15 +24,15 @@ function PlayingCard(rank, suit) {
     );
   }
 
-  rank = RANK_LABELS[card.rank] ?? card.rank;
-  suit = SUITS[card.suit];
+  const rank = RANK_LABELS[card.rank] ?? card.rank;
+  const suit = SUIT_SYMBOLS[card.suit];
   const isRed = card.suit === "HEARTS" || card.suit === "DIAMONDS";
 
   return (
     <div className={`playing-card ${isRed ? "card-red" : "card-black"}`}>
-      <span className="card-rank">{rank}</span>
-      <span className="card-suit">{suit}</span>
-      <span className="card-rank">{rank}</span>
+      <span className="playing-card-rank">{rank}</span>
+      <span className="playing-card-suit">{suit}</span>
+      <span className="playing-card-rank">{rank}</span>
     </div>
   );
 }

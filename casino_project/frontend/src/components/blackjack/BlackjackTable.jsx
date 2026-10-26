@@ -1,5 +1,4 @@
 import PlayingCard from "./PlayingCard";
-
 const OUTCOME_LABELS = {
   WIN: "Nyertél!",
   LOSE: "Vesztettél!",
@@ -40,7 +39,9 @@ function BlackjackTable({ game }) {
             return (
               <div
                 key={index}
-                className={`blackjack-hand ${isActive ? "active" : ""}`}
+                className={`blackjack-hand ${
+                  isActive ? "blackjack-hand-active" : ""
+                }`}
               >
                 <h2>
                   {game.hands.length > 1 ? `${index + 1}. kéz` : "Saját kéz"}
