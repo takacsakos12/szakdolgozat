@@ -57,8 +57,9 @@ router.get("/config", (req, res) => {
 router.post("/spin", protectRoute, async (req, res) => {
   const requestId = req.get("Idempotency-Key");
 
-
-  const { preparedBets, totalBetAmount, requestBets } = prepareRouletteBets( req.body?.bets );
+  const { preparedBets, totalBetAmount, requestBets } = prepareRouletteBets(
+    req.body?.bets,
+  );
 
   const settlement = await settleGameResult({
     userId: req.user._id,

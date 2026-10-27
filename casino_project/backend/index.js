@@ -11,6 +11,7 @@ const slotRoutes = require("./routes/slotRoutes");
 const provablyFairRoutes = require("./routes/provablyFairRoutes");
 const rouletteRoutes = require("./routes/rouletteRoutes");
 const blackjackRoutes = require("./routes/blackjackRoutes");
+const baccaratRoutes = require("./routes/baccaratRoutes");
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/provably-fair", provablyFairRoutes);
 app.use("/api/game-history", require("./routes/gameHistoryRoutes"));
 app.use("/api/roulette", rouletteRoutes);
 app.use("/api/blackjack", blackjackRoutes);
+app.use("/api/baccarat", baccaratRoutes);
 app.use((req, res) => {
   res.status(404).json({
     message: "A kért végpont nem található.",
