@@ -1,5 +1,6 @@
 const express = require("express");
-const { protectRoute } = require("../middleware/authMiddleware");
+const protectRoute = require("../middleware/authMiddleware");
+const { settleGameResult } = require("../services/gameSessionService");
 
 const {
   CONFIG_VERSION,
@@ -48,7 +49,7 @@ router.post("/play", protectRoute, async (req, res) => {
     gameType: GAME_TYPE,
     gameMode: GAME_MODE,
     configVersion: CONFIG_VERSION,
-    gamedomain: GAME_DOMAIN,
+    gameDomain: GAME_DOMAIN,
     baseBet: totalBetAmount,
     requestId,
     requestData: { bets: requestBets },

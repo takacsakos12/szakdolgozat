@@ -11,6 +11,7 @@ import Footer from "./components/layout/Footer";
 import HomePage from "./pages/HomePage";
 import RoulettePage from "./pages/RoulettePage";
 import BlackjackPage from "./pages/BlackjackPage";
+import BaccaraPage from "./pages/BaccaratPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -79,6 +80,10 @@ function App() {
         <Route
           path="/games/blackjack"
           element={<BlackjackPage user={user} onUserChange={setUser} />}
+        />
+        <Route
+          path="/games/baccarat"
+          element={<BaccaraPage user={user} onUserChange={setUser} />}
         />
       </Routes>
 

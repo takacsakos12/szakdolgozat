@@ -22,6 +22,10 @@ const {
   verifyBlackjackGameResult,
 } = require("../services/blackjack/blackjackVerifiactionService");
 
+const {
+  verifyBaccaratGameResult,
+} = require("../services/baccarat/baccaratVerificationService");
+
 const router = express.Router();
 
 router.get("/current", protectRoute, async (req, res) => {
@@ -110,7 +114,9 @@ router.post("/verify", protectRoute, async (req, res) => {
     case "BLACKJACK":
       verification = await verifyBlackjackGameResult(params);
       break;
-
+    case "BACCARAT":
+      verification = await verifyBaccaratGameResult(params);
+      break;
 
     default:
       return res.status(409).json({
