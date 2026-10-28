@@ -1,0 +1,200 @@
+.pf-page {
+  min-height: calc(100dvh - 88px);
+  padding: 24px;
+  color: var(--text);
+}
+
+.pf-panel {
+  width: min(1000px, 100%);
+  margin: 0 auto;
+}
+
+.pf-header {
+  margin-bottom: 24px;
+}
+
+.pf-header h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+}
+
+.pf-page p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.pf-page a {
+  color: var(--primary);
+}
+
+.pf-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.pf-page button {
+  padding: 10px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-light);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pf-tabs button[aria-pressed="true"] {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.pf-page button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pf-page button:focus-visible,
+.pf-page input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.pf-card {
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.pf-card h2 {
+  margin: 0 0 14px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.pf-card form,
+form.pf-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pf-card label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pf-card input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--background-soft);
+  color: var(--text);
+  font: inherit;
+}
+
+.pf-page .pf-primary {
+  color: #171717;
+  background: var(--primary);
+  border-color: var(--primary);
+  font-weight: 800;
+}
+
+.pf-seed-data {
+  margin: 0 0 20px;
+}
+
+.pf-seed-data dt {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pf-seed-data dd {
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+  font-family: monospace;
+  line-height: 1.6;
+}
+
+.pf-checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pf-checks li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-page .pf-success {
+  color: #55c88a;
+}
+
+.pf-page .pf-failure {
+  color: #ef7b7b;
+}
+
+.pf-page .pf-error {
+  padding: 14px;
+  border: 1px solid #813b3b;
+  border-radius: 8px;
+  color: #ffb4b4;
+  background: #301c20;
+}
+
+@media (max-width: 650px) {
+  .pf-page {
+    padding: 18px 12px;
+  }
+
+  .pf-card {
+    padding: 18px 14px;
+  }
+
+  .pf-header h1 {
+    font-size: 24px;
+  }
+
+  .pf-checks li {
+    flex-wrap: wrap;
+  }
+}
+
+.pf-card h3 {
+  margin: 26px 0 10px;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.pf-card p,
+.pf-card li {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.pf-card ul,
+.pf-card ol {
+  padding-left: 24px;
+}
+
+.pf-card li + li {
+  margin-top: 12px;
+}
+
+.pf-card li strong {
+  color: var(--text);
+}

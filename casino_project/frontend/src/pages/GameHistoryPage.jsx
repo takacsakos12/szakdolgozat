@@ -165,6 +165,7 @@ function GameHistoryPage({ user }) {
               <table className="history-table">
                 <thead>
                   <tr>
+                    <th>Kör azonosítója</th>
                     <th>Időpont</th>
                     <th>Játék</th>
                     <th>Játékmód</th>
@@ -189,6 +190,9 @@ function GameHistoryPage({ user }) {
 
                     return (
                       <tr key={game._id}>
+                        <td className="history-id">
+                          <code>{game._id}</code>
+                        </td>
                         <td>{formatDate(game.createdAt)}</td>
 
                         <td>

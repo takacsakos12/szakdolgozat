@@ -1,30 +1,4 @@
-import GameCard from "../games/GameCard";
-const games = [
-  {
-    id: "slot",
-    label: "SLOT",
-    title: "Nyerőgép",
-    path: "/games/slot",
-  },
-  {
-    id: "roulette",
-    label: "0–36",
-    title: "Európai rulett",
-    path: "/games/roulette",
-  },
-  {
-    id: "blackjack",
-    label: "21",
-    title: "Blackjack",
-    path: "/games/blackjack",
-  },
-  {
-    id: "baccarat",
-    label: "P / B",
-    title: "Baccarat",
-    path: "/games/baccarat",
-  },
-];
+import { Link } from "react-router-dom";
 
 function HomePage() {
   return (
@@ -45,9 +19,9 @@ function HomePage() {
           </p>
 
           <div className="hero-actions">
-            <a className="button button-primary button-large" href="#games">
+            <Link className="button button-primary button-large" to="/games">
               Játékok megtekintése
-            </a>
+            </Link>
 
             <a
               className="button button-secondary button-large"
@@ -107,21 +81,6 @@ function HomePage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="games-section" id="games">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Vizsgált modellek</span>
-            <h2>Kaszinójátékok</h2>
-          </div>
-        </div>
-
-        <div className="games-grid">
-          {games.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
         </div>
       </section>
 

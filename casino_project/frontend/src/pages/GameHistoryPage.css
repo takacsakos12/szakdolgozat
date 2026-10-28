@@ -309,3 +309,13 @@
     font-size: 11px;
   }
 }
+
+.history-id {
+  white-space: nowrap;
+}
+
+.history-id code {
+  color: var(--muted);
+  font-size: 11px;
+  user-select: all;
+}

@@ -14,9 +14,9 @@ function Header({ user, onLogout }) {
 
       <nav className="navigation" aria-label="Fő navigáció">
         <Link to="/">Főoldal</Link>
-        <Link to="/#games">Játékok</Link>
+        <Link to="/games">Játékok</Link>
         <Link to="/#statistics">Statisztikák</Link>
-        <Link to="/#provably-fair">Provably fair</Link>
+        <Link to="/provably-fair">Provably fair</Link>
         {user && <Link to="/games/history">Játéktörténet</Link>}
       </nav>
 

@@ -1,0 +1,531 @@
+.catalog-page {
+  min-height: calc(100dvh - 88px);
+  padding: 52px 24px 64px;
+  color: var(--text);
+  background:
+    radial-gradient(
+      ellipse at 50% 0,
+      rgba(245, 197, 66, 0.045),
+      transparent 55%
+    ),
+    var(--background);
+}
+
+.catalog-container {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+}
+
+/* Fejléc */
+
+.catalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 34px;
+}
+
+.catalog-eyebrow {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.catalog-header h1 {
+  margin: 12px 0 14px;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+
+.catalog-header p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.catalog-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 30px;
+  border-left: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.catalog-count > span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Játékkártyák */
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.catalog-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: var(--surface);
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.catalog-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(245, 197, 66, 0.65);
+}
+
+.catalog-card-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.catalog-card-link:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: -4px;
+  border-radius: 15px;
+}
+
+/* Illusztrációk háttere */
+
+.catalog-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 220px;
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(245, 197, 66, 0.16),
+      transparent 68%
+    ),
+    linear-gradient(145deg, #25231b, #101113 75%);
+}
+
+.catalog-card-blackjack .catalog-art {
+  background:
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(95, 133, 113, 0.2),
+      transparent 70%
+    ),
+    linear-gradient(145deg, #1c2722, #101113 75%);
+}
+
+.catalog-card-baccarat .catalog-art {
+  background:
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(143, 90, 107, 0.18),
+      transparent 70%
+    ),
+    linear-gradient(145deg, #292027, #101113 75%);
+}
+
+.catalog-art-orbit {
+  position: absolute;
+  z-index: -1;
+  bottom: 14px;
+  width: 270px;
+  height: 120px;
+  border: 1px solid rgba(245, 197, 66, 0.12);
+  border-radius: 50%;
+  transform: rotate(-12deg);
+  box-shadow:
+    0 0 0 20px rgba(245, 197, 66, 0.025),
+    0 0 0 40px rgba(245, 197, 66, 0.015);
+}
+
+/* A kártyák szöveges része */
+
+.catalog-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px 20px 20px;
+}
+
+.catalog-category {
+  color: var(--primary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.catalog-card-body h2 {
+  margin: 9px 0 12px;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.catalog-card-body > p {
+  flex: 1;
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.85;
+}
+
+.catalog-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.catalog-details > span {
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: #b8b9bd;
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 10px;
+}
+
+.catalog-open {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.catalog-open > span {
+  font-size: 20px;
+  transition: transform 180ms ease;
+}
+
+.catalog-card:hover .catalog-open > span {
+  transform: translateX(4px);
+}
+
+/* Alsó Provably Fair panel */
+
+.catalog-fairness {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 28px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.catalog-fairness strong {
+  font-size: 14px;
+}
+
+.catalog-fairness p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.catalog-fairness a {
+  flex-shrink: 0;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+/* Slot illusztráció */
+
+.catalog-slot-machine {
+  position: relative;
+  width: 210px;
+  padding: 20px 12px 18px;
+  border: 1px solid #9b7931;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #3c3422, #171817);
+  box-shadow:
+    0 12px 25px #0008,
+    inset 0 0 0 4px #211e17;
+  transform: rotate(-5deg);
+}
+
+.catalog-slot-caption {
+  display: block;
+  margin-bottom: 13px;
+  color: #f1d18a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-align: center;
+}
+
+.catalog-slot-reels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.catalog-slot-reel {
+  display: grid;
+  place-items: center;
+  height: 86px;
+  overflow: hidden;
+  border: 1px solid #4f442c;
+  border-radius: 5px;
+  color: #f5cd69;
+  background: linear-gradient(
+    #171919,
+    #303029 48%,
+    #171919
+  );
+  font-family: Georgia, serif;
+  font-size: 39px;
+  font-weight: 800;
+}
+
+.catalog-slot-line {
+  position: absolute;
+  top: 100px;
+  right: 8px;
+  left: 8px;
+  height: 1px;
+  background: #e6be5f55;
+}
+
+.catalog-book {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 45px;
+  border: 2px solid #f3d58a;
+  border-left-width: 5px;
+  border-radius: 3px;
+  background: #80551e;
+  box-shadow: 3px 3px 0 #402e17;
+  transform: rotate(8deg);
+}
+
+.catalog-book > span {
+  width: 15px;
+  height: 21px;
+  border: 1px solid #e1bb5e;
+  border-radius: 50%;
+}
+
+/* Rulett illusztráció */
+
+.catalog-wheel {
+  position: relative;
+  width: 165px;
+  height: 165px;
+  box-sizing: border-box;
+  border: 7px solid #b38a3e;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from -5deg,
+    #b9404d 0deg 10deg,
+    #24262d 10deg 20deg
+  );
+  box-shadow:
+    0 7px 0 #634820,
+    0 17px 28px #0008,
+    inset 0 0 0 2px #ead28a;
+  transform: perspective(500px) rotateX(20deg) rotate(-10deg);
+}
+
+.catalog-wheel-center {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  inset: 22%;
+  border: 4px solid #bb974c;
+  border-radius: 50%;
+  color: #ecd28b;
+  background: radial-gradient(circle, #39352b, #191b1c);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.catalog-wheel-zero {
+  position: absolute;
+  top: 1px;
+  left: calc(50% - 9px);
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 24px;
+  border-radius: 0 0 3px 3px;
+  color: #fff;
+  background: #39855e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.catalog-wheel-ball {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #fff,
+    #bbb
+  );
+  box-shadow: 1px 2px 4px #0008;
+}
+
+/* Blackjack és Baccarat illusztráció */
+
+.catalog-card-fan {
+  position: relative;
+  width: 200px;
+  height: 160px;
+}
+
+.catalog-playing-card {
+  position: absolute;
+  top: 9px;
+  left: 25px;
+  display: grid;
+  place-items: center;
+  width: 87px;
+  height: 122px;
+  border: 1px solid #ddd9cf;
+  border-radius: 9px;
+  color: #20252d;
+  background: #faf7ef;
+  box-shadow: 0 12px 20px #0005;
+  transform: rotate(-17deg);
+}
+
+.catalog-playing-card + .catalog-playing-card {
+  top: 19px;
+  left: 88px;
+  transform: rotate(15deg);
+}
+
+.catalog-playing-card-red {
+  color: #b83c4b;
+}
+
+.catalog-card-rank {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.catalog-card-rank-bottom {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 22px;
+  font-weight: 800;
+  transform: rotate(180deg);
+}
+
+.catalog-card-suit {
+  font-size: 42px;
+}
+
+.catalog-table-mark {
+  position: absolute;
+  right: 6px;
+  bottom: -3px;
+  color: #ebc65e;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-shadow: 0 3px 8px #0008;
+}
+
+/* Reszponzív elrendezés */
+
+@media (max-width: 1100px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .catalog-page {
+    padding: 30px 16px 40px;
+  }
+
+  .catalog-header {
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .catalog-count {
+    padding-left: 16px;
+    font-size: 30px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .catalog-art {
+    height: 210px;
+  }
+
+  .catalog-fairness {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-card,
+  .catalog-open > span {
+    transition: none;
+  }
+}
+
+.catalog-art {
+  position: relative;
+  overflow: hidden;
+}
+
+.catalog-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
