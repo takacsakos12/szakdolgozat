@@ -1,0 +1,1111 @@
+.baccarat-page {
+  padding: 24px 16px;
+  color: var(--text);
+}
+
+.app .baccarat-game {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.baccarat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.baccarat-header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.baccarat-header > span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.baccarat-table {
+  padding: 20px 24px;
+  background: var(--background-soft);
+}
+
+.baccarat-hands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.baccarat-hand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 230px;
+  padding: 16px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+}
+
+.baccarat-hand-won {
+  border-color: var(--primary);
+  background: rgba(245, 197, 66, 0.05);
+}
+
+.baccarat-hand-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.baccarat-hand-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.baccarat-hand-value {
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--surface-light);
+  font-weight: 800;
+}
+
+.baccarat-cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 108px;
+}
+
+.baccarat-card-placeholder,
+.baccarat-hand-status {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.baccarat-hand-won .baccarat-hand-status {
+  color: var(--primary);
+}
+
+/* A megosztott PlayingCard komponens helyi stílusai. */
+.baccarat-page .playing-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  flex-shrink: 0;
+  width: 72px;
+  height: 104px;
+  padding: 8px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 7px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.baccarat-page .card-red {
+  color: #c83e4b;
+}
+
+.baccarat-page .card-black {
+  color: #252a34;
+}
+
+.baccarat-page .playing-card-rank {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.baccarat-page .playing-card-rank:last-child {
+  justify-self: end;
+  transform: rotate(180deg);
+}
+
+.baccarat-page .playing-card-suit {
+  align-self: center;
+  justify-self: center;
+  font-size: 32px;
+  line-height: 1;
+}
+
+/* Fogadási mezők. */
+.baccarat-main-bets,
+.baccarat-side-bets {
+  display: grid;
+  gap: 10px;
+}
+
+.baccarat-main-bets {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 10px;
+}
+
+.baccarat-side-bets {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.baccarat-bet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 135px;
+  padding: 12px 8px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.baccarat-bet:enabled:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
+.baccarat-bet-won {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.baccarat-bet:disabled {
+  cursor: default;
+}
+
+.baccarat-bet-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.baccarat-main-bets .baccarat-bet-label {
+  font-size: 16px;
+}
+
+.baccarat-bet-payout,
+.baccarat-bet-amount {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.baccarat-bet-position {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+}
+
+.baccarat-empty-bet {
+  color: var(--muted);
+  font-size: 24px;
+}
+
+/* Zsetonválasztó és a tétek zsetonjai. */
+.baccarat-chip,
+.baccarat-bet-chip {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 15deg,
+    var(--chip-color) 0deg 24deg,
+    var(--chip-stripe) 24deg 36deg
+  );
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.35);
+}
+
+.baccarat-chip {
+  width: 50px;
+  height: 50px;
+  padding: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.baccarat-chip > span,
+.baccarat-bet-chip > span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  color: var(--chip-text);
+  background: var(--chip-color);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.baccarat-chip[aria-pressed="true"] {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.baccarat-chip:disabled {
+  cursor: default;
+}
+
+.baccarat-bet-chips {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  pointer-events: none;
+}
+
+.baccarat-bet-chip {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  padding: 4px;
+}
+
+.baccarat-bet-chip + .baccarat-bet-chip {
+  margin-left: -32px;
+}
+
+.baccarat-chip-count {
+  position: absolute;
+  right: -10px;
+  bottom: -6px;
+  padding: 2px 4px;
+  color: var(--text);
+  background: var(--surface-light);
+  border-radius: 6px;
+  font-size: 10px;
+}
+
+/* Alsó vezérlők. */
+.baccarat-deal-area {
+  display: flex;
+  justify-content: center;
+  padding: 18px 20px 8px;
+}
+
+.baccarat-deal-button {
+  width: min(280px, 100%);
+  min-height: 46px;
+  color: #171717;
+  background: var(--primary);
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.baccarat-deal-button:enabled:hover {
+  background: var(--primary-light);
+}
+
+.baccarat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 12px 16px;
+}
+
+.baccarat-chip-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 7px;
+  overflow-x: auto;
+}
+
+.baccarat-table-action {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  color: var(--text);
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.baccarat-controls {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px 12px;
+}
+
+.baccarat-clear-button {
+  padding: 7px 12px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.baccarat-game button:disabled {
+  cursor: default;
+}
+
+.baccarat-deal-button:disabled,
+.baccarat-table-action:disabled,
+.baccarat-clear-button:disabled {
+  opacity: 0.45;
+}
+
+.baccarat-information {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 24px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.baccarat-profit {
+  color: #55c88a;
+}
+
+.baccarat-loss {
+  color: #ef7b7b;
+}
+
+.baccarat-error {
+  margin: 14px 20px;
+  padding: 12px;
+  color: #ffc0c0;
+  background: rgba(200, 62, 75, 0.12);
+  border: 1px solid rgba(200, 62, 75, 0.4);
+  border-radius: 8px;
+}
+
+@media (max-width: 650px) {
+  .baccarat-page {
+    padding: 12px 8px;
+  }
+
+  .baccarat-header {
+    padding: 14px;
+  }
+
+  .baccarat-table {
+    padding: 14px 10px;
+  }
+
+  .baccarat-hands {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .baccarat-hand {
+    min-height: 190px;
+    padding: 8px 2px;
+  }
+
+  .baccarat-cards {
+    gap: 4px;
+    min-height: 80px;
+  }
+
+  .baccarat-page .playing-card {
+    width: clamp(34px, 8vw, 52px);
+    height: 76px;
+    padding: 5px;
+  }
+
+  .baccarat-page .playing-card-rank {
+    font-size: 13px;
+  }
+
+  .baccarat-page .playing-card-suit {
+    font-size: 24px;
+  }
+
+  .baccarat-side-bets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .baccarat-toolbar {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .baccarat-chip {
+    width: 42px;
+    height: 42px;
+    padding: 5px;
+  }
+}
+/* Az oldal fő elrendezése. */
+.app .baccarat-game {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 170px;
+  gap: 14px 20px;
+  width: min(1120px, 100%);
+  padding: 0 24px;
+  box-sizing: border-box;
+  background: var(--surface);
+}
+
+/* A Table belső részeit a közös elrendezés pozicionálja. */
+.baccarat-table,
+.baccarat-side-bets {
+  display: contents;
+}
+
+.baccarat-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin: 0 -24px;
+  padding: 16px 22px;
+}
+
+.baccarat-error {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin: 0;
+}
+
+.baccarat-loading {
+  grid-column: 1 / -1;
+  padding: 30px;
+  text-align: center;
+}
+
+/* Felül a Player és Banker lapjai. */
+.baccarat-hands {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  width: min(700px, 100%);
+  min-height: 290px;
+  margin: 0 auto;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
+.baccarat-hand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-width: 0;
+  min-height: 250px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.baccarat-hands {
+  position: relative;
+}
+
+.baccarat-hand:first-child:not(.baccarat-hand-won) {
+  border-right-color: transparent;
+}
+
+.baccarat-hands::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 50%;
+  width: 1px;
+  background: var(--border);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.baccarat-hand-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.baccarat-hand-heading h2 {
+  margin: 0;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.baccarat-cards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 120px;
+}
+
+.baccarat-hand-status {
+  min-height: 18px;
+}
+
+/* Középen az egyetlen fő gomb. */
+.baccarat-deal-area {
+  grid-column: 2;
+  grid-row: 4;
+  display: flex;
+  justify-content: center;
+  padding: 0 0 8px;
+}
+
+.baccarat-deal-button {
+  width: min(250px, 100%);
+  min-height: 46px;
+}
+
+/* A három főfogadás. */
+.baccarat-main-bets {
+  grid-column: 2;
+  grid-row: 5;
+  display: grid;
+  grid-template-columns: 1fr 0.75fr 1fr;
+  gap: 10px;
+  margin: 0;
+}
+
+.baccarat-main-bets .baccarat-bet {
+  position: relative;
+  min-height: 115px;
+  padding: 12px 8px;
+  background: var(--background-soft);
+}
+
+.baccarat-main-bets .baccarat-bet-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.baccarat-bet-position {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 50%;
+}
+
+/* Bal oldali párfogadások. */
+.baccarat-bet-player_pair {
+  grid-column: 1;
+  grid-row: 5;
+}
+
+.baccarat-bet-perfect_pair {
+  grid-column: 1;
+  grid-row: 6;
+}
+
+/* Jobb oldali párfogadások. */
+.baccarat-bet-banker_pair {
+  grid-column: 3;
+  grid-row: 5;
+}
+
+.baccarat-bet-either_pair {
+  grid-column: 3;
+  grid-row: 6;
+}
+
+.baccarat-side-bets > .baccarat-bet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  align-content: center;
+  align-items: center;
+  gap: 4px 8px;
+  align-self: center;
+  min-height: 82px;
+  padding: 10px;
+  text-align: left;
+  background: var(--background-soft);
+}
+
+.baccarat-side-bets .baccarat-bet-label {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.baccarat-side-bets .baccarat-bet-payout {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.baccarat-side-bets .baccarat-bet-amount {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.baccarat-side-bets .baccarat-bet-position {
+  grid-column: 2;
+  grid-row: 1 / 4;
+}
+
+.baccarat-toolbar {
+  grid-column: 2;
+  grid-row: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 0;
+}
+
+.baccarat-chip-selector {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 9px;
+  min-width: 0;
+  padding: 7px;
+  overflow-x: auto;
+}
+
+.baccarat-chip {
+  width: 46px;
+  height: 46px;
+  padding: 5px;
+}
+
+.baccarat-table-action {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.baccarat-controls {
+  grid-column: 1 / -1;
+  grid-row: 7;
+  padding: 0;
+}
+
+.baccarat-information {
+  grid-column: 1 / -1;
+  grid-row: 8;
+  margin: 0 -24px;
+  padding: 14px 20px;
+}
+
+@media (max-width: 850px) {
+  .app .baccarat-game {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 14px;
+  }
+
+  .baccarat-header {
+    order: 0;
+    margin: 0 -14px;
+  }
+
+  .baccarat-error {
+    order: 1;
+  }
+
+  .baccarat-hands {
+    order: 2;
+    min-height: 240px;
+    padding: 8px 0;
+  }
+
+  .baccarat-hand {
+    min-height: 220px;
+    padding: 10px 4px;
+  }
+
+  .baccarat-deal-area {
+    order: 3;
+  }
+
+  .baccarat-main-bets {
+    order: 4;
+  }
+
+  .baccarat-side-bets {
+    order: 5;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .baccarat-side-bets > .baccarat-bet {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+  }
+
+  .baccarat-toolbar {
+    order: 6;
+  }
+
+  .baccarat-controls {
+    order: 7;
+  }
+
+  .baccarat-information {
+    order: 8;
+    margin: 0 -14px;
+  }
+}
+
+/* A játékablak különálló részei egymás alatt vannak. */
+.app .baccarat-game {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+}
+
+.baccarat-header,
+.baccarat-information {
+  margin: 0;
+}
+
+.baccarat-error {
+  margin: 14px 20px;
+}
+
+.baccarat-table {
+  display: block;
+  padding: 0;
+  background: transparent;
+}
+
+/* Felső laposztási terület. */
+.baccarat-card-area {
+  padding: 24px 20px 20px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.baccarat-hands {
+  width: min(700px, 100%);
+  min-height: 280px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.baccarat-deal-area {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 0;
+}
+
+/* Alsó fogadási panel. */
+.baccarat-betting-area {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 170px;
+  gap: 12px 20px;
+  padding: 22px 24px 12px;
+  background: var(--surface);
+}
+
+.baccarat-main-bets {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  margin: 0;
+}
+
+.baccarat-main-bets .baccarat-bet {
+  min-height: 150px;
+}
+
+.baccarat-side-bets {
+  display: contents;
+}
+
+.baccarat-bet-player_pair {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.baccarat-bet-perfect_pair {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.baccarat-bet-banker_pair {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.baccarat-bet-either_pair {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+/* A zsetonválasztó a fogadási panel folytatása. */
+.baccarat-toolbar {
+  padding: 12px 24px;
+  background: var(--surface);
+}
+
+.baccarat-controls {
+  padding: 0 20px 14px;
+  background: var(--surface);
+}
+
+.baccarat-information {
+  padding: 14px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 850px) {
+  .baccarat-card-area {
+    padding: 16px 10px;
+  }
+
+  .baccarat-hands {
+    min-height: 230px;
+  }
+
+  .baccarat-betting-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 12px 8px;
+  }
+
+  .baccarat-main-bets {
+    width: 100%;
+  }
+
+  .baccarat-main-bets .baccarat-bet {
+    min-height: 125px;
+  }
+
+  .baccarat-side-bets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .baccarat-side-bets > .baccarat-bet {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .baccarat-toolbar {
+    padding: 12px;
+  }
+}
+
+.baccarat-empty-bet,
+.blackjack-empty-bet {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 0;
+  line-height: 0;
+}
+
+.baccarat-empty-bet::before,
+.baccarat-empty-bet::after,
+.blackjack-empty-bet::before,
+.blackjack-empty-bet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  border-radius: 1px;
+  transform: translate(-50%, -50%);
+}
+
+.baccarat-empty-bet::before,
+.blackjack-empty-bet::before {
+  width: 14px;
+  height: 2px;
+}
+
+.baccarat-empty-bet::after,
+.blackjack-empty-bet::after {
+  width: 2px;
+  height: 14px;
+}
+
+.baccarat-bet-position,
+.blackjack-side-bet .blackjack-bet-spot {
+  display: grid;
+  place-items: center;
+}
+
+.baccarat-card-area {
+  position: relative;
+  isolation: isolate;
+  padding-top: 70px;
+}
+
+/* A pakli jobb felül. */
+.baccarat-shoe {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 80px;
+  box-sizing: border-box;
+  color: var(--primary);
+  background: repeating-linear-gradient(45deg, #272a2f 0 5px, #1b1d21 5px 10px);
+  border: 2px solid var(--primary-dark);
+  border-radius: 7px;
+  box-shadow:
+    3px 3px 0 #b9b9b9,
+    5px 5px 0 #282a2e,
+    7px 7px 0 #b9b9b9;
+  font-size: 30px;
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+.dealt-card,
+.dealt-card-empty {
+  position: relative;
+  flex-shrink: 0;
+  width: 72px;
+  height: 104px;
+}
+
+.dealt-card {
+  z-index: 2;
+  perspective: 800px;
+}
+
+.dealt-card-front,
+.dealt-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.dealt-card-front {
+  transform: rotateY(0deg);
+}
+
+.dealt-card-back {
+  transform: rotateY(-180deg);
+}
+
+.baccarat-page .dealt-card .playing-card {
+  width: 100%;
+  height: 100%;
+}
+
+.baccarat-page .dealt-card-back .playing-card-back {
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  background: repeating-linear-gradient(45deg, #272a2f 0 5px, #1b1d21 5px 10px);
+  border: 2px solid var(--primary-dark);
+}
+
+.baccarat-page .dealt-card-back .playing-card-back > span {
+  font-size: 30px;
+}
+
+@media (max-width: 650px) {
+  .dealt-card,
+  .dealt-card-empty {
+    width: clamp(34px, 8vw, 52px);
+    height: 76px;
+  }
+
+  .baccarat-shoe {
+    width: 42px;
+    height: 58px;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+  }
+}
+
+.baccarat-card-area {
+  position: relative;
+  padding-top: 90px;
+}
+
+/* A teljes laposztási területhez igazodik. */
+.baccarat-card-area > .baccarat-shoe {
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  z-index: 3;
+  width: 56px;
+  height: 78px;
+  box-sizing: border-box;
+  border: 1px solid var(--primary-dark);
+  border-radius: 6px;
+  background: repeating-linear-gradient(45deg, #272a2f 0 5px, #1b1d21 5px 10px);
+  transform: rotate(8deg);
+
+  /* Az alsó lapok széle is ugyanolyan sárga. */
+  box-shadow:
+    3px 3px 0 #1b1d21,
+    3px 3px 0 1px var(--primary-dark),
+    6px 6px 0 #1b1d21,
+    6px 6px 0 1px var(--primary-dark);
+
+  pointer-events: none;
+}
+
+/* Az animált lap hátlapja illeszkedik a paklihoz. */
+.baccarat-page .dealt-card-back .playing-card-back {
+  border: 1px solid var(--primary-dark);
+  border-radius: 6px;
+  background: repeating-linear-gradient(45deg, #272a2f 0 5px, #1b1d21 5px 10px);
+}
+
+@media (max-width: 650px) {
+  .baccarat-card-area {
+    padding-top: 78px;
+  }
+
+  .baccarat-card-area > .baccarat-shoe {
+    top: 14px;
+    right: 20px;
+    width: 40px;
+    height: 56px;
+  }
+}
+.baccarat-card-area > .baccarat-shoe {
+  width: 72px;
+  height: 100px;
+}

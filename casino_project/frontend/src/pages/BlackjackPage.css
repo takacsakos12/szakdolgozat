@@ -880,3 +880,105 @@
 .blackjack-bet-spot:disabled {
   cursor: default;
 }
+
+.baccarat-empty-bet,
+.blackjack-empty-bet {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 0;
+  line-height: 0;
+}
+
+.baccarat-empty-bet::before,
+.baccarat-empty-bet::after,
+.blackjack-empty-bet::before,
+.blackjack-empty-bet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  border-radius: 1px;
+  transform: translate(-50%, -50%);
+}
+
+.baccarat-empty-bet::before,
+.blackjack-empty-bet::before {
+  width: 14px;
+  height: 2px;
+}
+
+.baccarat-empty-bet::after,
+.blackjack-empty-bet::after {
+  width: 2px;
+  height: 14px;
+}
+
+.baccarat-bet-position,
+.blackjack-side-bet .blackjack-bet-spot {
+  display: grid;
+  place-items: center;
+}
+
+.blackjack-table {
+  position: relative;
+  isolation: isolate;
+  padding-top: 80px;
+}
+
+/* Pakli a teljes asztal jobb felső sarkában. */
+.blackjack-shoe {
+  position: absolute;
+  top: 18px;
+  right: 26px;
+  z-index: 3;
+  width: 56px;
+  height: 78px;
+  box-sizing: border-box;
+  border: 1px solid var(--primary-dark);
+  border-radius: 6px;
+  background: repeating-linear-gradient(45deg, #272a2f 0 5px, #1b1d21 5px 10px);
+  transform: rotate(8deg);
+  box-shadow:
+    3px 3px 0 #1b1d21,
+    3px 3px 0 1px var(--primary-dark),
+    6px 6px 0 #1b1d21,
+    6px 6px 0 1px var(--primary-dark);
+  pointer-events: none;
+}
+
+.blackjack-cards {
+  position: relative;
+  z-index: 1;
+}
+
+.blackjack-page .dealt-card .playing-card {
+  width: 100%;
+  height: 100%;
+}
+
+.blackjack-page .dealt-card-back .playing-card-back,
+.blackjack-page .playing-card-back {
+  border: 1px solid var(--primary-dark);
+  border-radius: 6px;
+  background: repeating-linear-gradient(45deg, #272a2f 0 5px, #1b1d21 5px 10px);
+}
+
+@media (max-width: 650px) {
+  .blackjack-shoe {
+    width: 40px;
+    height: 56px;
+    top: 12px;
+    right: 18px;
+  }
+}
+.blackjack-shoe {
+  width: 72px;
+  height: 100px;
+}

@@ -399,20 +399,14 @@ function SlotPage({ user, onUserChange }) {
     <main className="slot-page">
       <section className="game-embed">
         <header className="game-embed-header">
-          <div>
-            <h1 className="game-embed-title">Book of Pharaoh</h1>
+          <h1 className="game-embed-title">Book of Pharaoh</h1>
 
-            <p className="game-embed-subtitle">
-              {reelCount} tárcsa · {rowCount} sor · 10 nyerővonal
-            </p>
-          </div>
-
-          <span className="game-mode-indicator">
-            {gameMode === "FEATURE_SPIN"
-              ? "Feature Spin"
-              : gameMode === "BONUS_BUY"
-                ? "Bónuszjáték"
-                : "Alapjáték"}
+          <span>
+            Egyenleg:{" "}
+            {balance.toLocaleString("hu-HU", {
+              maximumFractionDigits: 2,
+            })}{" "}
+            CR
           </span>
         </header>
 

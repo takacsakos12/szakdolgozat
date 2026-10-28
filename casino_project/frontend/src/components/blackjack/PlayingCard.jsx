@@ -18,9 +18,7 @@ function PlayingCard({ card }) {
       <div
         className="playing-card playing-card-back"
         aria-label="Rejtett kártya"
-      >
-        <span aria-hidden="true">♠</span>
-      </div>
+      ></div>
     );
   }
 

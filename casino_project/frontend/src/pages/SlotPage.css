@@ -876,3 +876,261 @@
   background: #f5c542;
   color: #171717;
 }
+
+/* Oldal és játékablak. */
+.app main.slot-page {
+  min-height: calc(100dvh - 88px);
+  padding: 20px 24px;
+  color: var(--text);
+  background: var(--background);
+}
+
+.app .slot-page .game-embed {
+  display: flex;
+  flex-direction: column;
+  width: min(1120px, 100%);
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+/* A többi játékhoz illeszkedő fejléc. */
+.slot-page .game-embed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.slot-page .game-embed-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.slot-page .game-embed-header > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Felül a tárcsák, alattuk a speciális módok. */
+.slot-page .slot-game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.slot-page .game-stage {
+  min-height: 370px;
+  padding: 30px 32px;
+  background: var(--background);
+}
+
+.slot-page .game-stage-content {
+  justify-content: center;
+  width: 100%;
+  height: auto;
+}
+
+.slot-page .slot-animated-grid {
+  width: min(820px, 100%);
+  margin: 0 auto;
+}
+
+/* Bónuszvásárlás és Feature Spin az alsó panelen. */
+.slot-page .slot-side-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-left: 0;
+}
+
+.slot-page .slot-side-action {
+  min-height: 100px;
+  gap: 6px;
+  padding: 12px;
+  color: var(--text);
+  background: var(--background-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.slot-page .slot-side-action:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+  box-shadow: none;
+  transform: none;
+}
+
+.slot-page .slot-side-action-active,
+.slot-page .slot-feature-active {
+  background: rgba(245, 197, 66, 0.05);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+.slot-page .slot-side-action-title {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.slot-page .slot-side-action-price {
+  font-size: 19px;
+}
+
+.slot-page .slot-side-action-detail {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Alsó vezérlősáv. */
+.slot-page .slot-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  min-height: 100px;
+  padding: 18px 24px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.slot-page .slot-control-information {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.slot-page .slot-control-value span {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
+
+.slot-page .slot-control-value strong {
+  font-size: 15px;
+}
+
+.slot-page .slot-spin-controls {
+  gap: 10px;
+}
+
+/* A fő gomb a Blackjack és Baccarat gombjához hasonló. */
+.slot-page .slot-main-spin-button {
+  width: 180px;
+  height: 46px;
+  padding: 10px 20px;
+  color: #171717;
+  background: var(--primary);
+  border: 0;
+  border-radius: 8px;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.slot-page .slot-main-spin-button:hover:not(:disabled) {
+  background: var(--primary-light);
+  box-shadow: none;
+  transform: none;
+}
+
+.slot-page .slot-main-spin-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.slot-page .slot-bet-button {
+  width: 38px;
+  height: 38px;
+  color: var(--text);
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 23px;
+}
+
+.slot-page .slot-bet-button:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: none;
+}
+
+/* Bónuszállapot és hibaüzenet. */
+.slot-page .bonus-playback {
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  box-sizing: border-box;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.slot-page .slot-status {
+  width: min(1120px, 100%);
+  box-sizing: border-box;
+}
+
+/* Mobil. */
+@media (max-width: 700px) {
+  .app main.slot-page {
+    padding: 14px 10px;
+  }
+
+  .slot-page .game-embed-header {
+    padding: 14px 16px;
+  }
+
+  .slot-page .game-stage {
+    min-height: 280px;
+    padding: 22px 12px;
+  }
+
+  .slot-page .slot-side-panel {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .slot-page .slot-side-action {
+    min-height: 105px;
+    padding: 10px 6px;
+  }
+
+  .slot-page .slot-controls {
+    flex-direction: column;
+    gap: 18px;
+    padding: 16px 12px;
+  }
+
+  .slot-page .slot-control-information {
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .slot-page .slot-spin-controls {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .slot-page .slot-main-spin-button {
+    width: min(220px, 60%);
+  }
+}

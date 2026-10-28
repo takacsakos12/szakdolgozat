@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
-import PlayingCard from "../components/blackjack/PlayingCard";
 import BaccaratTable from "../components/baccarat/BaccaratTable";
 import { getBaccaratConfig, playBaccarat } from "../api/baccaratApi";
 import { getCurrentUser } from "../api/authApi";
@@ -26,6 +25,12 @@ const BET_LABELS = {
   PERFECT_PAIR: "Perfect Pair",
 };
 
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
 function BaccaratPage({ user, onUserChange }) {
   const [bets, setBets] = useState([]);
   const [selectedChip, setSelectedChip] = useState(null);
@@ -39,6 +44,7 @@ function BaccaratPage({ user, onUserChange }) {
   const isSubmittingRef = useRef(false);
   const [displayedBalance, setDisplayedBalance] = useState(user?.balance ?? 0);
   const [displayedWin, setDisplayedWin] = useState(0);
+  const [dealingResult, setDealingResult] = useState(null);
   const controlsDisabled =
     isLoading || !baccaratConfig || isPlaying || Boolean(pendingRequest);
   const userId = user?.id;
@@ -63,7 +69,7 @@ function BaccaratPage({ user, onUserChange }) {
         }
 
         setBaccaratConfig(config);
-        setSelectedChip(config.allowedChipValues[0]);
+        setSelectedChip(config.chips[0]);
       } catch (error) {
         if (componentIsActive) {
           setErrorMessage(error.message);
@@ -93,7 +99,7 @@ function BaccaratPage({ user, onUserChange }) {
       return;
     }
 
-    if (!baccaratConfig.allowedChipValues.includes(chipValue)) {
+    if (!baccaratConfig.chips.includes(chipValue)) {
       return;
     }
 
@@ -112,10 +118,8 @@ function BaccaratPage({ user, onUserChange }) {
 
     const nextTotal = currentTotal + selectedChip;
 
-    if (nextTotal > baccaratConfig.maxTotalBetAmount) {
-      setErrorMessage(
-        `A maximális össztét ${baccaratConfig.maxTotalBetAmount} CR.`,
-      );
+    if (nextTotal > baccaratConfig.maxBet) {
+      setErrorMessage(`A maximális össztét ${baccaratConfig.maxBet} CR.`);
       return;
     }
 
@@ -133,6 +137,39 @@ function BaccaratPage({ user, onUserChange }) {
     ]);
 
     setErrorMessage("");
+  }
+
+  async function animateDeal(finalResult) {
+    let playerHand = [];
+    let bankerHand = [];
+
+    setDealingResult({ playerHand, bankerHand, bets: [] });
+
+    const dealOrder = [
+      { side: "PLAYER", card: finalResult.playerHand[0] },
+      { side: "BANKER", card: finalResult.bankerHand[0] },
+      { side: "PLAYER", card: finalResult.playerHand[1] },
+      { side: "BANKER", card: finalResult.bankerHand[1] },
+    ];
+
+    if (finalResult.playerHand[2]) {
+      dealOrder.push({ side: "PLAYER", card: finalResult.playerHand[2] });
+    }
+    if (finalResult.bankerHand[2]) {
+      dealOrder.push({ side: "BANKER", card: finalResult.bankerHand[2] });
+    }
+
+    for (const deal of dealOrder) {
+      if (deal.side === "PLAYER") {
+        playerHand.push(deal.card);
+      } else {
+        bankerHand.push(deal.card);
+      }
+
+      setDealingResult({ playerHand, bankerHand, bets: [] });
+
+      await wait(500);
+    }
   }
 
   function handleUndoBet() {
@@ -167,10 +204,8 @@ function BaccaratPage({ user, onUserChange }) {
       0,
     );
 
-    if (previousTotal > baccaratConfig.maxTotalBetAmount) {
-      setErrorMessage(
-        `A maximális össztét ${baccaratConfig.maxTotalBetAmount} CR.`,
-      );
+    if (previousTotal > baccaratConfig.maxBet) {
+      setErrorMessage(`A maximális össztét ${baccaratConfig.maxBet} CR.`);
       return;
     }
 
@@ -219,7 +254,9 @@ function BaccaratPage({ user, onUserChange }) {
     }
 
     isSubmittingRef.current = true;
+
     setIsPlaying(true);
+    setDealingResult(null);
     setPendingRequest(request);
     setErrorMessage("");
 
@@ -235,6 +272,7 @@ function BaccaratPage({ user, onUserChange }) {
           error.statusCode >= 500;
 
         if (uncertainOutcome) {
+          // Az eredeti kérés megmarad az újrapróbáláshoz.
           setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
         } else {
           setPendingRequest(null);
@@ -245,13 +283,24 @@ function BaccaratPage({ user, onUserChange }) {
       }
 
       setPendingRequest(null);
+
       setPreviousBets(request.bets.map((bet) => ({ ...bet })));
 
-      setResult(response.result);
-      setDisplayedWin(response.result.totalWin);
-      setBets([]);
+      try {
+        // Megvárjuk az összes lap kiosztását.
+        await animateDeal(response.result);
+      } catch {
+        setErrorMessage(
+          "A kör elszámolása megtörtént, de az osztási animáció megszakadt.",
+        );
+      } finally {
+        // Az eredmény és az egyenleg az animáció után frissül.
+        setResult(response.result);
+        setDisplayedWin(response.result.totalWin);
+        setBets([]);
 
-      await updateDisplayedBalance(response);
+        await updateDisplayedBalance(response);
+      }
     } finally {
       isSubmittingRef.current = false;
       setIsPlaying(false);
@@ -276,10 +325,8 @@ function BaccaratPage({ user, onUserChange }) {
 
     const total = bets.reduce((sum, bet) => sum + bet.amount, 0);
 
-    if (total > baccaratConfig.maxTotalBetAmount) {
-      setErrorMessage(
-        `A maximális össztét ${baccaratConfig.maxTotalBetAmount} CR.`,
-      );
+    if (total > baccaratConfig.maxBet) {
+      setErrorMessage(`A maximális össztét ${baccaratConfig.maxBet} CR.`);
       return;
     }
 
@@ -296,9 +343,15 @@ function BaccaratPage({ user, onUserChange }) {
 
   const totalBetAmount = bets.reduce((sum, bet) => sum + bet.amount, 0);
 
-  const showLastResult = Boolean(result) && bets.length === 0;
+  const showLastResult = !isPlaying && Boolean(result) && bets.length === 0;
 
-  const visibleResult = showLastResult ? result : null;
+  const visibleResult = isPlaying
+    ? dealingResult
+    : showLastResult
+      ? result
+      : null;
+
+  const displayedBets = showLastResult ? result.bets : bets;
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -325,8 +378,9 @@ function BaccaratPage({ user, onUserChange }) {
             <BaccaratTable
               config={baccaratConfig}
               result={visibleResult}
-              bets={displayedBets}
+              bets={bets}
               disabled={controlsDisabled}
+              isDealing={isPlaying}
               onPlaceBet={handlePlaceBet}
             />
 
@@ -362,7 +416,7 @@ function BaccaratPage({ user, onUserChange }) {
               </button>
 
               <div className="baccarat-chip-selector">
-                {baccaratConfig.allowedChipValues.map((chipValue) => (
+                {baccaratConfig.chips.map((chipValue) => (
                   <button
                     key={chipValue}
                     className="baccarat-chip"

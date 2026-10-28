@@ -31,6 +31,12 @@ const CHIP_COLORS = {
   100: "#292d38",
 };
 
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
 function BlackjackPage({ user, onUserChange }) {
   const [blackjackConfig, setBlackjackConfig] = useState(null);
   const [game, setGame] = useState(null);
@@ -47,6 +53,7 @@ function BlackjackPage({ user, onUserChange }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pendingAction, setPendingAction] = useState(null);
+  const [playbackGame, setPlaybackGame] = useState(null);
 
   const isSubmittingRef = useRef(false);
 
@@ -148,6 +155,112 @@ function BlackjackPage({ user, onUserChange }) {
     }
 
     return chips;
+  }
+
+  async function animateBlackjackResponse(response, request) {
+    const starting = request.type === "START";
+    const splitting = !starting && request.data.action === "SPLIT";
+
+    const view = {
+      ...response,
+      phase: "DEALING",
+      result: null,
+      availableActions: [],
+
+      hands: response.hands.map((hand, index) => ({
+        ...hand,
+        cards: starting
+          ? []
+          : splitting
+            ? [{ ...hand.cards[0], animateDeal: false }]
+            : (game.hands[index]?.cards ?? []).map((card) => ({
+                ...card,
+                animateDeal: false,
+              })),
+      })),
+
+      dealerHand: starting
+        ? []
+        : game.dealerHand.map((card) => ({
+            ...card,
+            animateDeal: false,
+          })),
+    };
+
+    function showFrame() {
+      setPlaybackGame({
+        ...view,
+        hands: view.hands.map((hand) => ({
+          ...hand,
+          cards: [...hand.cards],
+        })),
+        dealerHand: [...view.dealerHand],
+      });
+    }
+
+    async function dealPlayerCard(handIndex, card) {
+      view.hands[handIndex].cards.push({
+        ...card,
+        animateDeal: true,
+      });
+
+      showFrame();
+      await wait(480);
+    }
+
+    async function dealDealerCard(card) {
+      view.dealerHand.push({
+        ...card,
+        animateDeal: true,
+      });
+
+      showFrame();
+      await wait(480);
+    }
+
+    showFrame();
+
+    if (starting) {
+      await dealPlayerCard(0, response.hands[0].cards[0]);
+      await dealDealerCard(response.dealerHand[0]);
+
+      await dealPlayerCard(0, response.hands[0].cards[1]);
+      await dealDealerCard({ hidden: true });
+    } else {
+      // Hit, Double vagy Split során kapott új játékoslapok.
+      for (let handIndex = 0; handIndex < response.hands.length; handIndex++) {
+        const finalCards = response.hands[handIndex].cards;
+        const existingCount = view.hands[handIndex].cards.length;
+
+        for (
+          let cardIndex = existingCount;
+          cardIndex < finalCards.length;
+          cardIndex++
+        ) {
+          await dealPlayerCard(handIndex, finalCards[cardIndex]);
+        }
+      }
+    }
+    if (
+      view.dealerHand[1]?.hidden &&
+      response.dealerHand[1] &&
+      !response.dealerHand[1].hidden
+    ) {
+      view.dealerHand[1] = {
+        ...response.dealerHand[1],
+        animateDeal: false,
+      };
+
+      showFrame();
+      await wait(350);
+    }
+    for (
+      let index = view.dealerHand.length;
+      index < response.dealerHand.length;
+      index++
+    ) {
+      await dealDealerCard(response.dealerHand[index]);
+    }
   }
 
   function renderBetChips(type) {
@@ -322,45 +435,64 @@ function BlackjackPage({ user, onUserChange }) {
     }
 
     isSubmittingRef.current = true;
+
     setIsSubmitting(true);
     setPendingAction(request);
     setErrorMessage("");
 
     try {
-      const response =
-        request.type === "START"
-          ? await startBlackjackGame(request.data, request.requestId)
-          : await performBlackjackAction(request.data, request.requestId);
+      let response;
 
-      setGame(response);
+      try {
+        response =
+          request.type === "START"
+            ? await startBlackjackGame(request.data, request.requestId)
+            : await performBlackjackAction(request.data, request.requestId);
+      } catch (error) {
+        const uncertainOutcome =
+          error.code === "NETWORK_ERROR" ||
+          error.statusCode === 408 ||
+          error.statusCode >= 500;
 
-      if (request.type === "START") {
-        setPreviousBets({
-          ...request.data,
-          history: request.betHistory.map((bet) => ({ ...bet })),
-        });
-      }
+        if (uncertainOutcome) {
+          setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
+        } else {
+          setPendingAction(null);
+          setErrorMessage(error.message);
+        }
 
-      if (response.phase === "FINISHED") {
-        setBaseBet(0);
-        setPerfectPairsBet(0);
-        setTwentyOnePlusThreeBet(0);
-        setBetHistory([]);
+        return;
       }
 
       setPendingAction(null);
 
-      await updateDisplayedBalance(response);
-    } catch (error) {
-      const rejected = [400, 401, 403, 404, 409, 422, 429].includes(
-        error.statusCode,
-      );
+      if (request.type === "START") {
+        setPreviousBets({
+          ...request.data,
+          history: request.betHistory.map((bet) => ({
+            ...bet,
+          })),
+        });
+      }
 
-      if (rejected) {
-        setPendingAction(null);
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
+      try {
+        await animateBlackjackResponse(response, request);
+      } catch {
+        setErrorMessage(
+          "A művelet megtörtént, de a laposztási animáció megszakadt.",
+        );
+      } finally {
+        setGame(response);
+        setPlaybackGame(null);
+
+        if (response.phase === "FINISHED") {
+          setBaseBet(0);
+          setPerfectPairsBet(0);
+          setTwentyOnePlusThreeBet(0);
+          setBetHistory([]);
+        }
+
+        await updateDisplayedBalance(response);
       }
     } finally {
       isSubmittingRef.current = false;
@@ -462,7 +594,10 @@ function BlackjackPage({ user, onUserChange }) {
           <p role="status">Blackjack betöltése...</p>
         ) : blackjackConfig ? (
           <>
-            <BlackjackTable game={showRound ? game : null} />
+            <BlackjackTable
+              game={playbackGame ?? (showRound ? game : null)}
+              isAnimating={Boolean(playbackGame)}
+            />
             <div className="blackjack-console">
               <div className="blackjack-side-bet">
                 {blackjackConfig.sideBets.PERFECT_PAIRS.enabled && (
