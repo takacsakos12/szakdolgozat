@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import BaccaratTable from "../components/baccarat/BaccaratTable";
 import { getBaccaratConfig, playBaccarat } from "../api/baccaratApi";
@@ -161,12 +161,16 @@ function BaccaratPage({ user, onUserChange }) {
 
     for (const deal of dealOrder) {
       if (deal.side === "PLAYER") {
-        playerHand.push(deal.card);
+        playerHand = [...playerHand, deal.card];
       } else {
-        bankerHand.push(deal.card);
+        bankerHand = [...bankerHand, deal.card];
       }
 
-      setDealingResult({ playerHand, bankerHand, bets: [] });
+      setDealingResult({
+        playerHand,
+        bankerHand,
+        bets: [],
+      });
 
       await wait(500);
     }
@@ -186,7 +190,6 @@ function BaccaratPage({ user, onUserChange }) {
       return;
     }
 
-    setBets([]);
     setErrorMessage("");
   }
 
@@ -287,14 +290,12 @@ function BaccaratPage({ user, onUserChange }) {
       setPreviousBets(request.bets.map((bet) => ({ ...bet })));
 
       try {
-        // Megvárjuk az összes lap kiosztását.
         await animateDeal(response.result);
       } catch {
         setErrorMessage(
           "A kör elszámolása megtörtént, de az osztási animáció megszakadt.",
         );
       } finally {
-        // Az eredmény és az egyenleg az animáció után frissül.
         setResult(response.result);
         setDisplayedWin(response.result.totalWin);
         setBets([]);
@@ -378,7 +379,7 @@ function BaccaratPage({ user, onUserChange }) {
             <BaccaratTable
               config={baccaratConfig}
               result={visibleResult}
-              bets={bets}
+              bets={displayedBets}
               disabled={controlsDisabled}
               isDealing={isPlaying}
               onPlaceBet={handlePlaceBet}

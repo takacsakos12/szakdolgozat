@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import DealtCards from "../DealtCards";
 const CHIP_COLORS = {
   1: "#dce1e8",
@@ -39,6 +39,45 @@ function getBetChips(amount, chipValues) {
   }
 
   return chips;
+}
+
+function calculateVisibleValue(cards = []) {
+  if (cards.length === 0) {
+    return "—";
+  }
+
+  const total = cards.reduce((sum, card) => {
+    if (card.rank === "ACE") {
+      return sum + 1;
+    }
+
+    const value = Number(card.rank);
+    return sum + (Number.isNaN(value) ? 0 : value);
+  }, 0);
+
+  return total % 10;
+}
+
+function HandScore({ cards = [], isDealing }) {
+  const [value, setValue] = useState("—");
+  const cardKey = cards.map((card) => `${card.rank}:${card.suit}`).join("|");
+
+  const nextValue = calculateVisibleValue(cards);
+
+  useEffect(() => {
+    if (!isDealing || cardKey === "") {
+      setValue(nextValue);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setValue(nextValue);
+    }, 420);
+
+    return () => clearTimeout(timeout);
+  }, [cardKey, nextValue, isDealing]);
+
+  return <>{value}</>;
 }
 
 function BaccaratTable({
@@ -139,7 +178,7 @@ function BaccaratTable({
           <h2>{label}</h2>
 
           <span className="baccarat-hand-value">
-            {isDealing ? "—" : (value ?? "—")}
+            <HandScore cards={cards ?? []} isDealing={isDealing} />
           </span>
         </div>
 
@@ -148,7 +187,12 @@ function BaccaratTable({
             const card = cards?.[index];
 
             return card ? (
-              <DealtCards key={card.id} card={card} deckRef={deckRef} />
+              <DealtCards
+                key={card.id}
+                card={card}
+                deckRef={deckRef}
+                animate={isDealing}
+              />
             ) : (
               <div
                 key={`empty-${index}`}
