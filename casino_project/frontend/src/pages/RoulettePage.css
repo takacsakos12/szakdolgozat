@@ -41,8 +41,7 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    background-color 120ms ease,
+  transition: background-color 120ms ease,
     border-color 120ms ease;
 }
 
@@ -84,6 +83,7 @@
 .roulette-bet-zone:focus-visible {
   background: rgba(245, 197, 66, 0.65);
 }
+
 .roulette-dozens {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -172,6 +172,7 @@
   font-size: 11px;
   text-align: center;
 }
+
 .roulette-page {
   min-height: calc(100vh - 160px);
   padding: 28px 20px 48px;
@@ -183,9 +184,7 @@
 }
 
 .roulette-game {
-  display: grid;
-  grid-template-areas:
-    "header"
+  grid-template-areas: "header"
     "error"
     "wheel"
     "table"
@@ -226,12 +225,6 @@
 }
 
 .roulette-table-area {
-  grid-area: table;
-  min-width: 0;
-  margin: 0 14px;
-  padding: 8px;
-  background: var(--background-soft);
-  border-color: var(--border);
   border-radius: 10px;
 }
 
@@ -255,7 +248,6 @@
   font-size: 11px;
 }
 
-/* A piros es fekete kulso fogadas rombusza. */
 .roulette-outside.roulette-red,
 .roulette-outside.roulette-black {
   background: #141a31;
@@ -287,7 +279,6 @@
   justify-content: center;
   gap: 6px;
   margin-top: 0;
-  padding: 10px 14px;
 }
 
 .roulette-controls-area button {
@@ -333,8 +324,7 @@
   );
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 50%;
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.4),
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4),
     0 5px 9px rgba(0, 0, 0, 0.25);
   font: inherit;
   cursor: pointer;
@@ -382,7 +372,6 @@
   justify-content: center;
   gap: 12px 24px;
   margin-top: 0;
-  padding: 10px 14px;
   color: #bec4d8;
   font-size: 12px;
 }
@@ -425,42 +414,24 @@
 }
 
 .roulette-wheel-area {
-  grid-area: wheel;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 0;
-  padding: 6px 0 18px;
 }
 
 .roulette-wheel-container {
-  display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   justify-items: center;
   gap: 6px;
-  width: min(220px, 100%);
-  height: 100%;
-  max-height: 250px;
-  margin: 0 auto;
 }
 
 .roulette-wheel {
   position: relative;
-  width: auto;
-  height: 100%;
-  max-width: 100%;
-  aspect-ratio: 1;
   box-sizing: border-box;
   overflow: hidden;
-
   background: #17191e;
   border: 12px solid #a8792e;
   border-radius: 50%;
-
   transform: perspective(800px) rotateX(28deg);
-
-  box-shadow:
-    0 2px 0 #e4c079,
+  box-shadow: 0 2px 0 #e4c079,
     0 7px 0 #795020,
     0 13px 0 #523415,
     0 19px 0 #30200f,
@@ -527,8 +498,6 @@
 }
 
 .roulette-wheel-result {
-  margin: 0;
-  font-size: 12px;
   color: var(--text);
   text-align: center;
   font-weight: 700;
@@ -560,15 +529,14 @@
   animation: roulette-idle-rotation 60s linear infinite;
 }
 
-/* Fény a peremen és árnyék a kerék belső szélén. */
+
 .roulette-wheel::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  box-shadow:
-    inset 0 3px 5px rgba(255, 255, 255, 0.25),
+  box-shadow: inset 0 3px 5px rgba(255, 255, 255, 0.25),
     inset 0 -8px 14px rgba(0, 0, 0, 0.55);
 }
 
