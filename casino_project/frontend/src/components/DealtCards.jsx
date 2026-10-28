@@ -6,8 +6,6 @@ function DealtCard({ card, deckRef, animate = true }) {
   const cardRef = useRef(null);
   const frontRef = useRef(null);
   const backRef = useRef(null);
-  const animateOnMountRef = useRef(animate);
-  const previousHiddenRef = useRef(Boolean(card.hidden));
 
   useLayoutEffect(() => {
     if (!animate) {

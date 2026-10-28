@@ -682,3 +682,81 @@
     zoom: 1;
   }
 }
+
+.roulette-page .roulette-controls-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  padding: 16px 24px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.roulette-page .roulette-controls-area > button {
+  order: 0;
+  width: min(250px, 100%);
+  height: 46px;
+  padding: 10px 20px;
+  color: #171717;
+  background: var(--primary);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.roulette-page .roulette-controls-area > button:hover:not(:disabled) {
+  background: var(--primary-light);
+}
+
+.roulette-page .roulette-controls-area > button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.roulette-page .roulette-chip-selector {
+  order: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.roulette-page .roulette-chip-selector .roulette-select-chip {
+  width: 46px;
+  height: 46px;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.roulette-page .roulette-information {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  width: 100%;
+  min-height: 46px;
+  margin: 0;
+  padding: 14px 20px;
+  box-sizing: border-box;
+  color: var(--text);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .roulette-page .roulette-information {
+    gap: 4px 16px;
+    padding: 10px 12px;
+  }
+}

@@ -5,8 +5,6 @@ const creditFormatter = new Intl.NumberFormat("hu-HU", {
 function SlotControls({
   allowedBets = [],
   selectedBet,
-  balance = 0,
-  lastWin = 0,
   isPlaying = false,
   isLoading = false,
   hasPendingRequest = false,
@@ -50,21 +48,8 @@ function SlotControls({
     <div className="slot-controls">
       <div className="slot-control-information">
         <div className="slot-control-value">
-          <span>Egyenleg</span>
-
-          <strong>{creditFormatter.format(balance)} CR</strong>
-        </div>
-
-        <div className="slot-control-value">
-          <span>Tét</span>
-
+          <span>Alaptét</span>
           <strong>{creditFormatter.format(selectedBet || 0)} CR</strong>
-        </div>
-
-        <div className="slot-control-value">
-          <span>Utolsó nyeremény</span>
-
-          <strong>{creditFormatter.format(lastWin)} CR</strong>
         </div>
       </div>
 

@@ -157,6 +157,19 @@ function BlackjackPage({ user, onUserChange }) {
     return chips;
   }
 
+  function handleClearBets() {
+    if (betsDisabled || isSubmittingRef.current) {
+      return;
+    }
+
+    setBaseBet(0);
+    setPerfectPairsBet(0);
+    setTwentyOnePlusThreeBet(0);
+    setBetHistory([]);
+    setGame(null);
+    setErrorMessage("");
+  }
+
   async function animateBlackjackResponse(response, request) {
     const starting = request.type === "START";
     const splitting = !starting && request.data.action === "SPLIT";
@@ -766,16 +779,29 @@ function BlackjackPage({ user, onUserChange }) {
                 )}
               </div>
             </div>
+            <div className="blackjack-clear-area">
+              <button
+                type="button"
+                className="game-clear-button"
+                disabled={
+                  betsDisabled || (totalBetAmount === 0 && !showLastResult)
+                }
+                onClick={handleClearBets}
+              >
+                Tétek törlése
+              </button>
+            </div>
+
             <div className="blackjack-information">
               <span>Össztét: {showRound ? game.cost : totalBetAmount} CR</span>
 
-              {showLastResult && (
-                <>
-                  <span>Teljes jóváírás: {game.result.totalWin} CR</span>
+              <span>
+                Teljes jóváírás: {showLastResult ? game.result.totalWin : 0} CR
+              </span>
 
-                  <span>Nettó eredmény: {game.result.netResult} CR</span>
-                </>
-              )}
+              <span>
+                Nettó eredmény: {showLastResult ? game.result.netResult : 0} CR
+              </span>
             </div>
           </>
         ) : null}

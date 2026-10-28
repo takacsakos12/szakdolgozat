@@ -15,16 +15,6 @@ const CHIP_COLORS = {
   100: "#292d38",
 };
 
-const BET_LABELS = {
-  PLAYER: "Player",
-  TIE: "Tie",
-  BANKER: "Banker",
-  PLAYER_PAIR: "Player Pair",
-  BANKER_PAIR: "Banker Pair",
-  EITHER_PAIR: "Either Pair",
-  PERFECT_PAIR: "Perfect Pair",
-};
-
 function wait(milliseconds) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, milliseconds);
@@ -190,6 +180,9 @@ function BaccaratPage({ user, onUserChange }) {
       return;
     }
 
+    setBets([]);
+    setResult(null);
+    setDisplayedWin(0);
     setErrorMessage("");
   }
 
@@ -453,7 +446,7 @@ function BaccaratPage({ user, onUserChange }) {
               <button
                 className="baccarat-clear-button"
                 type="button"
-                disabled={controlsDisabled || bets.length === 0}
+                disabled={controlsDisabled || (bets.length === 0 && !result)}
                 onClick={handleClearBets}
               >
                 Tétek törlése
@@ -465,33 +458,22 @@ function BaccaratPage({ user, onUserChange }) {
                 Össztét: {showLastResult ? result.cost : totalBetAmount} CR
               </span>
 
-              {showLastResult && (
-                <>
-                  <span>
-                    Teljes jóváírás:{" "}
-                    {displayedWin.toLocaleString("hu-HU", {
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    CR
-                  </span>
+              <span>
+                Teljes jóváírás:{" "}
+                {(showLastResult ? displayedWin : 0).toLocaleString("hu-HU", {
+                  maximumFractionDigits: 2,
+                })}{" "}
+                CR
+              </span>
 
-                  <span
-                    className={
-                      result.netResult > 0
-                        ? "baccarat-profit"
-                        : result.netResult < 0
-                          ? "baccarat-loss"
-                          : ""
-                    }
-                  >
-                    Nettó eredmény:{" "}
-                    {result.netResult.toLocaleString("hu-HU", {
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    CR
-                  </span>
-                </>
-              )}
+              <span>
+                Nettó eredmény:{" "}
+                {(showLastResult ? result.netResult : 0).toLocaleString(
+                  "hu-HU",
+                  { maximumFractionDigits: 2 },
+                )}{" "}
+                CR
+              </span>
             </div>
           </>
         ) : null}

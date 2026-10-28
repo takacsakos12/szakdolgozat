@@ -31,7 +31,7 @@ function SlotPage({ user, onUserChange }) {
 
   const [gameResult, setGameResult] = useState(null);
   const [displayedGrid, setDisplayedGrid] = useState(null);
-  const [gameMode, setGameMode] = useState("BASE_GAME");
+  const [, setGameMode] = useState("BASE_GAME");
   const [balance, setBalance] = useState(user?.balance ?? 0);
 
   const [isFeatureSelectorOpen, setIsFeatureSelectorOpen] = useState(false);
@@ -105,6 +105,7 @@ function SlotPage({ user, onUserChange }) {
     }
 
     setSelectedBet(newBet);
+    setGameResult(null);
     setErrorMessage("");
   }
 
@@ -386,7 +387,6 @@ function SlotPage({ user, onUserChange }) {
 
   const selectableSymbols = slotConfig?.featureSpin?.selectableSymbols || [];
 
-  const lastWin = gameResult?.totalWin ?? 0;
 
   const controlsDisabled =
     isSpinning || isLoadingConfig || !slotConfig || Boolean(pendingRequest);
@@ -463,14 +463,25 @@ function SlotPage({ user, onUserChange }) {
         <SlotControls
           allowedBets={allowedBets}
           selectedBet={selectedBet}
-          balance={balance}
-          lastWin={lastWin}
           isPlaying={isSpinning}
           isLoading={isLoadingConfig || !slotConfig}
           hasPendingRequest={Boolean(pendingRequest)}
           onBetChange={handleBetChange}
           onSpin={handleSpin}
         />
+        <div className="slot-information">
+          <span>
+            Össztét:{" "}
+            {gameResult?.cost ??
+              (selectedBet ?? 0) *
+                (featureEnabled ? (featureCostMultiplier ?? 1) : 1)}{" "}
+            CR
+          </span>
+
+          <span>Teljes jóváírás: {gameResult?.totalWin ?? 0} CR</span>
+
+          <span>Nettó eredmény: {gameResult?.netResult ?? 0} CR</span>
+        </div>
       </section>
 
       {errorMessage && (

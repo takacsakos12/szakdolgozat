@@ -32,6 +32,8 @@ function RoulettePage({ user, onUserChange }) {
   const [isWheelSpinning, setIsWheelSpinning] = useState(false);
   const [displayedBalance, setDisplayedBalance] = useState(user?.balance ?? 0);
   const [displayedWin, setDisplayedWin] = useState(0);
+  const [lastRoundCost, setLastRoundCost] = useState(0);
+  const [showLastResult, setShowLastResult] = useState(false);
   const controlsDisabled =
     isLoading || isSpinning || isWheelSpinning || Boolean(pendingRequest);
 
@@ -76,7 +78,7 @@ function RoulettePage({ user, onUserChange }) {
         amount: selectedChip,
       },
     ]);
-
+    setShowLastResult(false);
     setErrorMessage("");
   }
 
@@ -147,6 +149,19 @@ function RoulettePage({ user, onUserChange }) {
         numbers: [...bet.numbers],
       })),
     );
+    setErrorMessage("");
+    setShowLastResult(false);
+  }
+
+  function handleClearBets() {
+    if (controlsDisabled || isSubmittingRef.current) {
+      return;
+    }
+
+    setBets([]);
+    setShowLastResult(false);
+    setDisplayedWin(0);
+    setLastRoundCost(0);
     setErrorMessage("");
   }
 
@@ -274,6 +289,9 @@ function RoulettePage({ user, onUserChange }) {
 
   function handleWheelSpinEnd() {
     setDisplayedWin(result?.totalWin ?? 0);
+    setLastRoundCost(result?.cost ?? 0);
+    setShowLastResult(true);
+
     setBets([]);
     setIsWheelSpinning(false);
   }
@@ -361,9 +379,32 @@ function RoulettePage({ user, onUserChange }) {
               </button>
             </div>
 
+            <div className="roulette-clear-area">
+              <button
+                type="button"
+                className="game-clear-button"
+                disabled={
+                  controlsDisabled || (bets.length === 0 && !showLastResult)
+                }
+                onClick={handleClearBets}
+              >
+                Tétek törlése
+              </button>
+            </div>
+
             <div className="roulette-information">
-              <span>Össztét: {totalBet} CR</span>
-              <span>Utolsó nyeremény: {displayedWin} CR</span>
+              <span>
+                Össztét: {showLastResult ? lastRoundCost : totalBet} CR
+              </span>
+
+              <span>
+                Teljes jóváírás: {showLastResult ? displayedWin : 0} CR
+              </span>
+
+              <span>
+                Nettó eredmény:{" "}
+                {showLastResult ? displayedWin - lastRoundCost : 0} CR
+              </span>
             </div>
           </>
         ) : null}
