@@ -7,7 +7,7 @@ const {
   GAME_DOMAIN,
 } = require("../../config/baccaratConfig");
 
-const { playBaccaratGame } = require("./baccaratEngine");
+const { prepareBaccaratBets, playBaccaratGame } = require("./baccaratEngine");
 
 const {
   FINGERPRINT_VERSION,
@@ -34,6 +34,14 @@ function objectsMatch(first, second) {
   );
 }
 
+function amountsMatch(first, second) {
+  return (
+    Number.isFinite(first) &&
+    Number.isFinite(second) &&
+    Math.abs(first - second) < 0.000001
+  );
+}
+
 async function verifyBaccaratGameResult({ userId, historyId }) {
   const history = await GameHistory.findOne({
     _id: historyId,
@@ -48,8 +56,11 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
   if (history.gameMode !== GAME_MODE) {
     throw createServiceError(
       "A játékmód nem egyezik a játékelőzményben szereplővel.",
-      400,
     );
+  }
+
+  if (history.configVersion !== CONFIG_VERSION) {
+    throw createServiceError("A játék konfigurációs verziója nem egyezik.");
   }
 
   const fairData = history.provablyFair;
@@ -57,22 +68,17 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
   if (!fairData) {
     throw createServiceError(
       "A játékelőzmény nem tartalmaz provably fair adatokat.",
-      400,
     );
   }
 
   if (fairData.algorithmVersion !== ALGORITHM_VERSION) {
     throw createServiceError(
       "A játékelőzményben szereplő algoritmus verzió nem egyezik a jelenlegi verzióval.",
-      400,
     );
   }
 
   if (!Number.isSafeInteger(fairData.nonce) || fairData.nonce < 0) {
-    throw createServiceError(
-      "A játékelőzményben szereplő nonce érvénytelen.",
-      400,
-    );
+    throw createServiceError("A játékelőzményben szereplő nonce érvénytelen.");
   }
 
   const revealedSeed = await getRevealedSeed({
@@ -89,7 +95,8 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
     revealedSeed.serverSeedHash === fairData.serverSeedHash &&
     revealedSeed.clientSeed === fairData.clientSeed &&
     revealedSeed.algorithmVersion === fairData.algorithmVersion &&
-    fairData.nonce < revealedSeed.finalNoncenonce &&
+    Number.isSafeInteger(revealedSeed.finalNonce) &&
+    fairData.nonce < revealedSeed.finalNonce &&
     fairData.gameDomain === GAME_DOMAIN;
 
   const { preparedBets, requestBets, totalBetAmount } = prepareBaccaratBets(
@@ -105,11 +112,12 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
 
   const fingerprintMatches =
     history.fingerprintVersion === FINGERPRINT_VERSION &&
+    typeof history.requestFingerprint === "string" &&
     history.requestFingerprint === recreatedFingerprint;
 
   const randomGenerator = createRandomGenerator({
     serverSeed: revealedSeed.serverSeed,
-    clientSeed: revealedSeed.clientSeed,
+    clientSeed: fairData.clientSeed,
     nonce: fairData.nonce,
     gameDomain: GAME_DOMAIN,
   });
@@ -120,6 +128,8 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
     randomInt: (range) => randomGenerator.randomInt(range),
   });
 
+  const gameResultMatches = objectsMatch(recreatedResult, history.result);
+
   const settlementMatches =
     amountsMatch(history.baseBet, recreatedResult.cost) &&
     amountsMatch(history.cost, recreatedResult.cost) &&
@@ -127,7 +137,7 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
     amountsMatch(history.netResult, recreatedResult.netResult) &&
     amountsMatch(
       history.balanceAfter,
-      history.balanceBefore + history.netResult,
+      history.balanceBefore + recreatedResult.netResult,
     );
 
   return {
@@ -135,13 +145,13 @@ async function verifyBaccaratGameResult({ userId, historyId }) {
       seedHashMatches &&
       seedDetailsMatch &&
       fingerprintMatches &&
-      gameresultMatches &&
+      gameResultMatches &&
       settlementMatches,
 
     seedHashMatches,
     seedDetailsMatch,
     fingerprintMatches,
-    gameresultMatches,
+    gameResultMatches,
     settlementMatches,
 
     historyId: history._id,

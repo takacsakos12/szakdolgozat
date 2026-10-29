@@ -69,6 +69,8 @@ const MAX_BET = 1000;
 const SIDE_BETS = {
   PERFECT_PAIRS: {
     enabled: true,
+    minBet: 1,
+    maxBet: 1000,
 
     payouts: {
       PERFECT_PAIR: 25,
@@ -79,6 +81,8 @@ const SIDE_BETS = {
 
   TWENTY_ONE_PLUS_THREE: {
     enabled: true,
+    minBet: 1,
+    maxBet: 1000,
 
     payouts: {
       SUITED_TRIPS: 100,

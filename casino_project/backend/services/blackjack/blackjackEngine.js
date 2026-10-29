@@ -320,7 +320,6 @@ function startBlackjackRound({
   perfectPairsBet = 0,
   twentyOnePlusThreeBet = 0,
 }) {
-
   if (
     !Number.isSafeInteger(baseBet) ||
     baseBet < MIN_BET ||
@@ -331,16 +330,38 @@ function startBlackjackRound({
     throw error;
   }
 
-  if (
-    ![perfectPairsBet, twentyOnePlusThreeBet].every(
-      (amount) =>
-        Number.isSafeInteger(amount) &&
-        amount >= 0,
-    )
-  ) {
-    const error = new Error("Érvénytelen mellékfogadás.");
-    error.statusCode = 400;
-    throw error;
+  const sideBetAmounts = {
+    PERFECT_PAIRS: perfectPairsBet,
+    TWENTY_ONE_PLUS_THREE: twentyOnePlusThreeBet,
+  };
+
+  for (const [type, amount] of Object.entries(sideBetAmounts)) {
+    const config = SIDE_BETS[type];
+
+    if (!Number.isSafeInteger(amount) || amount < 0) {
+      const error = new Error("Érvénytelen mellékfogadás.");
+      error.statusCode = 400;
+      throw error;
+    }
+    if (amount === 0) {
+      continue;
+    }
+
+    if (!config.enabled) {
+      const error = new Error(
+        `Ez a mellékfogadás jelenleg nem engedélyezett: ${type}.`,
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (amount < config.minBet || amount > config.maxBet) {
+      const error = new Error(
+        `A(z) ${type} tétje ${config.minBet} és ${config.maxBet} CR között legyen.`,
+      );
+      error.statusCode = 400;
+      throw error;
+    }
   }
 
   const shoe = shuffleShoe(createShoe(), randomInt);
