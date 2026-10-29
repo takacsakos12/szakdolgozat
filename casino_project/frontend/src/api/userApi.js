@@ -1,5 +1,9 @@
 import { apiRequest } from "./apiClient";
 
+function getProfileSummary() {
+  return apiRequest("/users/me/summary");
+}
+
 function updateProfile(changes) {
   return apiRequest("/users/me", {
     method: "PATCH",
@@ -17,5 +21,10 @@ function changePassword({ currentPassword, newPassword }) {
   });
 }
 
-export { updateProfile, changePassword };
-    
+function refillBalance() {
+  return apiRequest("/users/me/refill", {
+    method: "POST",
+  });
+}
+
+export { getProfileSummary, updateProfile, changePassword, refillBalance };

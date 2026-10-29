@@ -1,0 +1,269 @@
+.profile-page {
+  width: min(1120px, calc(100% - 40px));
+  margin: 44px auto 64px;
+  color: #f3f4f6;
+}
+
+.profile-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.profile-eyebrow {
+  margin: 0 0 10px;
+  color: #f7c948;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.profile-heading h1 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.profile-heading p:not(.profile-eyebrow) {
+  margin: 0;
+  color: #aeb3bc;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.profile-stat,
+.profile-panel {
+  border: 1px solid #343638;
+  border-radius: 12px;
+  background: #181a1c;
+}
+
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 18px;
+}
+
+.profile-stat > span {
+  color: #aeb3bc;
+  font-size: 13px;
+}
+
+.profile-stat > strong {
+  color: #f7c948;
+  font-size: clamp(19px, 2vw, 25px);
+  overflow-wrap: anywhere;
+}
+
+.profile-stat > .profile-positive {
+  color: #76d39b;
+}
+
+.profile-stat > .profile-negative {
+  color: #f18484;
+}
+
+.profile-stats-note {
+  margin: 14px 0 26px;
+  color: #aeb3bc;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.profile-panel {
+  padding: 26px;
+}
+
+.profile-panel h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.profile-panel-description,
+.profile-refill p {
+  color: #aeb3bc;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.profile-panel-description {
+  margin: 0 0 22px;
+}
+
+.profile-panel fieldset {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.profile-panel label {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile-panel input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 20px;
+  padding: 11px 13px;
+  border: 1px solid #3b3e42;
+  border-radius: 7px;
+  background: #101214;
+  color: #f3f4f6;
+  font: inherit;
+}
+
+.profile-panel input:focus {
+  border-color: #f7c948;
+  outline: 2px solid rgb(247 201 72 / 18%);
+  outline-offset: 2px;
+}
+
+.profile-page .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  padding: 10px 18px;
+  border: 1px solid #3b3e42;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.profile-page .button-primary {
+  border-color: #f7c948;
+  background: #f7c948;
+  color: #151515;
+}
+
+.profile-page .button-ghost {
+  background: #202224;
+  color: #f3f4f6;
+}
+
+.profile-page .button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.profile-page .button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.profile-page .button:focus-visible {
+  outline: 2px solid #f7c948;
+  outline-offset: 4px;
+}
+
+.profile-panel fieldset > .button {
+  align-self: flex-start;
+}
+
+.profile-refill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.profile-refill p {
+  margin: 0;
+}
+
+.profile-refill .profile-next-refill {
+  margin-top: 8px;
+  color: #f7c948;
+}
+
+.profile-refill > .button {
+  flex-shrink: 0;
+}
+
+.profile-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  color: #aeb3bc;
+  font-size: 13px;
+}
+
+.profile-message {
+  margin: 0 0 20px;
+  padding: 13px 16px;
+  border: 1px solid;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.profile-message-error {
+  border-color: #774343;
+  background: #2b1c1c;
+  color: #ffb1b1;
+}
+
+.profile-message-success {
+  border-color: #3d634b;
+  background: #18271e;
+  color: #a9e3bd;
+}
+
+.profile-loading {
+  padding: 32px 0;
+  color: #aeb3bc;
+}
+
+@media (max-width: 900px) {
+  .profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    width: calc(100% - 28px);
+    margin-top: 28px;
+  }
+
+  .profile-heading,
+  .profile-refill {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-panel {
+    padding: 20px;
+  }
+
+  .profile-stat {
+    padding: 17px 13px;
+  }
+}

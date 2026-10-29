@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       min: [0, "Az egyenleg nem lehet negatív."],
     },
+    lastRefillAt: {
+      type: Date,
+      default: null,
+    },
 
     authVersion: {
       type: Number,
@@ -43,6 +47,7 @@ const userSchema = new mongoose.Schema(
         message: "A hitelesítési verzió csak egész szám lehet.",
       },
     },
+
   },
   {
     timestamps: true,

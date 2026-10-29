@@ -1,6 +1,68 @@
 \chapter{Bevezetés}
 
-A fejezet célja, hogy a feladatkiírásnál kicsit részletesebben bemutassa, hogy miről fog szólni a dolgozat.
+Sokszor halljuk a híres mondást, hogy a ház mindig nyer. Ezzel legtöbbször a kaszinókra gondolunk. De ez mitől van pontosan?
+A játékosok nagyrésze erre nem kap választ a saját játékai során. Ennek az egyik oka lehet a túl kicsi mintavétel, túl keveset játszanak ahhoz, hogy
+ pontos képet kapjanak az esélyeikről. A kezdő szerencséjétől függően az is megtörténhet, hogy eleinte a játékos csak nyer és nyer folyamat így egy hamis képet kap
+ a valós esélyeiről.
+
+A szakdolgozat célja egy olyan webes rendszer elkészítése, amely pénzveszteség nélkül lehetővé teszi a kíváncsiak részére, hogy valójában milyen lenne ha egy valós online
+kaszinóban játszanának. A rendszer a játékosok számára lehetőséget biztosít arra, hogy a valós kaszinókban elérhető játékokat kipróbálhassák, és a játékokhoz tartozó esélyeket, nyerési arányokat megismerjék.
+Az alkalmazás négy játékkal rendelkezik: egy saját fejlesztésű nyerőgép, egy európai rulett, egy Blackjacket és egy Baccaratot. A játékok virtuális egyenleggel kredittel, rövidítve CR-el
+játszhatók.
+
+Játékok fejlesztése mellett a matematikai működésük is be vannak mutatva. A kimenetek valószínűsége, a kifizetések várható értéke az eredmények szórása. A legnagyobb mérvadója 
+egy játéknak a visszafizetési arány, vagyis RTP(RETURN TO PLAYER), ezek elméleti és szimulációs különbségeire. Blacjack-nél a játékos döntéseinek hatása, a nyerőgépnél pedig a különböző játékmódoknál
+a szimbólumok eloszlását és azok különbségeit.
+
+Az eredmények előállítását egy Provably Fair eljárással végezzük. Ez online kaszinókban nagyon gyakori. Garantálja matematikai és kriptográfiai úton, hogy a játékos egy csalás nélküli eredményt
+kapott. Ennek a három fő eleme a server seed, a kliens seed, és a nonce. Ezeket eltároljuk ha esetleg a játékos szeretné újraszámítani az eredményt és maga akar meggyőzödni a
+helyességről.
+
+A fejlesztéshez MERN stacket használtam, ami a következőkből áll: egy MongoDB-vel végzett adattárolás, a szerver működését a Node.js és Express biztosítja és felhasznalók által kezelt
+területet pedig a React. A szerver végzi az elszámolást, játékszabályok és motorok ellenőrzését. A kliens a átékok megjelenítéséért és a felhasználói műveletek kezeléséért felel.
+
+A dolgozat során ismertetem az alkalmazás követélményeit felépítését, az adatmodelleket, valamint a szerver és kliens közti kommunikáció lebonyolítását. Ezután a játékok fejlesztését
+matematikai hátterüket, majd a tesztek és szimulációk eredményét. A legnagyobb cél a játékok ingyenes kipróbálása mellett, a folytatólagos kockázatok és hosszútávok eredmények megértetése.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//A fejezet célja, hogy a feladatkiírásnál kicsit részletesebben bemutassa, hogy miről fog szólni a dolgozat.
 Érdemes azt részletezni benne, hogy milyen aktuális, érdekes és nehéz probléma megoldására vállalkozik a dolgozat.
 
 Ez egy egy-két oldalas leírás.

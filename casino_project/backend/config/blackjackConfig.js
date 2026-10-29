@@ -1,10 +1,10 @@
-const CONFIG_VERSION = "BlackjackConfig_v1.0.0";
+const CONFIG_VERSION = "BlackjackConfig_v1.1.0";
 
 const GAME_TYPE = "BLACKJACK";
 const GAME_MODE = "STANDARD";
 const GAME_DOMAIN = "BLACKJACK:STANDARD";
 
-const DECK_COUNT = 6;
+const DECK_COUNT = 8;
 
 const SUITS = ["HEARTS", "DIAMONDS", "CLUBS", "SPADES"];
 

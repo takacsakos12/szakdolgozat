@@ -23,10 +23,10 @@ function Header({ user, onLogout }) {
       <div className="auth-actions">
         {user ? (
           <>
-            <span className="logged-in-user">
-              <span>Bejelentkezve</span>
+            <Link className="logged-in-user" to="/profile">
+              <span>Profilom</span>
               <strong>{user.username}</strong>
-            </span>
+            </Link>
 
             <button
               className="button button-ghost"

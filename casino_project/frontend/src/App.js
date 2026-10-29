@@ -14,6 +14,7 @@ import BlackjackPage from "./pages/BlackjackPage";
 import BaccaraPage from "./pages/BaccaratPage";
 import ProvablyFairPage from "./pages/ProvablyFairPage";
 import GamesPage from "./pages/GamesPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -91,9 +92,16 @@ function App() {
           path="/provably-fair"
           element={<ProvablyFairPage user={user} />}
         />
+        <Route path="/games" element={<GamesPage user={user} />} />
         <Route
-          path="/games"
-          element={<GamesPage user={user} />}
+          path="/profile"
+          element={
+            <ProfilePage
+              user={user}
+              onUserChange={setUser}
+              onLogout={handleLogout}
+            />
+          }
         />
       </Routes>
 
