@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -32,9 +33,20 @@ const userSchema = new mongoose.Schema(
       required: true,
       min: [0, "Az egyenleg nem lehet negatív."],
     },
+
+    authVersion: {
+      type: Number,
+      default: 0,
+      min: 0,
+      validate: {
+        validator: Number.isSafeInteger,
+        message: "A hitelesítési verzió csak egész szám lehet.",
+      },
+    },
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
   },
 );
 
@@ -50,4 +62,5 @@ userSchema.pre("save", async function () {
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
 };
+
 module.exports = mongoose.model("User", userSchema);

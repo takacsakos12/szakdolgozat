@@ -20,12 +20,19 @@ async function protectRoute(req, res, next) {
       });
     }
 
+    if ((decodedToken.authVersion ?? 0) !== (user.authVersion ?? 0)) {
+      return res.status(401).json({
+        message: "A bejelentkezés érvényét vesztette. Jelentkezz be újra.",
+      });
+    }
+
     req.user = user;
-    next();
+    return next();
   } catch {
     return res.status(401).json({
       message: "Érvénytelen vagy lejárt bejelentkezés.",
     });
   }
 }
+
 module.exports = protectRoute;

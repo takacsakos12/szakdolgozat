@@ -1,8 +1,27 @@
-flowchart TD
-    A["Főoldal /"] --> B["Bejelentkezés /login"]
-    A --> C["Regisztráció /register"]
-    A --> D["Bejelentkezéshez kötött oldalak"]
-    D --> E["Slot /games/slot"]
-    D --> F["Rulett /games/roulette"]
-    D --> G["Játéktörténet /games/history"]
-    D -.-> H["Blackjack – fejlesztés alatt"]
+stateDiagram-v2
+    direction TB
+
+    state "Főoldal" as Home
+    state "Bejelentkezés" as Login
+    state "Regisztráció" as Register
+    state "Játékválasztó" as Games
+    state "Játékoldal" as Game
+    state "Játéktörténet" as History
+    state "Provably Fair" as Fair
+
+    [*] --> Home
+
+    Home --> Games
+    Home --> Login
+    Home --> Fair
+
+    Games --> Game
+    Game --> Games
+    Game --> Login: Nincs bejelentkezve
+
+    Login --> Register
+    Register --> Login: Sikeres regisztráció
+    Login --> Home: Sikeres belépés
+
+    Games --> History
+    Fair --> History

@@ -17,10 +17,11 @@ const authenticationLimiter = rateLimit({
   },
 });
 
-function createToken(userId) {
+function createToken(user) {
   return jwt.sign(
     {
-      userId,
+      userId: user._id,
+      authVersion: user.authVersion ?? 0,
     },
     process.env.JWT_SECRET,
     {
@@ -36,16 +37,18 @@ function getCookieOptions() {
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 }
 
-function sendAuthenticationResponse(res, user, statusCode, message) {
-  const token = createToken(user._id);
+function sendAuthenticationResponse(res, user, message) {
+  const token = createToken(user);
 
-  res.cookie("token", token, getCookieOptions());
+  res.cookie("token", token, {
+    ...getCookieOptions(),
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
-  return res.status(statusCode).json({
+  return res.status(200).json({
     message,
     user: {
       id: user._id,
@@ -57,48 +60,58 @@ function sendAuthenticationResponse(res, user, statusCode, message) {
 }
 
 function isValidEmail(email) {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailPattern.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function isValidPassword(password) {
-  const hasLowercaseLetter = /[a-z]/.test(password);
-  const hasUppercaseLetter = /[A-Z]/.test(password);
-  const hasNumber = /\d/.test(password);
-
   return (
     password.length >= 8 &&
-    hasLowercaseLetter &&
-    hasUppercaseLetter &&
-    hasNumber
+    Buffer.byteLength(password, "utf8") <= 72 &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password)
   );
 }
 
-/*A felhasználó létrejön, de nem jelentkezik be automatikusan.*/
-router.post("/register", authenticationLimiter, async (req, res) => {
+function handleAuthError(error, res, next) {
+  if (error.code === 11000) {
+    return res.status(409).json({
+      message: "A felhasználónév vagy az e-mail-cím már foglalt.",
+    });
+  }
+
+  if (error.name === "ValidationError") {
+    return res.status(400).json({
+      message: "Érvénytelen felhasználói adatok.",
+    });
+  }
+
+  if (error.name === "VersionError") {
+    return res.status(409).json({
+      message: "A felhasználói adatok megváltoztak. Próbáld újra.",
+    });
+  }
+
+  return next(error);
+}
+
+router.post("/register", authenticationLimiter, async (req, res, next) => {
   try {
+    const body = req.body ?? {};
+
     const username =
-      typeof req.body.username === "string"
-        ? req.body.username.trim().toLowerCase()
+      typeof body.username === "string"
+        ? body.username.trim().toLowerCase()
         : "";
 
     const email =
-      typeof req.body.email === "string"
-        ? req.body.email.trim().toLowerCase()
-        : "";
+      typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
 
-    const password =
-      typeof req.body.password === "string" ? req.body.password : "";
-
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        message: "Minden mező kitöltése kötelező.",
-      });
-    }
+    const password = typeof body.password === "string" ? body.password : "";
 
     if (username.length < 3 || username.length > 30) {
       return res.status(400).json({
-        message: "A felhasználónévnek 3 és 30 karakter között kell lennie.",
+        message: "A felhasználónév hossza 3 és 30 karakter között legyen.",
       });
     }
 
@@ -111,18 +124,17 @@ router.post("/register", authenticationLimiter, async (req, res) => {
     if (!isValidPassword(password)) {
       return res.status(400).json({
         message:
-          "A jelszó legyen legalább 8 karakteres, és tartalmazzon kisbetűt, nagybetűt és számot.",
+          "A jelszó legyen legalább 8 karakteres, legfeljebb 72 bájt hosszú, és tartalmazzon kisbetűt, nagybetűt és számot.",
       });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
+    const existingUser = await User.exists({
+      $or: [{ username }, { email }],
     });
 
     if (existingUser) {
       return res.status(409).json({
-        message:
-          "Ezzel az e-mail-címmel vagy felhasználónévvel már létezik fiók.",
+        message: "A felhasználónév vagy az e-mail-cím már foglalt.",
       });
     }
 
@@ -136,31 +148,20 @@ router.post("/register", authenticationLimiter, async (req, res) => {
       message: "A regisztráció sikeres. Most már bejelentkezhetsz.",
     });
   } catch (error) {
-    console.error("Regisztrációs hiba:", error);
-
-    if (error.code === 11000) {
-      return res.status(409).json({
-        message:
-          "Ezzel az e-mail-címmel vagy felhasználónévvel már létezik fiók.",
-      });
-    }
-
-    return res.status(500).json({
-      message: "A regisztráció során hiba történt.",
-    });
+    return handleAuthError(error, res, next);
   }
 });
 
-/*Bejelentkezés felhasználónévvel*/
-router.post("/login", authenticationLimiter, async (req, res) => {
+router.post("/login", authenticationLimiter, async (req, res, next) => {
   try {
+    const body = req.body ?? {};
+
     const username =
-      typeof req.body.username === "string"
-        ? req.body.username.trim().toLowerCase()
+      typeof body.username === "string"
+        ? body.username.trim().toLowerCase()
         : "";
 
-    const password =
-      typeof req.body.password === "string" ? req.body.password : "";
+    const password = typeof body.password === "string" ? body.password : "";
 
     if (!username || !password) {
       return res.status(400).json({
@@ -170,42 +171,20 @@ router.post("/login", authenticationLimiter, async (req, res) => {
 
     const user = await User.findOne({ username }).select("+password");
 
-    if (!user) {
+    if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({
         message: "Hibás felhasználónév vagy jelszó.",
       });
     }
 
-    const passwordIsCorrect = await user.comparePassword(password);
-
-    if (!passwordIsCorrect) {
-      return res.status(401).json({
-        message: "Hibás felhasználónév vagy jelszó.",
-      });
-    }
-
-    return sendAuthenticationResponse(
-      res,
-      user,
-      200,
-      "A bejelentkezés sikeres.",
-    );
+    return sendAuthenticationResponse(res, user, "A bejelentkezés sikeres.");
   } catch (error) {
-    console.error("Bejelentkezési hiba:", error);
-
-    return res.status(500).json({
-      message: "A bejelentkezés során hiba történt.",
-    });
+    return handleAuthError(error, res, next);
   }
 });
 
-/*Kijelentkezés*/
 router.post("/logout", (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
+  res.clearCookie("token", getCookieOptions());
 
   return res.status(200).json({
     message: "A kijelentkezés sikeres.",
@@ -221,5 +200,66 @@ router.get("/me", protectRoute, (req, res) => {
     },
   });
 });
+
+router.post(
+  "/change-password",
+  protectRoute,
+  authenticationLimiter,
+  async (req, res, next) => {
+    try {
+      const { currentPassword, newPassword } = req.body ?? {};
+
+      if (
+        typeof currentPassword !== "string" ||
+        typeof newPassword !== "string" ||
+        !currentPassword
+      ) {
+        return res.status(400).json({
+          message: "A jelenlegi és az új jelszó megadása kötelező.",
+        });
+      }
+
+      if (!isValidPassword(newPassword)) {
+        return res.status(400).json({
+          message:
+            "Az új jelszó legyen legalább 8 karakteres, legfeljebb 72 bájt hosszú, és tartalmazzon kisbetűt, nagybetűt és számot.",
+        });
+      }
+
+      const user = await User.findById(req.user._id).select("+password");
+
+      if (!user || (user.authVersion ?? 0) !== (req.user.authVersion ?? 0)) {
+        return res.status(401).json({
+          message: "Jelentkezz be újra.",
+        });
+      }
+
+      if (!(await user.comparePassword(currentPassword))) {
+        return res.status(400).json({
+          message: "A jelenlegi jelszó hibás.",
+        });
+      }
+
+      if (await user.comparePassword(newPassword)) {
+        return res.status(400).json({
+          message: "Az új jelszó nem egyezhet meg a jelenlegivel.",
+        });
+      }
+
+      user.password = newPassword;
+      user.authVersion = (user.authVersion ?? 0) + 1;
+
+      await user.save();
+
+      return sendAuthenticationResponse(
+        res,
+        user,
+        "A jelszó módosítása sikeres.",
+      );
+    } catch (error) {
+      return handleAuthError(error, res, next);
+    }
+  },
+);
 
 module.exports = router;

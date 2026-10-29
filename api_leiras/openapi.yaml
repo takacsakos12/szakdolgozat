@@ -1,0 +1,1152 @@
+openapi: 3.0.3
+
+info:
+  title: Kaszinóanalitika API
+  version: 1.0.0
+  description: |
+    A kaszinójáték-szimuláció API-jának rövidített leírása.
+    Hitelesítés: HttpOnly token cookie.
+    A frontend credentials: include beállítást használ.
+    Minden pénzösszeg virtuális CR-ben értendő.
+
+    Újrapróbáláskor az Idempotency-Key és a kérés tartalma változatlan marad.
+    A replayed válasz egyenlege korábbi pillanatkép lehet.
+
+    A profil módosítása és a jelszócsere tervezett bővítésként szerepel.
+    A fióktörlés nincs a leírásban.
+
+    A részletes, beágyazott játékadatok nincsenek teljes mélységben kibontva.
+    A dokumentáció forráskód alapján készült, nem integrációs teszt.
+
+servers:
+  - url: http://localhost:5000
+    description: Helyi fejlesztői szerver
+
+tags:
+  - name: Rendszer
+  - name: Hitelesítés
+  - name: Felhasználók
+  - name: Slot
+  - name: Rulett
+  - name: Blackjack
+  - name: Baccarat
+  - name: Játéktörténet
+  - name: Provably Fair
+
+security:
+  - cookieAuth: []
+
+paths:
+  /:
+    get:
+      tags: [Rendszer]
+      summary: API működésének ellenőrzése
+      operationId: getApiStatus
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/MessageResponse" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/auth/register:
+    post:
+      tags: [Hitelesítés]
+      summary: Új felhasználó regisztrációja
+      operationId: registerUser
+      security: []
+      description: |
+        A felhasználónév és az e-mail kisbetűsítve kerül feldolgozásra.
+        A sikeres regisztráció nem jelentkeztet be automatikusan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterRequest" }
+            example:
+              username: tesztuser
+              email: teszt@example.com
+              password: PeldaJelszo123
+      responses:
+        "201": { $ref: "#/components/responses/MessageResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/auth/login:
+    post:
+      tags: [Hitelesítés]
+      summary: Bejelentkezés
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+            example:
+              username: tesztuser
+              password: PeldaJelszo123
+      responses:
+        "200": { $ref: "#/components/responses/LoginResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/auth/logout:
+    post:
+      tags: [Hitelesítés]
+      summary: Kijelentkezés
+      operationId: logoutUser
+      security: []
+      description: Törli a böngésző token cookie-ját.
+      responses:
+        "200": { $ref: "#/components/responses/LogoutResponse" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/auth/me:
+    get:
+      tags: [Hitelesítés]
+      summary: Saját felhasználói adatok és aktuális egyenleg
+      operationId: getCurrentUser
+      responses:
+        "200": { $ref: "#/components/responses/UserResponse" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/users/me:
+    patch:
+      tags: [Felhasználók]
+      summary: Saját felhasználónév és e-mail módosítása
+      operationId: updateProfile
+      x-implementation-status: planned
+      description: |
+        A felhasználót a bejelentkezési cookie azonosítja.
+        A felhasználónév és az e-mail külön-külön is módosítható.
+        Jelszó és egyenleg ezen a végponton nem módosítható.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateProfileRequest" }
+            example:
+              username: ujfelhasznalonev
+              email: uj@example.com
+      responses:
+        "200": { $ref: "#/components/responses/ProfileResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/auth/change-password:
+    post:
+      tags: [Hitelesítés]
+      summary: Jelszócsere a jelenlegi jelszóval
+      operationId: changePassword
+      x-implementation-status: planned
+      description: |
+        Bejelentkezés és a helyes jelenlegi jelszó szükséges.
+        Az új jelszó nem egyezhet meg a jelenlegivel.
+        A szerver hash-elve menti el az új jelszót.
+        Az authVersion növelésével érvényteleníti a korábbi tokeneket,
+        és új cookie-t állít be a jelenlegi böngészőnek.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChangePasswordRequest" }
+            example:
+              currentPassword: RegiJelszo123
+              newPassword: UjJelszo456
+      responses:
+        "200": { $ref: "#/components/responses/PasswordResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/slot/config:
+    get:
+      tags: [Slot]
+      summary: Slot konfigurációjának lekérése
+      operationId: getSlotConfig
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/ConfigResponse" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/slot/spin:
+    post:
+      tags: [Slot]
+      summary: Alapjáték pörgetése
+      operationId: spinSlot
+      description: |
+        Költség: baseBet.
+        A természetesen aktivált bónusz eredménye is a válasz része.
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SlotRequest" }
+            example: { baseBet: 10 }
+      responses:
+        "200": { $ref: "#/components/responses/GameResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/slot/bonus-buy:
+    post:
+      tags: [Slot]
+      summary: Bónusz vásárlása
+      operationId: buySlotBonus
+      description: |
+        Költség: baseBet × 100.
+        A teljes bónusz egy kérésben számolódik el.
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SlotRequest" }
+            example: { baseBet: 10 }
+      responses:
+        "200": { $ref: "#/components/responses/GameResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/slot/feature-spin:
+    post:
+      tags: [Slot]
+      summary: Feature Spin választott bővülő szimbólummal
+      operationId: playFeatureSpin
+      description: "Költség: baseBet × 10."
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FeatureRequest" }
+            example:
+              baseBet: 10
+              selectedSymbol: PHARAOH
+      responses:
+        "200": { $ref: "#/components/responses/GameResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/roulette/config:
+    get:
+      tags: [Rulett]
+      summary: Rulett konfigurációjának lekérése
+      operationId: getRouletteConfig
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/ConfigResponse" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/roulette/spin:
+    post:
+      tags: [Rulett]
+      summary: Rulettpörgetés és fogadások kiértékelése
+      operationId: spinRoulette
+      description: |
+        Legalább egy fogadás szükséges.
+        A maximális össztét 2000 CR.
+        A belső fogadások számkombinációit a backend ellenőrzi.
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RouletteRequest" }
+            example:
+              bets:
+                - { type: RED, amount: 10 }
+                - { type: STRAIGHT, numbers: [17], amount: 5 }
+      responses:
+        "200": { $ref: "#/components/responses/GameResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/blackjack/config:
+    get:
+      tags: [Blackjack]
+      summary: Blackjack konfigurációjának lekérése
+      operationId: getBlackjackConfig
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/ConfigResponse" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/blackjack/start:
+    post:
+      tags: [Blackjack]
+      summary: Blackjack-kör indítása
+      operationId: startBlackjack
+      description: |
+        Egy felhasználónak egyszerre legfeljebb egy aktív köre lehet.
+        A kezdőtéteket levonja az egyenlegből.
+        Azonnali lezárás esetén a nyereményt is jóváírja.
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BlackjackStartRequest" }
+            example:
+              baseBet: 10
+              perfectPairsBet: 0
+              twentyOnePlusThreeBet: 0
+      responses:
+        "200": { $ref: "#/components/responses/BlackjackResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/blackjack/active:
+    get:
+      tags: [Blackjack]
+      summary: Aktív saját Blackjack-kör visszatöltése
+      operationId: getActiveBlackjack
+      description: 'Ha nincs aktív kör, a válasz: {"game": null}.'
+      responses:
+        "200": { $ref: "#/components/responses/ActiveBlackjackResponse" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/blackjack/action:
+    post:
+      tags: [Blackjack]
+      summary: Művelet végrehajtása a Blackjack-körben
+      operationId: performBlackjackAction
+      description: |
+        Csak az availableActions listában szereplő művelet engedélyezett.
+        A Double, Split és Insurance további tétet vonhat le.
+        A nyeremény jóváírása az összes kéz lezárása után történik.
+        Újrapróbáláskor az expectedVersion is változatlan maradjon.
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BlackjackActionRequest" }
+            example:
+              sessionId: "6adddd3c7327f5c10eb58ad7"
+              expectedVersion: 0
+              action: STAND
+      responses:
+        "200": { $ref: "#/components/responses/BlackjackResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/baccarat/config:
+    get:
+      tags: [Baccarat]
+      summary: Baccarat konfigurációjának lekérése
+      operationId: getBaccaratConfig
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/ConfigResponse" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/baccarat/play:
+    post:
+      tags: [Baccarat]
+      summary: Baccarat-kör lejátszása
+      operationId: playBaccarat
+      description: |
+        A laposztás és a harmadik lap húzása automatikus.
+        A fő- és mellékfogadások ugyanazzal az eredménnyel értékelődnek ki.
+        A maximális össztét 2000 CR.
+      parameters:
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BaccaratRequest" }
+            example:
+              bets:
+                - { type: BANKER, amount: 10 }
+                - { type: PLAYER_PAIR, amount: 5 }
+      responses:
+        "200": { $ref: "#/components/responses/GameResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/game-history:
+    get:
+      tags: [Játéktörténet]
+      summary: Saját játékelőzmények lekérése
+      operationId: getGameHistory
+      description: |
+        Lapozható lista a saját elszámolt körökről.
+        Rendezés createdAt és _id szerint csökkenő sorrendben.
+        A lista nem tartalmazza a teljes result dokumentumot.
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        "200": { $ref: "#/components/responses/HistoryResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/provably-fair/current:
+    get:
+      tags: [Provably Fair]
+      summary: Aktív seedpár nyilvános adatainak lekérése
+      operationId: getCurrentSeed
+      description: |
+        A titkos szerverseed nem szerepel a válaszban.
+        Ha nincs aktív seedpár, a jelenlegi implementáció létrehozza.
+      responses:
+        "200": { $ref: "#/components/responses/CurrentSeedResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/provably-fair/rotate:
+    post:
+      tags: [Provably Fair]
+      summary: Seedpár cseréje
+      operationId: rotateSeed
+      description: |
+        Felfedi a régi szerverseedet és új aktív seedpárt hoz létre.
+        Aktív Blackjack-kör esetén 409-es hibát ad.
+        Nem idempotens: ismételt kérés újabb seedcserét végezhet.
+        Üres JSON-objektum is küldhető.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RotateRequest" }
+            example: {}
+      responses:
+        "200": { $ref: "#/components/responses/RotationResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/provably-fair/revealed/{seedId}:
+    get:
+      tags: [Provably Fair]
+      summary: Saját felfedett seed lekérése
+      operationId: getRevealedSeed
+      parameters:
+        - name: seedId
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/ObjectId" }
+      responses:
+        "200": { $ref: "#/components/responses/RevealedSeedResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /api/provably-fair/verify:
+    post:
+      tags: [Provably Fair]
+      summary: Korábbi kör szerveroldali ellenőrzése
+      operationId: verifyGame
+      description: |
+        Saját historyId és már felfedett seed alapján számolja újra a kört.
+        verified=false esetén is érkezhet HTTP 200.
+        A vizsgált Baccarat-verifikációban hiányzó definíciók és elírások vannak,
+        ezért ennél a játéknál a jelenlegi kód 500-as hibára futhat.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VerifyRequest" }
+            example: { historyId: "6adde3657327f5c10eb58b00" }
+      responses:
+        "200": { $ref: "#/components/responses/VerificationResponse" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+      description: A bejelentkezéskor beállított HttpOnly JWT cookie.
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: |
+        Új művelethez új azonosító szükséges.
+        Újrapróbáláskor ugyanazt a kulcsot és tartalmat kell küldeni.
+        Eltérő tartalommal történő újrafelhasználás 409-es hibát okozhat.
+      schema: { type: string, minLength: 8, maxLength: 100 }
+      example: "8d75455f-4d16-4afe-aa9a-2f50aab6c44c"
+
+  responses:
+    MessageResponse:
+      description: Sikeres művelet.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Message" }
+
+    LoginResponse:
+      description: Sikeres bejelentkezés.
+      headers:
+        Set-Cookie:
+          description: HttpOnly token cookie.
+          schema: { type: string }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/LoginResponse" }
+
+    LogoutResponse:
+      description: Sikeres kijelentkezés.
+      headers:
+        Set-Cookie:
+          description: A token cookie lejáratása.
+          schema: { type: string }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Message" }
+
+    UserResponse:
+      description: A bejelentkezett felhasználó adatai.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/UserResponse" }
+
+    ProfileResponse:
+      description: Sikeres profilmódosítás és friss felhasználói adatok.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/LoginResponse" }
+
+    PasswordResponse:
+      description: Sikeres jelszócsere és friss felhasználói adatok.
+      headers:
+        Set-Cookie:
+          description: Új HttpOnly token cookie.
+          schema: { type: string }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/LoginResponse" }
+
+    ConfigResponse:
+      description: A játék nyilvános konfigurációja.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Config" }
+
+    GameResponse:
+      description: Elszámolt játékkör eredménye.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/GameResponse" }
+
+    BlackjackResponse:
+      description: A Blackjack-kör aktuális publikus állapota.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/BlackjackSession" }
+
+    ActiveBlackjackResponse:
+      description: Aktív saját kör vagy null.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ActiveBlackjackResponse" }
+
+    HistoryResponse:
+      description: Lapozható játékelőzmények.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/HistoryResponse" }
+
+    CurrentSeedResponse:
+      description: Aktív seedpár nyilvános adatai.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              seed: { $ref: "#/components/schemas/CurrentSeed" }
+            required: [seed]
+
+    RotationResponse:
+      description: Felfedett korábbi seed és új aktív seed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RotationResponse" }
+
+    RevealedSeedResponse:
+      description: Korábbi, felfedett seedpár.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              seed: { $ref: "#/components/schemas/RevealedSeed" }
+            required: [seed]
+
+    VerificationResponse:
+      description: Az eredmény ellenőrzésének részletei.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Verification" }
+
+    Error400:
+      description: Érvénytelen kérés, hibás jelszó, érvénytelen tét vagy elégtelen egyenleg.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+    Error401:
+      description: Hiányzó, érvénytelen vagy lejárt bejelentkezés.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+    Error404:
+      description: Az erőforrás nem található vagy a seed még nincs felfedve.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+    Error409:
+      description: Ütköző kérés, foglalt felhasználói adat, elavult verzió vagy nem engedélyezett állapot.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+    Error429:
+      description: Túl sok hitelesítési próbálkozás.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+    Error500:
+      description: Váratlan szerverhiba.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    ObjectId:
+      type: string
+      pattern: "^[a-fA-F0-9]{24}$"
+      example: "6adde3657327f5c10eb58b00"
+
+    Money:
+      type: number
+      description: Virtuális CR-összeg; tört érték is lehet.
+      example: 100.5
+
+    Message:
+      type: object
+      properties:
+        message: { type: string }
+      required: [message]
+
+    Error:
+      type: object
+      properties:
+        message: { type: string }
+        allowedBets: { type: array, items: { type: integer } }
+        selectableSymbols: { type: array, items: { type: string } }
+      required: [message]
+
+    User:
+      type: object
+      properties:
+        id: { $ref: "#/components/schemas/ObjectId" }
+        username: { type: string, minLength: 3, maxLength: 30 }
+        email: { type: string, format: email }
+        balance: { $ref: "#/components/schemas/Money" }
+      required: [id, username, email, balance]
+
+    RegisterRequest:
+      type: object
+      properties:
+        username: { type: string, minLength: 3, maxLength: 30 }
+        email: { type: string, format: email }
+        password:
+          type: string
+          format: password
+          minLength: 8
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$"
+          description: Legalább egy kisbetű, nagybetű és szám szükséges.
+      required: [username, email, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+      required: [username, password]
+
+    LoginResponse:
+      type: object
+      properties:
+        message: { type: string }
+        user: { $ref: "#/components/schemas/User" }
+      required: [message, user]
+
+    UserResponse:
+      type: object
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+      required: [user]
+
+    UpdateProfileRequest:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      description: |
+        Legalább az egyik mező megadása szükséges.
+        A szerver levágja a szélső szóközöket és kisbetűsíti az értékeket.
+      properties:
+        username: { type: string, minLength: 3, maxLength: 30 }
+        email: { type: string, format: email }
+
+    ChangePasswordRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          format: password
+          minLength: 1
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$"
+          description: |
+            Legalább egy kisbetű, nagybetű és szám szükséges.
+            UTF-8 kódolással legfeljebb 72 bájt hosszú lehet.
+            Nem egyezhet meg a jelenlegi jelszóval.
+
+    FairData:
+      type: object
+      properties:
+        seedId: { $ref: "#/components/schemas/ObjectId" }
+        serverSeedHash: { type: string, pattern: "^[a-f0-9]{64}$" }
+        clientSeed: { type: string }
+        nonce: { type: integer, minimum: 0 }
+        gameDomain: { type: string, example: "ROULETTE:STANDARD" }
+        algorithmVersion: { type: string, example: HMAC_SHA512_V1 }
+      required:
+        [
+          seedId,
+          serverSeedHash,
+          clientSeed,
+          nonce,
+          gameDomain,
+          algorithmVersion,
+        ]
+
+    CurrentSeed:
+      type: object
+      properties:
+        seedId: { $ref: "#/components/schemas/ObjectId" }
+        serverSeedHash: { type: string, pattern: "^[a-f0-9]{64}$" }
+        clientSeed: { type: string }
+        nonce: { type: integer, minimum: 0 }
+        algorithmVersion: { type: string }
+        createdAt: { type: string, format: date-time }
+      required:
+        [seedId, serverSeedHash, clientSeed, nonce, algorithmVersion, createdAt]
+
+    RevealedSeed:
+      type: object
+      properties:
+        seedId: { $ref: "#/components/schemas/ObjectId" }
+        serverSeed: { type: string, pattern: "^[a-f0-9]{64}$" }
+        serverSeedHash: { type: string, pattern: "^[a-f0-9]{64}$" }
+        clientSeed: { type: string }
+        finalNonce: { type: integer, minimum: 0 }
+        algorithmVersion: { type: string }
+        revealedAt: { type: string, format: date-time }
+      required:
+        [
+          seedId,
+          serverSeed,
+          serverSeedHash,
+          clientSeed,
+          finalNonce,
+          algorithmVersion,
+          revealedAt,
+        ]
+
+    RotateRequest:
+      type: object
+      properties:
+        clientSeed:
+          type: string
+          maxLength: 128
+          description: Elhagyás vagy üres érték esetén a szerver generál újat.
+
+    RotationResponse:
+      type: object
+      properties:
+        message: { type: string }
+        previousSeed: { $ref: "#/components/schemas/RevealedSeed" }
+        currentSeed: { $ref: "#/components/schemas/CurrentSeed" }
+      required: [message, previousSeed, currentSeed]
+
+    VerifyRequest:
+      type: object
+      properties:
+        historyId: { $ref: "#/components/schemas/ObjectId" }
+      required: [historyId]
+
+    SlotBet:
+      type: integer
+      enum: [1, 2, 5, 10, 20, 50, 100]
+
+    SlotRequest:
+      type: object
+      properties:
+        baseBet: { $ref: "#/components/schemas/SlotBet" }
+      required: [baseBet]
+
+    ExpandableSymbol:
+      type: string
+      enum: [TEN, JACK, QUEEN, KING, ACE, SCARAB, FALCON, ANUBIS, PHARAOH]
+
+    FeatureRequest:
+      type: object
+      properties:
+        baseBet: { $ref: "#/components/schemas/SlotBet" }
+        selectedSymbol: { $ref: "#/components/schemas/ExpandableSymbol" }
+      required: [baseBet, selectedSymbol]
+
+    RouletteBetType:
+      type: string
+      enum:
+        - STRAIGHT
+        - SPLIT
+        - TRIO
+        - STREET
+        - CORNER
+        - FIRST_FOUR
+        - SIX_LINE
+        - FIRST_DOZEN
+        - SECOND_DOZEN
+        - THIRD_DOZEN
+        - FIRST_COLUMN
+        - SECOND_COLUMN
+        - THIRD_COLUMN
+        - RED
+        - BLACK
+        - EVEN
+        - ODD
+        - LOW
+        - HIGH
+
+    RouletteBet:
+      type: object
+      properties:
+        type: { $ref: "#/components/schemas/RouletteBetType" }
+        amount: { type: integer, minimum: 1 }
+        numbers:
+          type: array
+          items: { type: integer, minimum: 0, maximum: 36 }
+          description: |
+            Belső fogadásnál kötelező.
+            A konfigurációban szereplő érvényes kombináció szükséges.
+            Külső fogadásnál elhagyható vagy üres.
+      required: [type, amount]
+
+    RouletteRequest:
+      type: object
+      properties:
+        bets:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/RouletteBet" }
+      required: [bets]
+
+    BaccaratBetType:
+      type: string
+      enum:
+        [
+          PLAYER,
+          BANKER,
+          TIE,
+          PLAYER_PAIR,
+          BANKER_PAIR,
+          EITHER_PAIR,
+          PERFECT_PAIR,
+        ]
+
+    BaccaratBet:
+      type: object
+      properties:
+        type: { $ref: "#/components/schemas/BaccaratBetType" }
+        amount: { type: integer, minimum: 1 }
+      required: [type, amount]
+
+    BaccaratRequest:
+      type: object
+      properties:
+        bets:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/BaccaratBet" }
+      required: [bets]
+
+    BlackjackAction:
+      type: string
+      enum: [HIT, STAND, DOUBLE_DOWN, SPLIT, INSURANCE, DECLINE_INSURANCE]
+
+    BlackjackStartRequest:
+      type: object
+      properties:
+        baseBet: { type: integer, minimum: 1, maximum: 1000 }
+        perfectPairsBet: { type: integer, minimum: 0, default: 0 }
+        twentyOnePlusThreeBet: { type: integer, minimum: 0, default: 0 }
+      required: [baseBet]
+
+    BlackjackActionRequest:
+      type: object
+      properties:
+        sessionId: { $ref: "#/components/schemas/ObjectId" }
+        expectedVersion:
+          type: integer
+          minimum: 0
+          description: A legutóbbi válasz version mezője.
+        action: { $ref: "#/components/schemas/BlackjackAction" }
+        insuranceAmount:
+          type: number
+          nullable: true
+          minimum: 0.5
+          multipleOf: 0.5
+          description: |
+            Csak Insurance esetén.
+            Elhagyás vagy null esetén az alaptét felével számol.
+            Nem haladhatja meg a konfiguráció szerinti maximumot.
+      required: [sessionId, expectedVersion, action]
+
+    BlackjackSession:
+      type: object
+      properties:
+        sessionId: { $ref: "#/components/schemas/ObjectId" }
+        version: { type: integer, minimum: 0 }
+        status: { type: string, enum: [ACTIVE, FINISHED] }
+        phase: { type: string, enum: [INSURANCE, PLAYER_TURN, FINISHED] }
+        activeHandIndex: { type: integer, nullable: true, minimum: 0 }
+        hands:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            description: Lapok, tét, állapot és kézérték.
+        dealerHand:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            description: Látható lapnál rank és suit, rejtettnél hidden=true.
+        cost: { $ref: "#/components/schemas/Money" }
+        insuranceBet: { $ref: "#/components/schemas/Money" }
+        sideBets: { type: object, additionalProperties: true }
+        availableActions:
+          type: array
+          items: { $ref: "#/components/schemas/BlackjackAction" }
+        result:
+          type: object
+          nullable: true
+          additionalProperties: true
+        provablyFair: { $ref: "#/components/schemas/FairData" }
+        historyId:
+          oneOf:
+            - { $ref: "#/components/schemas/ObjectId" }
+            - { $ref: "#/components/schemas/NullValue" }
+        balance: { $ref: "#/components/schemas/Money" }
+        replayed: { type: boolean }
+      required:
+        - sessionId
+        - version
+        - status
+        - phase
+        - activeHandIndex
+        - hands
+        - dealerHand
+        - cost
+        - insuranceBet
+        - sideBets
+        - availableActions
+        - result
+        - provablyFair
+        - historyId
+        - balance
+        - replayed
+
+    ActiveBlackjackResponse:
+      type: object
+      properties:
+        game:
+          oneOf:
+            - { $ref: "#/components/schemas/BlackjackSession" }
+            - { $ref: "#/components/schemas/NullValue" }
+      required: [game]
+
+    HistoryItem:
+      type: object
+      properties:
+        _id: { $ref: "#/components/schemas/ObjectId" }
+        gameType: { $ref: "#/components/schemas/GameType" }
+        gameMode: { $ref: "#/components/schemas/GameMode" }
+        createdAt: { type: string, format: date-time }
+        baseBet: { $ref: "#/components/schemas/Money" }
+        cost: { $ref: "#/components/schemas/Money" }
+        winAmount: { $ref: "#/components/schemas/Money" }
+        netResult: { $ref: "#/components/schemas/Money" }
+        balanceAfter: { $ref: "#/components/schemas/Money" }
+      required:
+        [
+          _id,
+          gameType,
+          gameMode,
+          createdAt,
+          baseBet,
+          cost,
+          winAmount,
+          netResult,
+          balanceAfter,
+        ]
+
+    HistoryResponse:
+      type: object
+      properties:
+        games:
+          type: array
+          items: { $ref: "#/components/schemas/HistoryItem" }
+        pagination:
+          type: object
+          properties:
+            page: { type: integer, minimum: 1 }
+            limit: { type: integer, minimum: 1, maximum: 50 }
+            total: { type: integer, minimum: 0 }
+            totalPages: { type: integer, minimum: 0 }
+          required: [page, limit, total, totalPages]
+      required: [games, pagination]
+
+    GameType:
+      type: string
+      enum: [SLOT, ROULETTE, BLACKJACK, BACCARAT]
+
+    GameMode:
+      type: string
+      enum: [BASE_GAME, BONUS_BUY, FEATURE_SPIN, STANDARD]
+
+    NullValue:
+      type: string
+      nullable: true
+      enum: [null]
+
+    GameResponse:
+      type: object
+      properties:
+        requestId: { type: string }
+        gameMode: { $ref: "#/components/schemas/GameMode" }
+        provablyFair: { $ref: "#/components/schemas/FairData" }
+        balanceBefore: { $ref: "#/components/schemas/Money" }
+        balanceAfter: { $ref: "#/components/schemas/Money" }
+        netResult: { $ref: "#/components/schemas/Money" }
+        historyId: { $ref: "#/components/schemas/ObjectId" }
+        replayed:
+          type: boolean
+          description: A korábban elszámolt kérés mentett válaszát jelzi.
+        result:
+          type: object
+          properties:
+            cost: { $ref: "#/components/schemas/Money" }
+            totalWin: { $ref: "#/components/schemas/Money" }
+          required: [cost, totalWin]
+          additionalProperties: true
+          description: A részletes eredmény szerkezete játékonként eltér.
+      required:
+        - requestId
+        - gameMode
+        - provablyFair
+        - balanceBefore
+        - balanceAfter
+        - netResult
+        - historyId
+        - replayed
+        - result
+
+    Config:
+      type: object
+      additionalProperties: true
+      description: |
+        Játékfüggő nyilvános konfiguráció.
+        Slot: allowedBets.
+        Rulett: allowedChipValues és maxTotalBetAmount.
+        Blackjack: allowedChipValues, minBet és maxBet.
+        Baccarat: chips és maxBet.
+
+    Verification:
+      type: object
+      properties:
+        verified: { type: boolean }
+        seedHashMatches: { type: boolean }
+        seedDetailsMatch: { type: boolean }
+        gameResultMatches: { type: boolean }
+        fingerprintMatches: { type: boolean }
+        settlementMatches: { type: boolean }
+        roundStateMatches: { type: boolean }
+        historyId: { $ref: "#/components/schemas/ObjectId" }
+        sessionId: { $ref: "#/components/schemas/ObjectId" }
+        gameType: { $ref: "#/components/schemas/GameType" }
+        gameMode: { $ref: "#/components/schemas/GameMode" }
+        configVersion: { type: string }
+        algorithmVersion: { type: string }
+      required:
+        [verified, seedHashMatches, seedDetailsMatch, historyId, gameType]
+      additionalProperties: true
+      description: |
+        Az ellenőrzési jelzők játékfüggők.
+        Slot: három ellenőrzés.
+        Rulett: öt ellenőrzés.
+        Blackjack: hat ellenőrzés.
+        A vizsgált Baccarat-forrás a gameresultMatches mezőnevet használja.

@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const connectDatabase = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const slotRoutes = require("./routes/slotRoutes");
+const userRoutes = require("./routes/userRoutes");
 const provablyFairRoutes = require("./routes/provablyFairRoutes");
 const rouletteRoutes = require("./routes/rouletteRoutes");
 const blackjackRoutes = require("./routes/blackjackRoutes");
@@ -37,6 +38,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/slot", slotRoutes);
 app.use("/api/provably-fair", provablyFairRoutes);
 app.use("/api/game-history", require("./routes/gameHistoryRoutes"));

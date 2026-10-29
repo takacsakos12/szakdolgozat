@@ -1,89 +1,38 @@
 flowchart LR
-    subgraph Client["Kliens – React alkalmazás"]
-        subgraph Pages["Oldalak"]
-            AuthPage["App.js és AuthPage.js"]
-            SlotPage["SlotPage.jsx"]
-            RoulettePage["RoulettePage.jsx"]
-            HistoryPage["GameHistoryPage.jsx"]
-        end
+    subgraph Client["Böngésző – React"]
+        direction TB
 
-        subgraph ClientAPIs["API-modulok"]
-            AuthAPI["`authApi.js
-Bejelentkezés, regisztráció,
-kijelentkezés és felhasználólekérés`"]
+        UI["Oldalak és játékfelületek"]
+        API["API-modulok és apiClient.js"]
 
-            SlotAPI["`slotApi.js
-Konfiguráció, Spin,
-Bonus Buy és Feature Spin`"]
-
-            RouletteAPI["`rouletteApi.js
-Konfiguráció és pörgetés`"]
-
-            HistoryAPI["`gameHistoryApi.js
-Lapozott játéktörténet lekérése`"]
-        end
-
-        APIClient["`apiClient.js
-Közös fetch, API-alapcím,
-cookie továbbítása és HTTP-hibakezelés`"]
-
-        AuthPage --> AuthAPI
-        SlotPage --> SlotAPI
-        RoulettePage --> RouletteAPI
-        HistoryPage --> HistoryAPI
-
-        AuthAPI --> APIClient
-        SlotAPI --> APIClient
-        RouletteAPI --> APIClient
-        HistoryAPI --> APIClient
-
-        SlotPage -.->|"Aktuális egyenleg lekérése"| AuthAPI
-        RoulettePage -.->|"Aktuális egyenleg lekérése"| AuthAPI
+        UI <--> API
     end
 
     subgraph Server["Szerver – Node.js és Express"]
-        Router["Express útválasztás"]
+        direction LR
 
-        subgraph Routes["API-végpontok"]
-            AuthRoutes["`/api/auth
-POST register, login, logout
-GET me`"]
+        Routes["API-útvonalak és hitelesítés"]
 
-            GameRoutes["`/api/slot és /api/roulette
-GET config
-POST játékműveletek`"]
+        subgraph Logic["Játéklogika és szolgáltatások"]
+            direction TB
 
-            FairRoutes["`/api/provably-fair
-GET current és revealed/:seedId
-POST rotate és verify`"]
+            Sessions["Elszámolás és körkezelés"]
+            Fair["Provably Fair és ellenőrzés"]
+            Engines["Játékmotorok"]
 
-            HistoryRoutes["`/api/game-history
-GET – page és limit paraméterekkel`"]
+            Sessions --> Fair
+            Sessions --> Engines
+            Fair --> Engines
         end
 
-        subgraph Logic["Játékkérés"]
-            GameLogic["Játékmotorok és közös elszámolás"]
-            FairLogic["Provably Fair és eredményellenőrzés"]
-        end
+        Models["Mongoose-modellek"]
 
-        Models["Mongoose adatmodellek"]
-
-        Router --> AuthRoutes
-        Router --> GameRoutes
-        Router --> FairRoutes
-        Router --> HistoryRoutes
-
-        GameRoutes -->|"Játékkérés"| GameLogic
-        GameLogic -->|"Véletlenszámok"| FairLogic
-        FairRoutes --> FairLogic
-
-        AuthRoutes --> Models
-        GameLogic --> Models
-        FairLogic --> Models
-        HistoryRoutes --> Models
+        Routes --> Logic
+        Routes --> Models
+        Logic --> Models
     end
 
-    DB[("MongoDB adatbázis")]
+    DB[("MongoDB")]
 
-    APIClient <-->|"HTTP-kérések és JSON-válaszok"| Router
-    Models <--> DB
+    API <-->|"HTTP és JSON"| Routes
+    Models <--> DB  
