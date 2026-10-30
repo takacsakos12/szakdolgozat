@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.2",
+  "mode": "feature-spin",
+  "selectedSymbol": "ACE",
+  "seed": "feature-retuned-1",
+  "roundCount": 1000000,
+  "baseBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9594774.5,
+  "rtpPercent": 95.947745,
+  "hitRatePercent": 59.704,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 1,
+  "winsAtLeast100x": 20040,
+  "winsAtLeast500x": 141,
+  "winsAtLeast1000x": 44,
+  "winsAtLeast2000x": 12,
+  "standardDeviation": 2.846103670063323,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 84.865
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 91.416
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.0719
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 95.947745
+    }
+  ],
+  "createdAt": "2026-10-30T10:51:52.547Z"
+}

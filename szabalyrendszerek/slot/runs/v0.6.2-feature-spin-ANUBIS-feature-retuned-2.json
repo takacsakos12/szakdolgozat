@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.2",
+  "mode": "feature-spin",
+  "selectedSymbol": "ANUBIS",
+  "seed": "feature-retuned-2",
+  "roundCount": 1000000,
+  "baseBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9669354,
+  "rtpPercent": 96.69354,
+  "hitRatePercent": 54.0646,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 3,
+  "winsAtLeast100x": 13437,
+  "winsAtLeast500x": 678,
+  "winsAtLeast1000x": 491,
+  "winsAtLeast2000x": 461,
+  "standardDeviation": 6.004489331002091,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 101.49
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 102.9565
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 96.9451
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 96.69354
+    }
+  ],
+  "createdAt": "2026-10-30T10:55:15.549Z"
+}

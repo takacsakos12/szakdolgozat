@@ -23,12 +23,12 @@ function HomePage() {
               Játékok megtekintése
             </Link>
 
-            <a
+            <Link
               className="button button-secondary button-large"
-              href="#statistics"
+              to="/statistics"
             >
               Elemzések megtekintése
-            </a>
+            </Link>
           </div>
 
           <div className="author-information">
@@ -100,10 +100,10 @@ function HomePage() {
             összehasonlítása.
           </p>
 
-          <button className="text-button" type="button">
+          <Link className="text-button" to="/statistics">
             <span>Statisztikák megtekintése</span>
             <span aria-hidden="true">→</span>
-          </button>
+          </Link>
         </article>
 
         <article className="information-card" id="provably-fair">
@@ -121,10 +121,10 @@ function HomePage() {
             előállítása.
           </p>
 
-          <button className="text-button" type="button">
+          <Link className="text-button" to="/provably-fair">
             <span>Működés megismerése</span>
             <span aria-hidden="true">→</span>
-          </button>
+          </Link>
         </article>
       </section>
     </main>

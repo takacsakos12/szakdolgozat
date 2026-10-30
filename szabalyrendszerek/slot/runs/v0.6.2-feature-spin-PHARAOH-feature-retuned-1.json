@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.2",
+  "mode": "feature-spin",
+  "selectedSymbol": "PHARAOH",
+  "seed": "feature-retuned-1",
+  "roundCount": 1000000,
+  "baseBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9677344,
+  "rtpPercent": 96.77344,
+  "hitRatePercent": 48.159400000000005,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 81,
+  "winsAtLeast100x": 37551,
+  "winsAtLeast500x": 2886,
+  "winsAtLeast1000x": 2781,
+  "winsAtLeast2000x": 85,
+  "standardDeviation": 7.304940054046057,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 113.79999999999998
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 99.58
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 96.1707
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 96.77344
+    }
+  ],
+  "createdAt": "2026-10-30T10:52:37.674Z"
+}

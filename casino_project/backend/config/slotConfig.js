@@ -1,4 +1,4 @@
-const CONFIG_VERSION = "0.6.1";
+const CONFIG_VERSION = "0.6.2";
 
 const ROW_COUNT = 3;
 const REEL_COUNT = 5;
@@ -73,18 +73,18 @@ const BONUS_TARGET_COUNTS = {
 };
 
 const FEATURE_SPIN_TARGET_COUNTS = {
-  TEN: [110, 110, 110, 110, 110],
-  JACK: [113, 113, 113, 113, 113],
-  QUEEN: [110, 111, 110, 111, 111],
+  TEN: [107, 108, 107, 107, 106],
+  JACK: [107, 107, 108, 107, 107],
+  QUEEN: [105, 106, 105, 107, 105],
 
-  KING: [93, 94, 94, 93, 92],
-  ACE: [97, 97, 97, 97, 97],
+  KING: [89, 89, 90, 88, 87],
+  ACE: [93, 93, 93, 93, 93],
 
-  SCARAB: [55, 54, 54, 55, 55],
-  FALCON: [56, 57, 57, 56, 56],
+  SCARAB: [52, 52, 52, 53, 53],
+  FALCON: [53, 54, 54, 55, 53],
 
-  ANUBIS: [41, 41, 41, 40, 41],
-  PHARAOH: [39, 39, 40, 39, 8],
+  ANUBIS: [39, 39, 40, 39, 38],
+  PHARAOH: [37, 37, 40, 37, 8],
 };
 
 const PAYLINES = [

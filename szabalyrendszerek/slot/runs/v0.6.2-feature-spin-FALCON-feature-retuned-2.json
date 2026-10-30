@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.2",
+  "mode": "feature-spin",
+  "selectedSymbol": "FALCON",
+  "seed": "feature-retuned-2",
+  "roundCount": 1000000,
+  "baseBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9656152.5,
+  "rtpPercent": 96.561525,
+  "hitRatePercent": 61.7718,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 1,
+  "winsAtLeast100x": 25879,
+  "winsAtLeast500x": 1679,
+  "winsAtLeast1000x": 45,
+  "winsAtLeast2000x": 8,
+  "standardDeviation": 3.814807510114206,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 111.29500000000002
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 93.455
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.91135
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 96.561525
+    }
+  ],
+  "createdAt": "2026-10-30T10:55:04.385Z"
+}

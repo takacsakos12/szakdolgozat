@@ -18,7 +18,11 @@ const {
   PAYLINES,
 } = require("../config/slotConfig");
 
-const { spin, featureSpin, buyBookBonus } = require("../services/slot/slotEngine");
+const {
+  spin,
+  featureSpin,
+  buyBookBonus,
+} = require("../services/slot/slotEngine");
 
 const router = express.Router();
 
@@ -147,11 +151,15 @@ router.post("/spin", protectRoute, async (req, res) => {
       const slotDetails = {
         bonusTriggered: result.bonusTriggered,
         bonusSource: result.bonusTriggered ? "NATURAL" : null,
+
         baseGameWin: result.baseGameWin,
-        totalFreeSpins: result.bonus?.totalFreeSpins || 0,
-        retriggerCount: result.bonus?.retriggerCount || 0,
-        expandingSymbol: result.bonus?.expandingSymbol || null,
         bonusWin: result.bonusWin,
+
+        totalFreeSpins: result.bonus?.totalFreeSpins ?? 0,
+        retriggerCount: result.bonus?.retriggerCount ?? 0,
+
+        // Itt a játékos által kiválasztott Feature Spin szimbóluma marad.
+        expandingSymbol: result.expandingSymbol,
       };
 
       return {
@@ -183,7 +191,7 @@ router.post("/bonus-buy", protectRoute, async (req, res) => {
     gameDomain: "SLOT:BONUS_BUY",
     requestData: {},
 
-    createGameResult: ({randomFloat: random}) => {
+    createGameResult: ({ randomFloat: random }) => {
       const result = buyBookBonus({
         baseBet,
         random,

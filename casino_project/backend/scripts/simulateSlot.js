@@ -3,7 +3,11 @@ const path = require("path");
 
 const slotConfig = require("../config/slotConfig");
 
-const { spin, featureSpin, buyBookBonus } = require("../services/slotEngine");
+const {
+  spin,
+  featureSpin,
+  buyBookBonus,
+} = require("../services/slot/slotEngine");
 
 const MODES = {
   BASE: "base-book",

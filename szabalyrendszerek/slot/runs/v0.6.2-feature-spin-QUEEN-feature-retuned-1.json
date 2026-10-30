@@ -1,0 +1,38 @@
+{
+  "configVersion": "0.6.2",
+  "mode": "feature-spin",
+  "selectedSymbol": "QUEEN",
+  "seed": "feature-retuned-1",
+  "roundCount": 1000000,
+  "baseBet": 1,
+  "totalWager": 10000000,
+  "totalWin": 9623892,
+  "rtpPercent": 96.23892,
+  "hitRatePercent": 66.2013,
+  "maximumWinMultiplier": 5000,
+  "maxWinHits": 2,
+  "winsAtLeast100x": 31190,
+  "winsAtLeast500x": 142,
+  "winsAtLeast1000x": 51,
+  "winsAtLeast2000x": 8,
+  "standardDeviation": 2.554591914311016,
+  "convergence": [
+    {
+      "rounds": 1000,
+      "rtpPercent": 86.055
+    },
+    {
+      "rounds": 10000,
+      "rtpPercent": 97.474
+    },
+    {
+      "rounds": 100000,
+      "rtpPercent": 95.14035
+    },
+    {
+      "rounds": 1000000,
+      "rtpPercent": 96.23892
+    }
+  ],
+  "createdAt": "2026-10-30T10:51:30.503Z"
+}

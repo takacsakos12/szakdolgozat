@@ -359,11 +359,9 @@ function featureSpin({
   validateSelectedSymbol(selectedSymbol);
 
   const featureCost = baseBet * FEATURE_SPIN_COST_MULTIPLIER;
-
   const maximumWinAmount = baseBet * MAX_WIN_MULTIPLIER;
 
   const expandingSymbol = selectedSymbol;
-
   const reelStrips = FEATURE_SPIN_REEL_STRIPS_BY_SYMBOL[expandingSymbol];
 
   const originalGrid = generateGrid(random, reelStrips);
@@ -374,9 +372,26 @@ function featureSpin({
     baseBet,
   });
 
+  // A Feature Spin nyereménye is beleszámít az 5000× korlátba.
   const uncappedWin = evaluated.totalWin;
+  const baseGameWin = Math.min(uncappedWin, maximumWinAmount);
 
-  const totalWin = Math.min(uncappedWin, maximumWinAmount);
+  // A BOOK-ok számát a bővítés előtti rácsból kapjuk.
+  const bonusTriggered =
+    evaluated.scatterCount >= BOOK_BONUS.triggerScatterCount;
+
+  // A bónusz saját, véletlen bővülő szimbólumot kap.
+  const bonus = bonusTriggered
+    ? playBookBonus({
+        baseBet,
+        random,
+        maxWinAmount: maximumWinAmount - baseGameWin,
+        useFeatureReels: true,
+      })
+    : null;
+
+  const bonusWin = bonus?.totalWin ?? 0;
+  const totalWin = baseGameWin + bonusWin;
 
   return {
     baseBet,
@@ -386,10 +401,15 @@ function featureSpin({
 
     ...evaluated,
 
-    totalWin,
+    baseGameWin,
     uncappedWin,
-    maximumWinAmount,
 
+    bonusTriggered,
+    bonus,
+    bonusWin,
+
+    totalWin,
+    maximumWinAmount,
     maxWinReached: totalWin >= maximumWinAmount,
   };
 }

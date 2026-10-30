@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import SlotPage from "./pages/SlotPage";
 import "./App.css";
 import AuthPage from "./AuthPage";
@@ -15,10 +15,21 @@ import BaccaraPage from "./pages/BaccaratPage";
 import ProvablyFairPage from "./pages/ProvablyFairPage";
 import GamesPage from "./pages/GamesPage";
 import ProfilePage from "./pages/ProfilePage";
+import StatisticsPage from "./pages/StatisticsPage";
 
 function App() {
   const [user, setUser] = useState(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname]);
 
   useEffect(() => {
     async function checkCurrentUser() {
@@ -103,6 +114,7 @@ function App() {
             />
           }
         />
+        <Route path="/statistics" element={<StatisticsPage user={user} />} />
       </Routes>
 
       <Footer />
