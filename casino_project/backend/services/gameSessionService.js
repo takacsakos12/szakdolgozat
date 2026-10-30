@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const GameHistory = require("../models/GameHistory");
+const BlackjackSession = require("../models/BlackjackSession");
 const {
   getOrCreateActiveSeed,
   reserveNonce,
@@ -172,6 +173,18 @@ async function settleGameResult({
 
         settlement = toSettlement(existingHistory, true);
         return;
+      }
+
+      const blackjackRequest = await BlackjackSession.exists({
+        userId,
+        requestId: normalizedRequestId,
+      }).session(session);
+
+      if (blackjackRequest) {
+        throw createRequestError(
+          "A kérésazonosítót már egy blackjackkör indításához használták.",
+          409,
+        );
       }
 
       const fairSeed = await reserveNonce({

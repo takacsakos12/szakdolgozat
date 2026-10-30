@@ -20,6 +20,8 @@ import StatisticsPage from "./pages/StatisticsPage";
 function App() {
   const [user, setUser] = useState(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [sessionError, setSessionError] = useState("");
+  const [sessionCheckAttempt, setSessionCheckAttempt] = useState(0);
 
   const { pathname } = useLocation();
 
@@ -32,19 +34,43 @@ function App() {
   }, [pathname]);
 
   useEffect(() => {
+    let active = true;
+
+    setIsCheckingSession(true);
+    setSessionError("");
+
     async function checkCurrentUser() {
       try {
         const response = await getCurrentUser();
-        setUser(response.user);
-      } catch {
-        setUser(null);
+
+        if (active) {
+          setUser(response.user);
+        }
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        if (error.statusCode === 401) {
+          setUser(null);
+        } else {
+          setSessionError(
+            "A munkamenetet nem sikerült ellenőrizni. Ellenőrizd a kapcsolatot, majd próbáld újra.",
+          );
+        }
       } finally {
-        setIsCheckingSession(false);
+        if (active) {
+          setIsCheckingSession(false);
+        }
       }
     }
 
     checkCurrentUser();
-  }, []);
+
+    return () => {
+      active = false;
+    };
+  }, [sessionCheckAttempt]);
 
   async function handleLogout() {
     try {
@@ -55,8 +81,38 @@ function App() {
     }
   }
 
+  function handleRetrySession() {
+    setIsCheckingSession(true);
+    setSessionError("");
+    setSessionCheckAttempt((current) => current + 1);
+  }
+
   if (isCheckingSession) {
-    return <div className="session-loading">Munkamenet ellenőrzése...</div>;
+    return (
+      <div className="session-loading" role="status">
+        Munkamenet ellenőrzése…
+      </div>
+    );
+  }
+
+  if (sessionError) {
+    return (
+      <main className="session-loading">
+        <div>
+          <h1>Kapcsolódási hiba</h1>
+
+          <p role="alert">{sessionError}</p>
+
+          <button
+            className="button button-primary"
+            type="button"
+            onClick={handleRetrySession}
+          >
+            Újrapróbálás
+          </button>
+        </div>
+      </main>
+    );
   }
 
   return (

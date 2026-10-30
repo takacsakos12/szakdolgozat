@@ -40,6 +40,14 @@ function objectsMatch(first, second) {
   );
 }
 
+function amountsMatch(first, second) {
+  return (
+    Number.isFinite(first) &&
+    Number.isFinite(second) &&
+    Math.abs(first - second) < 1e-8
+  );
+}
+
 async function verifyBlackjackGameResult({ userId, historyId }) {
   const history = await GameHistory.findOne({
     _id: historyId,
@@ -180,11 +188,18 @@ async function verifyBlackjackGameResult({ userId, historyId }) {
   const gameResultMatches = objectsMatch(recreatedResult, history.result);
 
   const settlementMatches =
-    history.baseBet === baseBet &&
-    history.cost === recreatedResult.cost &&
-    history.winAmount === recreatedResult.totalWin &&
-    history.netResult === recreatedResult.netResult &&
-    history.balanceBefore + history.netResult === history.balanceAfter;
+    amountsMatch(history.baseBet, baseBet) &&
+    amountsMatch(history.cost, recreatedResult.cost) &&
+    amountsMatch(history.winAmount, recreatedResult.totalWin) &&
+    amountsMatch(history.netResult, recreatedResult.netResult) &&
+    amountsMatch(history.netResult, history.winAmount - history.cost) &&
+    amountsMatch(history.balanceBefore, game.balanceBefore);
+
+  const balanceSnapshotsValid =
+    Number.isFinite(history.balanceBefore) &&
+    history.balanceBefore >= 0 &&
+    Number.isFinite(history.balanceAfter) &&
+    history.balanceAfter >= 0;
 
   return {
     verified:
@@ -193,7 +208,8 @@ async function verifyBlackjackGameResult({ userId, historyId }) {
       fingerprintMatches &&
       roundStateMatches &&
       gameResultMatches &&
-      settlementMatches,
+      settlementMatches &&
+      balanceSnapshotsValid,
 
     seedHashMatches,
     seedDetailsMatch,
@@ -201,6 +217,9 @@ async function verifyBlackjackGameResult({ userId, historyId }) {
     roundStateMatches,
     gameResultMatches,
     settlementMatches,
+    balanceSnapshotsValid,
+
+    balanceCheckMode: "ROUND_TOTALS_ONLY",
 
     historyId: history._id,
     sessionId: game._id,
@@ -211,6 +230,4 @@ async function verifyBlackjackGameResult({ userId, historyId }) {
   };
 }
 
-module.exports = {
-  verifyBlackjackGameResult,
-};
+module.exports = { verifyBlackjackGameResult };

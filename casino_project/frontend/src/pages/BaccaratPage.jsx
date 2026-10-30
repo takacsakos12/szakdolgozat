@@ -263,6 +263,7 @@ function BaccaratPage({ user, onUserChange }) {
         response = await playBaccarat(request.bets, request.requestId);
       } catch (error) {
         const uncertainOutcome =
+          error.outcomeUnknown === true ||
           error.code === "NETWORK_ERROR" ||
           error.statusCode === 408 ||
           error.statusCode >= 500;

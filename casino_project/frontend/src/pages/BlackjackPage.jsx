@@ -37,6 +37,69 @@ function wait(milliseconds) {
   });
 }
 
+function validateBlackjackBets(bets, config, allowIncomplete = false) {
+  const fields = [
+    {
+      amount: bets.baseBet,
+      label: "Alaptét",
+      min: config.minBet,
+      max: config.maxBet,
+      enabled: true,
+      optional: false,
+    },
+    {
+      amount: bets.perfectPairsBet,
+      label: "Perfect Pairs",
+      ...config.sideBets.PERFECT_PAIRS,
+      optional: true,
+    },
+    {
+      amount: bets.twentyOnePlusThreeBet,
+      label: "21+3",
+      ...config.sideBets.TWENTY_ONE_PLUS_THREE,
+      optional: true,
+    },
+  ];
+
+  for (const field of fields) {
+    const { amount, label, optional, enabled } = field;
+
+    const min = optional ? field.minBet : field.min;
+    const max = optional ? field.maxBet : field.max;
+
+    if (!Number.isSafeInteger(amount) || amount < 0) {
+      return `${label}: nemnegatív egész összeg szükséges.`;
+    }
+
+    // A kihagyott mellékfogadás szabályos.
+    if (optional && amount === 0) {
+      continue;
+    }
+
+    if (!enabled) {
+      return `${label}: ez a mellékfogadás nem elérhető.`;
+    }
+
+    if (amount > max) {
+      return `${label}: a maximum ${max} CR.`;
+    }
+
+    // Zsetonelhelyezés közben még épülhet a minimumtét.
+    if (!allowIncomplete && amount < min) {
+      return `${label}: a minimum ${min} CR.`;
+    }
+  }
+
+  const total =
+    bets.baseBet + bets.perfectPairsBet + bets.twentyOnePlusThreeBet;
+
+  if (!Number.isSafeInteger(total)) {
+    return "A teljes tét összege érvénytelen.";
+  }
+
+  return null;
+}
+
 function BlackjackPage({ user, onUserChange }) {
   const [blackjackConfig, setBlackjackConfig] = useState(null);
   const [game, setGame] = useState(null);
@@ -333,27 +396,59 @@ function BlackjackPage({ user, onUserChange }) {
     }
 
     const betFields = {
-      BASE_BET: [baseBet, setBaseBet],
-      PERFECT_PAIRS: [perfectPairsBet, setPerfectPairsBet],
-      TWENTY_ONE_PLUS_THREE: [twentyOnePlusThreeBet, setTwentyOnePlusThreeBet],
+      BASE_BET: {
+        field: "baseBet",
+        amount: baseBet,
+        setAmount: setBaseBet,
+      },
+      PERFECT_PAIRS: {
+        field: "perfectPairsBet",
+        amount: perfectPairsBet,
+        setAmount: setPerfectPairsBet,
+      },
+      TWENTY_ONE_PLUS_THREE: {
+        field: "twentyOnePlusThreeBet",
+        amount: twentyOnePlusThreeBet,
+        setAmount: setTwentyOnePlusThreeBet,
+      },
     };
 
-    const [amount, setAmount] = betFields[bet.type];
+    const selected = betFields[bet.type];
 
-    if (
-      bet.type === "BASE_BET" &&
-      amount + selectedChip > blackjackConfig.maxBet
-    ) {
-      setErrorMessage(`A maximális alaptét ${blackjackConfig.maxBet} CR.`);
+    if (!selected) {
       return;
     }
 
-    if (totalBetAmount + selectedChip > user.balance) {
+    const nextBets = {
+      baseBet,
+      perfectPairsBet,
+      twentyOnePlusThreeBet,
+
+      [selected.field]: selected.amount + selectedChip,
+    };
+
+    const validationError = validateBlackjackBets(
+      nextBets,
+      blackjackConfig,
+      true,
+    );
+
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
+
+    const nextTotal =
+      nextBets.baseBet +
+      nextBets.perfectPairsBet +
+      nextBets.twentyOnePlusThreeBet;
+
+    if (nextTotal > user.balance) {
       setErrorMessage("Nincs elegendő egyenleg.");
       return;
     }
 
-    setAmount((currentAmount) => currentAmount + selectedChip);
+    selected.setAmount((amount) => amount + selectedChip);
 
     setBetHistory((history) => [
       ...history,
@@ -390,13 +485,13 @@ function BlackjackPage({ user, onUserChange }) {
       return;
     }
 
-    if (
-      previousBets.baseBet < blackjackConfig.minBet ||
-      previousBets.baseBet > blackjackConfig.maxBet
-    ) {
-      setErrorMessage(
-        "Az előző alaptét nem fér bele az aktuális téthatárokba.",
-      );
+    const validationError = validateBlackjackBets(
+      previousBets,
+      blackjackConfig,
+    );
+
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -442,6 +537,41 @@ function BlackjackPage({ user, onUserChange }) {
     }
   }
 
+  async function refreshBlackjackSession(message) {
+    // Sikertelen lekérésnél az újrapróbálás csak állapotot kér le.
+    setPendingAction({ type: "SYNC" });
+
+    try {
+      const [response, currentUserResponse] = await Promise.all([
+        getActiveBlackjackSession(),
+        getCurrentUser(),
+      ]);
+
+      setGame(response.game ?? null);
+      setPlaybackGame(null);
+
+      setBaseBet(0);
+      setPerfectPairsBet(0);
+      setTwentyOnePlusThreeBet(0);
+      setBetHistory([]);
+
+      onUserChange(currentUserResponse.user);
+
+      setPendingAction(null);
+      setErrorMessage(message);
+    } catch (error) {
+      if (error.statusCode === 401) {
+        onUserChange(null);
+        setPendingAction(null);
+        return;
+      }
+
+      setErrorMessage(
+        "Az aktuális kört nem sikerült visszatölteni. Az Újrapróbálás gombbal ismét lekérheted.",
+      );
+    }
+  }
+
   async function executeRequest(request) {
     if (isSubmittingRef.current) {
       return;
@@ -454,6 +584,13 @@ function BlackjackPage({ user, onUserChange }) {
     setErrorMessage("");
 
     try {
+      if (request.type === "SYNC") {
+        await refreshBlackjackSession(
+          "Az aktuális játékállapotot betöltöttük.",
+        );
+
+        return;
+      }
       let response;
 
       try {
@@ -463,12 +600,17 @@ function BlackjackPage({ user, onUserChange }) {
             : await performBlackjackAction(request.data, request.requestId);
       } catch (error) {
         const uncertainOutcome =
+          error.outcomeUnknown === true ||
           error.code === "NETWORK_ERROR" ||
           error.statusCode === 408 ||
           error.statusCode >= 500;
 
         if (uncertainOutcome) {
           setErrorMessage(`${error.message} Próbáld újra ugyanazt a kérést.`);
+        } else if (error.statusCode === 409) {
+          await refreshBlackjackSession(
+            `${error.message} Az aktuális játékállapotot betöltöttük.`,
+          );
         } else {
           setPendingAction(null);
           setErrorMessage(error.message);
@@ -518,24 +660,17 @@ function BlackjackPage({ user, onUserChange }) {
       return;
     }
 
-    if (
-      !Number.isSafeInteger(baseBet) ||
-      baseBet < blackjackConfig.minBet ||
-      baseBet > blackjackConfig.maxBet
-    ) {
-      setErrorMessage(
-        `A tétnek ${blackjackConfig.minBet} és ${blackjackConfig.maxBet} között kell lennie.`,
-      );
-      return;
-    }
+    const validationError = validateBlackjackBets(
+      {
+        baseBet,
+        perfectPairsBet,
+        twentyOnePlusThreeBet,
+      },
+      blackjackConfig,
+    );
 
-    if (
-      ![perfectPairsBet, twentyOnePlusThreeBet].every(
-        (amount) => Number.isSafeInteger(amount) && amount >= 0,
-      ) ||
-      !Number.isSafeInteger(totalBetAmount)
-    ) {
-      setErrorMessage("A mellékfogadások nemnegatív egész összegek legyenek.");
+    if (validationError) {
+      setErrorMessage(validationError);
       return;
     }
 
@@ -657,12 +792,14 @@ function BlackjackPage({ user, onUserChange }) {
                     onClick={pendingAction ? handleRetry : handleStartGame}
                   >
                     {isSubmitting
-                      ? "Küldés..."
-                      : pendingAction
-                        ? "Újrapróbálás"
-                        : hasActiveGame
-                          ? "Folyamatban"
-                          : "Osztás"}
+                      ? "Feldolgozás..."
+                      : pendingAction?.type === "SYNC"
+                        ? "Állapot frissítése"
+                        : pendingAction
+                          ? "Újrapróbálás"
+                          : hasActiveGame
+                            ? "Folyamatban"
+                            : "Osztás"}
                   </button>
 
                   <button

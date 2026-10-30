@@ -2,16 +2,44 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 async function protectRoute(req, res, next) {
-  try {
-    const token = req.cookies.token;
+  const token = req.cookies?.token;
 
-    if (!token) {
+  if (!token) {
+    return res.status(401).json({
+      message: "A művelethez bejelentkezés szükséges.",
+    });
+  }
+
+  let decodedToken;
+
+  try {
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    if (
+      error instanceof jwt.JsonWebTokenError ||
+      error instanceof jwt.TokenExpiredError ||
+      error instanceof jwt.NotBeforeError
+    ) {
       return res.status(401).json({
-        message: "A művelethez bejelentkezés szükséges.",
+        message: "Érvénytelen vagy lejárt bejelentkezés.",
       });
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    return next(error);
+  }
+
+  if (
+    !decodedToken ||
+    typeof decodedToken !== "object" ||
+    typeof decodedToken.userId !== "string" ||
+    !/^[a-f0-9]{24}$/i.test(decodedToken.userId)
+  ) {
+    return res.status(401).json({
+      message: "Érvénytelen bejelentkezési adatok.",
+    });
+  }
+
+  try {
     const user = await User.findById(decodedToken.userId);
 
     if (!user) {
@@ -27,12 +55,12 @@ async function protectRoute(req, res, next) {
     }
 
     req.user = user;
-    return next();
-  } catch {
-    return res.status(401).json({
-      message: "Érvénytelen vagy lejárt bejelentkezés.",
-    });
+  } catch (error) {
+    // Az adatbázishiba nem jelent érvénytelen bejelentkezést.
+    return next(error);
   }
+
+  return next();
 }
 
 module.exports = protectRoute;

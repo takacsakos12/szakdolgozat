@@ -240,7 +240,10 @@ function SlotPage({ user, onUserChange }) {
         }
       } catch (error) {
         const uncertainOutcome =
-          error.code === "NETWORK_ERROR" || error.statusCode >= 500;
+          error.outcomeUnknown === true ||
+          error.code === "NETWORK_ERROR" ||
+          error.statusCode === 408 ||
+          error.statusCode >= 500;
 
         if (uncertainOutcome) {
           setPendingRequest({ mode, request });
@@ -386,7 +389,6 @@ function SlotPage({ user, onUserChange }) {
   const featureCostMultiplier = slotConfig?.featureSpin?.costMultiplier;
 
   const selectableSymbols = slotConfig?.featureSpin?.selectableSymbols || [];
-
 
   const controlsDisabled =
     isSpinning || isLoadingConfig || !slotConfig || Boolean(pendingRequest);

@@ -158,8 +158,8 @@ router.post("/spin", protectRoute, async (req, res) => {
         totalFreeSpins: result.bonus?.totalFreeSpins ?? 0,
         retriggerCount: result.bonus?.retriggerCount ?? 0,
 
-        // Itt a játékos által kiválasztott Feature Spin szimbóluma marad.
-        expandingSymbol: result.expandingSymbol,
+        // Alapjátékban csak a kiváltott bónusznak van bővülő szimbóluma.
+        expandingSymbol: result.bonus?.expandingSymbol ?? null,
       };
 
       return {
@@ -257,13 +257,15 @@ router.post("/feature-spin", protectRoute, async (req, res) => {
       });
 
       const slotDetails = {
-        bonusTriggered: false,
-        bonusSource: null,
-        baseGameWin: 0,
-        totalFreeSpins: 0,
-        retriggerCount: 0,
+        bonusTriggered: result.bonusTriggered,
+        bonusSource: result.bonusTriggered ? "NATURAL" : null,
+
+        baseGameWin: result.baseGameWin,
+        bonusWin: result.bonusWin,
+
+        totalFreeSpins: result.bonus?.totalFreeSpins ?? 0,
+        retriggerCount: result.bonus?.retriggerCount ?? 0,
         expandingSymbol: result.expandingSymbol,
-        bonusWin: 0,
       };
 
       return {
